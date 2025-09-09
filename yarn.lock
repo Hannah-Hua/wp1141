@@ -121,9 +121,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"myweb-js@workspace:.":
+"myweb-ts@workspace:.":
   version: 0.0.0-use.local
-  resolution: "myweb-js@workspace:."
+  resolution: "myweb-ts@workspace:."
   dependencies:
     "@types/node": "npm:^24.3.1"
     ts-node: "npm:^10.9.2"

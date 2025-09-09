@@ -11,14 +11,14 @@ const RAW_RUNTIME_STATE =
   ],\
   "dependencyTreeRoots": [\
     {\
-      "name": "myweb-js",\
+      "name": "myweb-ts",\
       "reference": "workspace:."\
     }\
   ],\
   "enableTopLevelFallback": true,\
   "ignorePatternData": "(^(?:\\\\.yarn\\\\/sdks(?:\\\\/(?!\\\\.{1,2}(?:\\\\/|$))(?:(?:(?!(?:^|\\\\/)\\\\.{1,2}(?:\\\\/|$)).)*?)|$))$)",\
   "fallbackExclusionList": [\
-    ["myweb-js", ["workspace:."]]\
+    ["myweb-ts", ["workspace:."]]\
   ],\
   "fallbackPool": [\
   ],\
@@ -28,7 +28,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./",\
         "packageDependencies": [\
           ["@types/node", "npm:24.3.1"],\
-          ["ts-node", "virtual:d7cc6894f28807df80b80589b5181388c878cf21784ecca50734ee8284319260bdcc61d131ff2c121bdcd71b5d3d136789bda20352b5c1299375eca9d3cce0af#npm:10.9.2"],\
+          ["ts-node", "virtual:c0daa82254a160c80b661c77f973c53495cb1814a5072711ad5759473ca532ad016810999afbe9ac0aa3553a617a974fecc26c454604928308c174dbfef5b1d4#npm:10.9.2"],\
           ["typescript", "patch:typescript@npm%3A5.9.2#optional!builtin<compat/typescript>::version=5.9.2&hash=5786d5"]\
         ],\
         "linkType": "SOFT"\
@@ -174,13 +174,13 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
-    ["myweb-js", [\
+    ["myweb-ts", [\
       ["workspace:.", {\
         "packageLocation": "./",\
         "packageDependencies": [\
-          ["myweb-js", "workspace:."],\
+          ["myweb-ts", "workspace:."],\
           ["@types/node", "npm:24.3.1"],\
-          ["ts-node", "virtual:d7cc6894f28807df80b80589b5181388c878cf21784ecca50734ee8284319260bdcc61d131ff2c121bdcd71b5d3d136789bda20352b5c1299375eca9d3cce0af#npm:10.9.2"],\
+          ["ts-node", "virtual:c0daa82254a160c80b661c77f973c53495cb1814a5072711ad5759473ca532ad016810999afbe9ac0aa3553a617a974fecc26c454604928308c174dbfef5b1d4#npm:10.9.2"],\
           ["typescript", "patch:typescript@npm%3A5.9.2#optional!builtin<compat/typescript>::version=5.9.2&hash=5786d5"]\
         ],\
         "linkType": "SOFT"\
@@ -194,10 +194,10 @@ const RAW_RUNTIME_STATE =
         ],\
         "linkType": "SOFT"\
       }],\
-      ["virtual:d7cc6894f28807df80b80589b5181388c878cf21784ecca50734ee8284319260bdcc61d131ff2c121bdcd71b5d3d136789bda20352b5c1299375eca9d3cce0af#npm:10.9.2", {\
-        "packageLocation": "./.yarn/__virtual__/ts-node-virtual-9c88535ff9/2/.yarn/berry/cache/ts-node-npm-10.9.2-3f3890b9ac-10c0.zip/node_modules/ts-node/",\
+      ["virtual:c0daa82254a160c80b661c77f973c53495cb1814a5072711ad5759473ca532ad016810999afbe9ac0aa3553a617a974fecc26c454604928308c174dbfef5b1d4#npm:10.9.2", {\
+        "packageLocation": "./.yarn/__virtual__/ts-node-virtual-d811f08a05/2/.yarn/berry/cache/ts-node-npm-10.9.2-3f3890b9ac-10c0.zip/node_modules/ts-node/",\
         "packageDependencies": [\
-          ["ts-node", "virtual:d7cc6894f28807df80b80589b5181388c878cf21784ecca50734ee8284319260bdcc61d131ff2c121bdcd71b5d3d136789bda20352b5c1299375eca9d3cce0af#npm:10.9.2"],\
+          ["ts-node", "virtual:c0daa82254a160c80b661c77f973c53495cb1814a5072711ad5759473ca532ad016810999afbe9ac0aa3553a617a974fecc26c454604928308c174dbfef5b1d4#npm:10.9.2"],\
           ["@cspotcode/source-map-support", "npm:0.8.1"],\
           ["@swc/core", null],\
           ["@swc/wasm", null],\

@@ -1,6 +1,6 @@
-# Hannah 個人網站
+# Hannah 個人網站 (TypeScript)
 
-這是一個使用純 HTML、CSS 和 TypeScript 建立的個人網站，不依賴任何前端框架。
+這是一個使用純 HTML、CSS 和 TypeScript 建立的個人網站，不依賴任何前端框架。專案完全使用 TypeScript 開發，提供類型安全和現代化的開發體驗。
 
 ## 功能特色
 
@@ -16,13 +16,14 @@
 
 - **HTML5**：語義化標記
 - **CSS3**：現代化樣式和動畫
-- **TypeScript**：類型安全的 JavaScript
+- **TypeScript**：類型安全的 JavaScript，提供完整的類型檢查
 - **Yarn**：套件管理工具
+- **ES2020**：現代 JavaScript 特性
 
 ## 專案結構
 
 ```
-myweb-js/
+myweb-ts/
 ├── index.html              # 主頁面
 ├── src/
 │   ├── css/
@@ -57,7 +58,13 @@ yarn serve
 
 然後在瀏覽器中開啟 `http://localhost:8000`
 
-### 4. 開發模式（自動編譯）
+### 4. 一鍵啟動（編譯 + 伺服器）
+
+```bash
+yarn start
+```
+
+### 5. 開發模式（自動編譯）
 
 ```bash
 yarn dev
@@ -88,7 +95,8 @@ yarn dev
 
 1. **文字內容**：編輯 `index.html` 中的文字
 2. **樣式**：修改 `src/css/styles.css`
-3. **功能**：調整 `src/js/main.ts`
+3. **功能**：調整 `src/js/main.ts`（TypeScript 原始碼）
+4. **類型定義**：在 TypeScript 檔案中定義介面和類型
 
 ### 更換圖片
 
@@ -103,6 +111,7 @@ yarn dev
 1. 在 `index.html` 中添加新的 `.page-section`
 2. 在 `main.ts` 的 `PageManager` 類別中添加頁面 ID
 3. 更新導航選單和頁面指示器
+4. 使用 TypeScript 的類型檢查確保程式碼正確性
 
 ## 瀏覽器支援
 
@@ -120,12 +129,23 @@ yarn install
 # 編譯 TypeScript
 yarn build
 
-# 監聽模式編譯
+# 監聽模式編譯（開發時使用）
 yarn dev
 
 # 啟動本地伺服器
 yarn serve
+
+# 一鍵啟動（編譯 + 伺服器）
+yarn start
 ```
+
+## TypeScript 特色
+
+- **類型安全**：編譯時檢查類型錯誤
+- **智能提示**：IDE 提供完整的自動完成
+- **重構支援**：安全的重命名和重構
+- **現代語法**：支援最新的 JavaScript 特性
+- **模組化**：清晰的類別和介面結構
 
 ## 授權
 

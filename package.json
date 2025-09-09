@@ -1,13 +1,14 @@
 {
-  "name": "myweb-js",
+  "name": "myweb-ts",
   "version": "1.0.0",
-  "description": "Hannah's personal website",
+  "description": "Hannah's personal website built with TypeScript",
   "main": "index.html",
   "packageManager": "yarn@4.6.0",
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "serve": "python3 -m http.server 8000"
+    "serve": "python3 -m http.server 8000",
+    "start": "yarn build && yarn serve"
   },
   "devDependencies": {
     "@types/node": "^24.3.1",
