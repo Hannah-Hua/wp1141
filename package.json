@@ -1,4 +1,17 @@
 {
   "name": "myweb-js",
-  "packageManager": "yarn@4.6.0"
+  "version": "1.0.0",
+  "description": "Hannah's personal website",
+  "main": "index.html",
+  "packageManager": "yarn@4.6.0",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "serve": "python3 -m http.server 8000"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  }
 }
