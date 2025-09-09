@@ -4,11 +4,13 @@ class PageManager {
     private pages: NodeListOf<HTMLElement>;
     private navLinks: NodeListOf<HTMLAnchorElement>;
     private indicators: NodeListOf<HTMLButtonElement>;
+    private scrollHint: HTMLElement | null;
 
     constructor() {
         this.pages = document.querySelectorAll('.page-section');
         this.navLinks = document.querySelectorAll('.nav-link');
         this.indicators = document.querySelectorAll('.indicator-btn');
+        this.scrollHint = document.getElementById('scrollHint');
         this.init();
     }
 
@@ -43,17 +45,71 @@ class PageManager {
 
     private setupScrollHandler(): void {
         let isScrolling = false;
+        let scrollTimeout: ReturnType<typeof setTimeout>;
         
         window.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            
             if (isScrolling) return;
             
             isScrolling = true;
             const direction = e.deltaY > 0 ? 'next' : 'prev';
             this.navigatePage(direction);
             
-            setTimeout(() => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
                 isScrolling = false;
-            }, 1000);
+            }, 800);
+        });
+
+        // 添加鍵盤導航支援
+        window.addEventListener('keydown', (e) => {
+            if (isScrolling) return;
+            
+            if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                e.preventDefault();
+                isScrolling = true;
+                this.navigatePage('next');
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 800);
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                e.preventDefault();
+                isScrolling = true;
+                this.navigatePage('prev');
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 800);
+            }
+        });
+
+        // 添加觸控支援（行動裝置）
+        let touchStartY = 0;
+        let touchEndY = 0;
+
+        window.addEventListener('touchstart', (e) => {
+            touchStartY = e.changedTouches[0].screenY;
+        });
+
+        window.addEventListener('touchend', (e) => {
+            if (isScrolling) return;
+            
+            touchEndY = e.changedTouches[0].screenY;
+            const swipeThreshold = 50;
+            const diff = touchStartY - touchEndY;
+
+            if (Math.abs(diff) > swipeThreshold) {
+                isScrolling = true;
+                const direction = diff > 0 ? 'next' : 'prev';
+                this.navigatePage(direction);
+                
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 800);
+            }
         });
     }
 
@@ -104,6 +160,46 @@ class PageManager {
         window.scrollTo({
             top: 0,
             behavior: 'smooth'
+        });
+
+        // 添加頁面切換動畫效果
+        this.addPageTransitionEffect(targetPage);
+
+        // 管理滾動提示顯示
+        this.updateScrollHint();
+    }
+
+    private updateScrollHint(): void {
+        if (!this.scrollHint) return;
+
+        // 在首頁顯示滾動提示，其他頁面隱藏
+        if (this.currentPage === 'home') {
+            this.scrollHint.style.display = 'block';
+        } else {
+            this.scrollHint.style.display = 'none';
+        }
+    }
+
+    private addPageTransitionEffect(targetPage: HTMLElement | null): void {
+        if (!targetPage) return;
+
+        // 添加淡入效果
+        targetPage.style.opacity = '0';
+        targetPage.style.transform = 'translateY(20px)';
+        
+        requestAnimationFrame(() => {
+            targetPage.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            targetPage.style.opacity = '1';
+            targetPage.style.transform = 'translateY(0)';
+        });
+
+        // 重置其他頁面的樣式
+        this.pages.forEach(page => {
+            if (page !== targetPage) {
+                page.style.transition = '';
+                page.style.opacity = '';
+                page.style.transform = '';
+            }
         });
     }
 }
@@ -232,7 +328,7 @@ class ImageManager {
 
 // 動畫管理類別
 class AnimationManager {
-    private observer: IntersectionObserver;
+    private observer!: IntersectionObserver;
 
     constructor() {
         this.init();
@@ -293,10 +389,10 @@ class AnimationManager {
 
 // 應用程式主類別
 class App {
-    private pageManager: PageManager;
-    private socialManager: SocialManager;
-    private imageManager: ImageManager;
-    private animationManager: AnimationManager;
+    private pageManager!: PageManager;
+    private socialManager!: SocialManager;
+    private imageManager!: ImageManager;
+    private animationManager!: AnimationManager;
 
     constructor() {
         this.init();
