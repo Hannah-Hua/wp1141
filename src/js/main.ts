@@ -5,12 +5,15 @@ class PageManager {
     private navLinks: NodeListOf<HTMLAnchorElement>;
     private indicators: NodeListOf<HTMLButtonElement>;
     private scrollHint: HTMLElement | null;
+    private scrollProgress: HTMLElement | null;
+    private isScrolling: boolean = false;
 
     constructor() {
         this.pages = document.querySelectorAll('.page-section');
         this.navLinks = document.querySelectorAll('.nav-link');
         this.indicators = document.querySelectorAll('.indicator-btn');
         this.scrollHint = document.getElementById('scrollHint');
+        this.scrollProgress = document.getElementById('scrollProgress');
         this.init();
     }
 
@@ -18,6 +21,7 @@ class PageManager {
         this.setupNavigation();
         this.setupIndicators();
         this.setupScrollHandler();
+        this.setupScrollProgress();
     }
 
     private setupNavigation(): void {
@@ -26,7 +30,7 @@ class PageManager {
                 e.preventDefault();
                 const targetPage = link.getAttribute('href')?.substring(1);
                 if (targetPage) {
-                    this.showPage(targetPage);
+                    this.scrollToPage(targetPage);
                 }
             });
         });
@@ -37,51 +41,29 @@ class PageManager {
             indicator.addEventListener('click', () => {
                 const targetPage = indicator.getAttribute('data-page');
                 if (targetPage) {
-                    this.showPage(targetPage);
+                    this.scrollToPage(targetPage);
                 }
             });
         });
     }
 
     private setupScrollHandler(): void {
-        let isScrolling = false;
-        let scrollTimeout: ReturnType<typeof setTimeout>;
-        
-        window.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            
-            if (isScrolling) return;
-            
-            isScrolling = true;
-            const direction = e.deltaY > 0 ? 'next' : 'prev';
-            this.navigatePage(direction);
-            
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(() => {
-                isScrolling = false;
-            }, 800);
+        // 監聽滾動事件來更新當前頁面和進度條
+        window.addEventListener('scroll', () => {
+            this.updateCurrentPage();
+            this.updateScrollProgress();
         });
 
         // 添加鍵盤導航支援
         window.addEventListener('keydown', (e) => {
-            if (isScrolling) return;
+            if (this.isScrolling) return;
             
             if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
                 e.preventDefault();
-                isScrolling = true;
-                this.navigatePage('next');
-                clearTimeout(scrollTimeout);
-                scrollTimeout = setTimeout(() => {
-                    isScrolling = false;
-                }, 800);
+                this.scrollToNextPage();
             } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
                 e.preventDefault();
-                isScrolling = true;
-                this.navigatePage('prev');
-                clearTimeout(scrollTimeout);
-                scrollTimeout = setTimeout(() => {
-                    isScrolling = false;
-                }, 800);
+                this.scrollToPrevPage();
             }
         });
 
@@ -94,56 +76,92 @@ class PageManager {
         });
 
         window.addEventListener('touchend', (e) => {
-            if (isScrolling) return;
+            if (this.isScrolling) return;
             
             touchEndY = e.changedTouches[0].screenY;
             const swipeThreshold = 50;
             const diff = touchStartY - touchEndY;
 
             if (Math.abs(diff) > swipeThreshold) {
-                isScrolling = true;
-                const direction = diff > 0 ? 'next' : 'prev';
-                this.navigatePage(direction);
-                
-                clearTimeout(scrollTimeout);
-                scrollTimeout = setTimeout(() => {
-                    isScrolling = false;
-                }, 800);
+                if (diff > 0) {
+                    this.scrollToNextPage();
+                } else {
+                    this.scrollToPrevPage();
+                }
             }
         });
     }
 
-    private navigatePage(direction: 'next' | 'prev'): void {
-        const pageOrder = ['home', 'story', 'life'];
-        const currentIndex = pageOrder.indexOf(this.currentPage);
-        
-        let nextIndex: number;
-        if (direction === 'next') {
-            nextIndex = currentIndex < pageOrder.length - 1 ? currentIndex + 1 : 0;
-        } else {
-            nextIndex = currentIndex > 0 ? currentIndex - 1 : pageOrder.length - 1;
-        }
-        
-        this.showPage(pageOrder[nextIndex]);
+    private setupScrollProgress(): void {
+        // 初始化滾動進度條
+        this.updateScrollProgress();
     }
 
-    private showPage(pageId: string): void {
-        // 隱藏所有頁面
-        this.pages.forEach(page => {
-            page.classList.remove('active');
-        });
-
-        // 顯示目標頁面
+    private scrollToPage(pageId: string): void {
         const targetPage = document.getElementById(pageId);
         if (targetPage) {
-            targetPage.classList.add('active');
-            this.currentPage = pageId;
+            this.isScrolling = true;
+            targetPage.scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+            
+            setTimeout(() => {
+                this.isScrolling = false;
+            }, 1000);
         }
+    }
 
+    private scrollToNextPage(): void {
+        const pageOrder = ['home', 'story', 'life'];
+        const currentIndex = pageOrder.indexOf(this.currentPage);
+        const nextIndex = currentIndex < pageOrder.length - 1 ? currentIndex + 1 : 0;
+        this.scrollToPage(pageOrder[nextIndex]);
+    }
+
+    private scrollToPrevPage(): void {
+        const pageOrder = ['home', 'story', 'life'];
+        const currentIndex = pageOrder.indexOf(this.currentPage);
+        const prevIndex = currentIndex > 0 ? currentIndex - 1 : pageOrder.length - 1;
+        this.scrollToPage(pageOrder[prevIndex]);
+    }
+
+    private updateCurrentPage(): void {
+        const scrollPosition = window.scrollY;
+        const windowHeight = window.innerHeight;
+        
+        this.pages.forEach(page => {
+            const rect = page.getBoundingClientRect();
+            const pageTop = rect.top + scrollPosition;
+            const pageBottom = pageTop + rect.height;
+            
+            // 如果頁面在視窗中央區域，則設為當前頁面
+            if (scrollPosition + windowHeight / 2 >= pageTop && 
+                scrollPosition + windowHeight / 2 <= pageBottom) {
+                const pageId = page.id;
+                if (pageId !== this.currentPage) {
+                    this.currentPage = pageId;
+                    this.updateNavigation();
+                }
+            }
+        });
+    }
+
+    private updateScrollProgress(): void {
+        if (!this.scrollProgress) return;
+        
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const scrollPercent = (scrollTop / docHeight) * 100;
+        
+        this.scrollProgress.style.width = `${scrollPercent}%`;
+    }
+
+    private updateNavigation(): void {
         // 更新導航連結狀態
         this.navLinks.forEach(link => {
             link.classList.remove('active');
-            if (link.getAttribute('href') === `#${pageId}`) {
+            if (link.getAttribute('href') === `#${this.currentPage}`) {
                 link.classList.add('active');
             }
         });
@@ -151,21 +169,12 @@ class PageManager {
         // 更新指示器狀態
         this.indicators.forEach(indicator => {
             indicator.classList.remove('active');
-            if (indicator.getAttribute('data-page') === pageId) {
+            if (indicator.getAttribute('data-page') === this.currentPage) {
                 indicator.classList.add('active');
             }
         });
 
-        // 平滑滾動到頂部
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-
-        // 添加頁面切換動畫效果
-        this.addPageTransitionEffect(targetPage);
-
-        // 管理滾動提示顯示
+        // 更新滾動提示顯示
         this.updateScrollHint();
     }
 
@@ -178,29 +187,6 @@ class PageManager {
         } else {
             this.scrollHint.style.display = 'none';
         }
-    }
-
-    private addPageTransitionEffect(targetPage: HTMLElement | null): void {
-        if (!targetPage) return;
-
-        // 添加淡入效果
-        targetPage.style.opacity = '0';
-        targetPage.style.transform = 'translateY(20px)';
-        
-        requestAnimationFrame(() => {
-            targetPage.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-            targetPage.style.opacity = '1';
-            targetPage.style.transform = 'translateY(0)';
-        });
-
-        // 重置其他頁面的樣式
-        this.pages.forEach(page => {
-            if (page !== targetPage) {
-                page.style.transition = '';
-                page.style.opacity = '';
-                page.style.transform = '';
-            }
-        });
     }
 }
 
