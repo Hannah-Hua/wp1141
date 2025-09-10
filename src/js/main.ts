@@ -113,14 +113,14 @@ class PageManager {
     }
 
     private scrollToNextPage(): void {
-        const pageOrder = ['home', 'story', 'life'];
+        const pageOrder = ['home', 'about', 'portfolio', 'blog', 'contact'];
         const currentIndex = pageOrder.indexOf(this.currentPage);
         const nextIndex = currentIndex < pageOrder.length - 1 ? currentIndex + 1 : 0;
         this.scrollToPage(pageOrder[nextIndex]);
     }
 
     private scrollToPrevPage(): void {
-        const pageOrder = ['home', 'story', 'life'];
+        const pageOrder = ['home', 'about', 'portfolio', 'blog', 'contact'];
         const currentIndex = pageOrder.indexOf(this.currentPage);
         const prevIndex = currentIndex > 0 ? currentIndex - 1 : pageOrder.length - 1;
         this.scrollToPage(pageOrder[prevIndex]);
@@ -373,12 +373,146 @@ class AnimationManager {
     }
 }
 
+// 作品集管理類別
+class PortfolioManager {
+    private filterButtons: NodeListOf<HTMLButtonElement>;
+    private portfolioItems: NodeListOf<HTMLElement>;
+
+    constructor() {
+        this.filterButtons = document.querySelectorAll('.filter-btn');
+        this.portfolioItems = document.querySelectorAll('.portfolio-item');
+        this.init();
+    }
+
+    private init(): void {
+        this.setupFilterButtons();
+    }
+
+    private setupFilterButtons(): void {
+        this.filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // 移除所有按鈕的 active 類別
+                this.filterButtons.forEach(btn => btn.classList.remove('active'));
+                // 添加 active 類別到點擊的按鈕
+                button.classList.add('active');
+                
+                const filter = button.getAttribute('data-filter');
+                this.filterPortfolio(filter);
+            });
+        });
+    }
+
+    private filterPortfolio(filter: string | null): void {
+        this.portfolioItems.forEach(item => {
+            const category = item.getAttribute('data-category');
+            
+            if (filter === 'all' || category === filter) {
+                item.style.display = 'block';
+                item.style.animation = 'fadeInUp 0.5s ease';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+}
+
+// 聯絡表單管理類別
+class ContactManager {
+    private contactForm: HTMLFormElement | null;
+
+    constructor() {
+        this.contactForm = document.querySelector('.contact-form');
+        this.init();
+    }
+
+    private init(): void {
+        if (this.contactForm) {
+            this.setupFormSubmission();
+        }
+    }
+
+    private setupFormSubmission(): void {
+        if (!this.contactForm) return;
+
+        this.contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleFormSubmission();
+        });
+    }
+
+    private handleFormSubmission(): void {
+        if (!this.contactForm) return;
+
+        const formData = new FormData(this.contactForm);
+        const name = formData.get('name') as string;
+        const email = formData.get('email') as string;
+        const subject = formData.get('subject') as string;
+        const message = formData.get('message') as string;
+
+        // 簡單的表單驗證
+        if (!name || !email || !subject || !message) {
+            this.showNotification('請填寫所有必填欄位', 'error');
+            return;
+        }
+
+        if (!this.isValidEmail(email)) {
+            this.showNotification('請輸入有效的電子郵件地址', 'error');
+            return;
+        }
+
+        // 模擬表單提交
+        this.showNotification('訊息已發送！我們會盡快回覆您。', 'success');
+        this.contactForm.reset();
+    }
+
+    private isValidEmail(email: string): boolean {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+    private showNotification(message: string, type: 'success' | 'error'): void {
+        const notification = document.createElement('div');
+        notification.textContent = message;
+        notification.style.cssText = `
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background-color: ${type === 'success' ? '#48bb78' : '#f56565'};
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            z-index: 10000;
+            font-size: 14px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        `;
+
+        document.body.appendChild(notification);
+
+        // 顯示動畫
+        setTimeout(() => {
+            notification.style.transform = 'translateX(0)';
+        }, 100);
+
+        // 自動隱藏
+        setTimeout(() => {
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 300);
+        }, 3000);
+    }
+}
+
 // 應用程式主類別
 class App {
     private pageManager!: PageManager;
     private socialManager!: SocialManager;
     private imageManager!: ImageManager;
     private animationManager!: AnimationManager;
+    private portfolioManager!: PortfolioManager;
+    private contactManager!: ContactManager;
 
     constructor() {
         this.init();
@@ -400,8 +534,10 @@ class App {
         this.socialManager = new SocialManager();
         this.imageManager = new ImageManager();
         this.animationManager = new AnimationManager();
+        this.portfolioManager = new PortfolioManager();
+        this.contactManager = new ContactManager();
         
-        console.log('Hannah 的個人網站已載入完成！');
+        console.log('Hannah Chen 的專業個人網站已載入完成！');
     }
 }
 

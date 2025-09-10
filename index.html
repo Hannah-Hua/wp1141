@@ -3,7 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hannah - Personal Website (TypeScript)</title>
+    <title>Hannah Chen - Digital Content Creator & Lifestyle Blogger</title>
+    <meta name="description" content="Hannah Chen 是一位專業的數位內容創作者，專精於美妝、時尚、生活技巧分享。透過部落格和社群媒體分享生活點滴與專業見解。">
+    <meta name="keywords" content="Hannah Chen, 美妝部落客, 時尚部落客, 生活技巧, 數位內容創作者, 部落格">
+    <meta name="author" content="Hannah Chen">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Hannah Chen - Digital Content Creator & Lifestyle Blogger">
+    <meta property="og:description" content="專業的數位內容創作者，分享美妝、時尚、生活技巧與個人見解">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://hannahchen.com">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👩‍💼</text></svg>">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="src/css/styles.css">
 </head>
 <body>
@@ -15,13 +33,21 @@
     <!-- 導航列 -->
     <nav class="navbar">
         <div class="nav-brand">
-            <h1>Hannah.</h1>
+            <h1>Hannah Chen</h1>
+            <span class="nav-subtitle">Content Creator</span>
         </div>
         <div class="nav-menu">
-            <a href="#home" class="nav-link active">Home</a>
-            <a href="#story" class="nav-link">My Story</a>
-            <a href="#life" class="nav-link">My Life</a>
+            <a href="#home" class="nav-link active">首頁</a>
+            <a href="#about" class="nav-link">關於我</a>
+            <a href="#portfolio" class="nav-link">作品集</a>
+            <a href="#blog" class="nav-link">部落格</a>
+            <a href="#contact" class="nav-link">聯絡我</a>
         </div>
+        <button class="mobile-menu-toggle" id="mobileMenuToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
     </nav>
 
     <!-- 主內容區域 -->
@@ -29,67 +55,267 @@
         <!-- 首頁區塊 -->
         <section id="home" class="page-section">
             <div class="hero-container">
-                <div class="hero-image">
+                <div class="hero-content">
                     <div class="hero-text">
-                        <h1 class="hero-title">HANNAH</h1>
+                        <h1 class="hero-title">Hannah Chen</h1>
+                        <h2 class="hero-subtitle">數位內容創作者</h2>
                         <div class="hero-line"></div>
-                        <p class="hero-subtitle">Vlogging About Beauty, Fashion, Life Hacks & My Life!</p>
+                        <p class="hero-description">專精於美妝、時尚與生活技巧分享的專業內容創作者，致力於為讀者帶來實用且具啟發性的內容。</p>
+                        <div class="hero-buttons">
+                            <a href="#portfolio" class="btn btn-primary">查看作品</a>
+                            <a href="#contact" class="btn btn-secondary">聯絡我</a>
+                        </div>
+                    </div>
+                    <div class="hero-image">
+                        <div class="hero-photo"></div>
+                        <div class="hero-badge">
+                            <span class="badge-text">5+ 年經驗</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">50K+</span>
+                        <span class="stat-label">追蹤者</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">200+</span>
+                        <span class="stat-label">文章</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">1M+</span>
+                        <span class="stat-label">瀏覽量</span>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 我的故事區塊 -->
-        <section id="story" class="page-section">
-            <div class="story-container">
-                <div class="story-content">
-                    <h2 class="story-title">THIS IS MY STORY</h2>
-                    <div class="story-text">
-                        <p>I'm a paragraph. Click here to add your own text and edit me. It's easy. Just click "Edit Text" or double click me to add your own content and make changes to the font. Feel free to drag and drop me anywhere you like on your page.</p>
-                        <p>This is a great space to write long text about your company and your services. You can use this space to go into a little more detail about your company. Talk about your team and what services you provide.</p>
+        <!-- 關於我區塊 -->
+        <section id="about" class="page-section">
+            <div class="about-container">
+                <div class="about-content">
+                    <div class="about-text">
+                        <h2 class="section-title">關於我</h2>
+                        <h3 class="about-subtitle">專業的數位內容創作者</h3>
+                        <div class="about-description">
+                            <p>我是 Hannah Chen，一位擁有 5 年以上經驗的數位內容創作者。專精於美妝、時尚、生活技巧等領域的內容創作，致力於為讀者提供實用且具啟發性的內容。</p>
+                            <p>透過部落格、社群媒體和影片創作，我分享專業的美妝技巧、時尚穿搭建議，以及提升生活品質的實用方法。我的目標是幫助更多人發現自己的美麗，並在生活中找到自信與快樂。</p>
+                        </div>
+                        <div class="about-skills">
+                            <div class="skill-item">
+                                <span class="skill-name">內容創作</span>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 95%"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <span class="skill-name">社群媒體行銷</span>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 90%"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <span class="skill-name">影片製作</span>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 85%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="#contact" class="btn btn-primary">聯絡我</a>
                     </div>
-                    <button class="follow-btn">Follow Me</button>
-                </div>
-                <div class="story-image">
-                    <div class="story-photo"></div>
+                    <div class="about-image">
+                        <div class="about-photo"></div>
+                        <div class="about-badges">
+                            <div class="badge">美妝專家</div>
+                            <div class="badge">時尚達人</div>
+                            <div class="badge">生活顧問</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- 我的生活區塊 -->
-        <section id="life" class="page-section">
-            <div class="life-container">
-                <div class="life-header">
-                    <h2 class="life-title">#HANNAH ON INSTAme</h2>
+        <!-- 作品集區塊 -->
+        <section id="portfolio" class="page-section">
+            <div class="portfolio-container">
+                <div class="portfolio-header">
+                    <h2 class="section-title">作品集</h2>
+                    <p class="section-subtitle">精選的內容創作作品</p>
                 </div>
-                <div class="life-grid">
-                    <div class="grid-item large">
-                        <div class="grid-photo photo-1"></div>
+                <div class="portfolio-filter">
+                    <button class="filter-btn active" data-filter="all">全部</button>
+                    <button class="filter-btn" data-filter="beauty">美妝</button>
+                    <button class="filter-btn" data-filter="fashion">時尚</button>
+                    <button class="filter-btn" data-filter="lifestyle">生活</button>
+                </div>
+                <div class="portfolio-grid">
+                    <div class="portfolio-item" data-category="beauty">
+                        <div class="portfolio-image">
+                            <div class="portfolio-photo photo-1"></div>
+                            <div class="portfolio-overlay">
+                                <h3>春季美妝教學</h3>
+                                <p>2024 春季流行妝容完整教學</p>
+                                <a href="#" class="portfolio-link">查看詳情</a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="grid-item">
-                        <div class="grid-photo photo-2"></div>
+                    <div class="portfolio-item" data-category="fashion">
+                        <div class="portfolio-image">
+                            <div class="portfolio-photo photo-2"></div>
+                            <div class="portfolio-overlay">
+                                <h3>職場穿搭指南</h3>
+                                <p>專業又時尚的職場造型建議</p>
+                                <a href="#" class="portfolio-link">查看詳情</a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="grid-item">
-                        <div class="grid-photo photo-3"></div>
+                    <div class="portfolio-item" data-category="lifestyle">
+                        <div class="portfolio-image">
+                            <div class="portfolio-photo photo-3"></div>
+                            <div class="portfolio-overlay">
+                                <h3>居家生活技巧</h3>
+                                <p>提升生活品質的實用小技巧</p>
+                                <a href="#" class="portfolio-link">查看詳情</a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="grid-item">
-                        <div class="grid-photo photo-4"></div>
+                    <div class="portfolio-item" data-category="beauty">
+                        <div class="portfolio-image">
+                            <div class="portfolio-photo photo-4"></div>
+                            <div class="portfolio-overlay">
+                                <h3>護膚保養心得</h3>
+                                <p>有效護膚步驟與產品推薦</p>
+                                <a href="#" class="portfolio-link">查看詳情</a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="grid-item">
-                        <div class="grid-photo photo-5"></div>
+                    <div class="portfolio-item" data-category="fashion">
+                        <div class="portfolio-image">
+                            <div class="portfolio-photo photo-5"></div>
+                            <div class="portfolio-overlay">
+                                <h3>約會穿搭靈感</h3>
+                                <p>浪漫約會的完美造型選擇</p>
+                                <a href="#" class="portfolio-link">查看詳情</a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="grid-item">
-                        <div class="grid-photo photo-6"></div>
+                    <div class="portfolio-item" data-category="lifestyle">
+                        <div class="portfolio-image">
+                            <div class="portfolio-photo photo-6"></div>
+                            <div class="portfolio-overlay">
+                                <h3>健康生活習慣</h3>
+                                <p>建立健康生活方式的建議</p>
+                                <a href="#" class="portfolio-link">查看詳情</a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="grid-item">
-                        <div class="grid-photo photo-7"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 部落格區塊 -->
+        <section id="blog" class="page-section">
+            <div class="blog-container">
+                <div class="blog-header">
+                    <h2 class="section-title">最新文章</h2>
+                    <p class="section-subtitle">分享美妝、時尚與生活的最新見解</p>
+                </div>
+                <div class="blog-grid">
+                    <article class="blog-card featured">
+                        <div class="blog-image">
+                            <div class="blog-photo photo-1"></div>
+                            <div class="blog-category">美妝</div>
+                        </div>
+                        <div class="blog-content">
+                            <h3 class="blog-title">2024 春季美妝趨勢解析</h3>
+                            <p class="blog-excerpt">探索今年春季最受歡迎的美妝趨勢，從色彩搭配到質地選擇，為你的妝容注入新活力。</p>
+                            <div class="blog-meta">
+                                <span class="blog-date">2024年3月15日</span>
+                                <span class="blog-read-time">5 分鐘閱讀</span>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="blog-card">
+                        <div class="blog-image">
+                            <div class="blog-photo photo-2"></div>
+                            <div class="blog-category">時尚</div>
+                        </div>
+                        <div class="blog-content">
+                            <h3 class="blog-title">職場女性的穿搭智慧</h3>
+                            <p class="blog-excerpt">如何在專業與時尚之間找到完美平衡，展現自信的職場形象。</p>
+                            <div class="blog-meta">
+                                <span class="blog-date">2024年3月10日</span>
+                                <span class="blog-read-time">3 分鐘閱讀</span>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="blog-card">
+                        <div class="blog-image">
+                            <div class="blog-photo photo-3"></div>
+                            <div class="blog-category">生活</div>
+                        </div>
+                        <div class="blog-content">
+                            <h3 class="blog-title">建立健康的生活習慣</h3>
+                            <p class="blog-excerpt">從日常小細節開始，打造更健康、更有品質的生活方式。</p>
+                            <div class="blog-meta">
+                                <span class="blog-date">2024年3月5日</span>
+                                <span class="blog-read-time">4 分鐘閱讀</span>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                <div class="blog-cta">
+                    <a href="#" class="btn btn-primary">查看更多文章</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 聯絡我區塊 -->
+        <section id="contact" class="page-section">
+            <div class="contact-container">
+                <div class="contact-header">
+                    <h2 class="section-title">聯絡我</h2>
+                    <p class="section-subtitle">讓我們一起創造美好的內容</p>
+                </div>
+                <div class="contact-content">
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <div class="contact-icon">📧</div>
+                            <div class="contact-details">
+                                <h3>電子郵件</h3>
+                                <p>hannah@example.com</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon">📱</div>
+                            <div class="contact-details">
+                                <h3>電話</h3>
+                                <p>+886 912 345 678</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon">📍</div>
+                            <div class="contact-details">
+                                <h3>位置</h3>
+                                <p>台北市，台灣</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="grid-item">
-                        <div class="grid-photo photo-8"></div>
-                    </div>
-                    <div class="grid-item">
-                        <div class="grid-photo photo-9"></div>
-                    </div>
+                    <form class="contact-form">
+                        <div class="form-group">
+                            <input type="text" id="name" name="name" placeholder="您的姓名" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" id="email" name="email" placeholder="您的電子郵件" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="subject" name="subject" placeholder="主旨" required>
+                        </div>
+                        <div class="form-group">
+                            <textarea id="message" name="message" placeholder="您的訊息" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">發送訊息</button>
+                    </form>
                 </div>
             </div>
         </section>
@@ -112,8 +338,10 @@
     <!-- 頁面快轉按鈕 -->
     <div class="page-indicator">
         <button class="indicator-btn active" data-page="home"></button>
-        <button class="indicator-btn" data-page="story"></button>
-        <button class="indicator-btn" data-page="life"></button>
+        <button class="indicator-btn" data-page="about"></button>
+        <button class="indicator-btn" data-page="portfolio"></button>
+        <button class="indicator-btn" data-page="blog"></button>
+        <button class="indicator-btn" data-page="contact"></button>
     </div>
 
     <!-- 滾動提示 -->
