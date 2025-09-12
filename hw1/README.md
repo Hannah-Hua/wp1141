@@ -1,16 +1,4 @@
-# Hannah 個人網站
 
-<div align="center">
-
-![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
-![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
-![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
-
-**現代化個人網站 - 數位內容創作者專業形象展示**
-
-</div>
-
----
 
 ## 🚀 如何開啟網頁
 
@@ -66,8 +54,6 @@ yarn serve
 
 <div align="center">
 
-**展現現代網頁設計的最佳實踐**
-
-Made with ❤️ by Hannah Chen
+B12705022
 
 </div>
