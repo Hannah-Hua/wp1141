@@ -30,11 +30,42 @@ yarn serve
 
 ## 📱 網站內容
 
-- **首頁**：個人品牌展示與數據統計
-- **關於我**：個人故事與技能展示
-- **作品集**：美妝、時尚、生活作品分類展示
-- **部落格**：精選文章與專業見解
-- **聯絡我**：多種聯絡方式與互動表單
+- **首頁**：台大資管系學生身份展示與學習成果統計
+- **關於我**：資管系學習歷程與程式設計技能展示
+- **作品集**：網頁開發、資料分析、行動應用專案分類展示
+- **部落格**：技術學習心得與校園生活分享
+- **聯絡我**：學術交流與合作機會聯絡方式
+
+## 📁 專案結構
+
+```
+hw1/
+├── index.html              # 主頁面檔案
+├── package.json            # 專案依賴配置
+├── tsconfig.json           # TypeScript 編譯配置
+├── yarn.lock              # 依賴版本鎖定檔案
+├── README.md              # 專案說明文件
+├── dist/                  # 編譯輸出目錄
+│   └── js/
+│       ├── main.js        # 編譯後的 JavaScript 檔案
+│       ├── main.js.map    # Source Map 檔案
+│       ├── main.d.ts      # TypeScript 宣告檔案
+│       └── main.d.ts.map  # TypeScript Source Map
+└── src/                   # 原始碼目錄
+    ├── css/
+    │   └── styles.css     # 樣式表檔案
+    ├── js/
+    │   └── main.ts        # TypeScript 主程式檔案
+    └── images/            # 圖片資源目錄
+        ├── 個人網頁.png
+        ├── 圖書館.jpg
+        ├── 學習平台.jpg
+        ├── 學習成效分析.jpg
+        ├── 校園活動.jpg
+        ├── 資管系心得.jpg
+        ├── 電商.webp
+        └── javascript學習筆記.jpg
+```
 
 ## ⚡ 主要功能
 
