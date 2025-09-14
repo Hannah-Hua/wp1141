@@ -386,6 +386,7 @@ class PortfolioManager {
 
     private init(): void {
         this.setupFilterButtons();
+        this.setupPortfolioLinks();
     }
 
     private setupFilterButtons(): void {
@@ -398,6 +399,18 @@ class PortfolioManager {
                 
                 const filter = button.getAttribute('data-filter');
                 this.filterPortfolio(filter);
+            });
+        });
+    }
+
+    private setupPortfolioLinks(): void {
+        // 移除所有「查看詳情」連結的跳轉功能
+        const portfolioLinks = document.querySelectorAll('.portfolio-link');
+        portfolioLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                // 不執行任何跳轉動作
+                console.log('查看詳情按鈕被點擊，但已禁用跳轉功能');
             });
         });
     }
