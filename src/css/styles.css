@@ -5,6 +5,36 @@
     box-sizing: border-box;
 }
 
+/* 確保顏色一致性 */
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* 針對不同瀏覽器的顏色渲染優化 */
+@supports (-webkit-appearance: none) {
+    .hero-container {
+        /* Safari 特殊處理 */
+        background: -webkit-linear-gradient(135deg, #A78BFA 0%, #C084FC 100%);
+        -webkit-background-clip: padding-box;
+    }
+}
+
+@-moz-document url-prefix() {
+    .hero-container {
+        /* Firefox 特殊處理 */
+        background: -moz-linear-gradient(135deg, #A78BFA 0%, #C084FC 100%);
+    }
+}
+
+:root {
+    /* 定義主要顏色變數，確保一致性 */
+    --primary-purple-start: #A78BFA;
+    --primary-purple-end: #C084FC;
+    --button-purple-start: #667eea;
+    --button-purple-end: #764ba2;
+}
+
 html {
     scroll-behavior: smooth;
     font-size: 16px;
@@ -45,6 +75,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-primary {
+    background-color: #667eea;
+    background: -webkit-linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: -moz-linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: -o-linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
@@ -205,7 +239,20 @@ h1, h2, h3, h4, h5, h6 {
 .hero-container {
     position: relative;
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* 為舊版瀏覽器提供備用顏色 */
+    background-color: var(--primary-purple-start);
+    /* 漸層背景，支援多種瀏覽器 */
+    background: -webkit-linear-gradient(135deg, var(--primary-purple-start) 0%, var(--primary-purple-end) 100%);
+    background: -moz-linear-gradient(135deg, var(--primary-purple-start) 0%, var(--primary-purple-end) 100%);
+    background: -o-linear-gradient(135deg, var(--primary-purple-start) 0%, var(--primary-purple-end) 100%);
+    background: linear-gradient(135deg, var(--primary-purple-start) 0%, var(--primary-purple-end) 100%);
+    /* 確保漸層在容器中正確顯示 */
+    background-attachment: fixed;
+    background-size: cover;
+    background-repeat: no-repeat;
+    /* 確保在不同顯示器上顏色一致 */
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -765,12 +812,15 @@ h1, h2, h3, h4, h5, h6 {
 .portfolio-photo {
     width: 100%;
     height: 100%;
+    object-fit: cover;
+    object-position: center;
     background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 48px;
-    color: white;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.portfolio-item:hover .portfolio-photo {
+    transform: scale(1.05);
 }
 
 .portfolio-overlay {
@@ -865,12 +915,15 @@ h1, h2, h3, h4, h5, h6 {
 .blog-photo {
     width: 100%;
     height: 100%;
+    object-fit: cover;
+    object-position: center;
     background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 48px;
-    color: white;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.blog-card:hover .blog-photo {
+    transform: scale(1.05);
 }
 
 .blog-category {
@@ -1045,10 +1098,20 @@ h1, h2, h3, h4, h5, h6 {
     
     .portfolio-grid {
         grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .portfolio-image {
+        height: 200px;
     }
     
     .blog-grid {
         grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .blog-image {
+        height: 180px;
     }
     
     .blog-card.featured {
@@ -1089,6 +1152,23 @@ h1, h2, h3, h4, h5, h6 {
     
     .filter-btn {
         padding: 8px 16px;
-        font-size: 14px;
+    }
+    
+    .portfolio-image {
+        height: 180px;
+    }
+    
+    .portfolio-photo {
+        object-fit: cover;
+        object-position: center;
+    }
+    
+    .blog-image {
+        height: 160px;
+    }
+    
+    .blog-photo {
+        object-fit: cover;
+        object-position: center;
     }
 }

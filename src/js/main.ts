@@ -206,6 +206,12 @@ class SocialManager {
     private setupSocialLinks(): void {
         this.socialLinks.forEach(link => {
             link.addEventListener('click', (e) => {
+                // 如果是 Instagram 或 Facebook 連結，直接跳轉，不阻止預設行為
+                if (link.classList.contains('instagram') || link.classList.contains('facebook')) {
+                    return; // 讓瀏覽器處理連結跳轉
+                }
+                
+                // 其他社交媒體連結顯示通知
                 e.preventDefault();
                 const platform = link.classList.contains('facebook') ? 'Facebook' : 'Instagram';
                 this.handleSocialClick(platform);
@@ -537,7 +543,7 @@ class App {
         this.portfolioManager = new PortfolioManager();
         this.contactManager = new ContactManager();
         
-        console.log('Hannah Chen 的專業個人網站已載入完成！');
+        console.log('Hannah 的專業個人網站已載入完成！');
     }
 }
 
