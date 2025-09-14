@@ -352,5 +352,22 @@
 
     <!-- TypeScript 編譯後的 JavaScript 檔案 -->
     <script type="module" src="dist/js/main.js"></script>
+    
+    <!-- 備用方案：如果模組載入失敗，顯示提示 -->
+    <script>
+        // 檢查是否在 file:// 協議下運行
+        if (window.location.protocol === 'file:') {
+            console.warn('直接開啟 HTML 檔案可能無法正常載入 JavaScript 模組');
+            console.warn('建議使用本地伺服器：yarn serve 然後訪問 http://localhost:8000');
+            
+            // 嘗試載入 JavaScript 作為普通腳本
+            const script = document.createElement('script');
+            script.src = 'dist/js/main.js';
+            script.onerror = function() {
+                alert('無法載入 JavaScript 檔案。請使用本地伺服器開啟網站：\n1. 在終端執行 yarn serve\n2. 訪問 http://localhost:8000');
+            };
+            document.head.appendChild(script);
+        }
+    </script>
 </body>
 </html>
