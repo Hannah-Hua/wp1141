@@ -206,19 +206,19 @@ class SocialManager {
     private setupSocialLinks(): void {
         this.socialLinks.forEach(link => {
             link.addEventListener('click', (e) => {
-                e.preventDefault();
+                // 不阻止預設行為，讓連結正常跳轉
                 const platform = link.classList.contains('facebook') ? 'Facebook' : 'Instagram';
-                this.handleSocialClick(platform);
+                console.log(`點擊了 ${platform} 按鈕，即將跳轉到: ${link.href}`);
+                
+                // 顯示提示訊息
+                this.showNotification(`即將前往 ${platform} 頁面`);
             });
         });
     }
 
     private handleSocialClick(platform: string): void {
-        // 這裡可以添加實際的社交媒體連結
+        // 這個方法現在不再需要，因為我們讓連結自然跳轉
         console.log(`點擊了 ${platform} 按鈕`);
-        
-        // 顯示提示訊息
-        this.showNotification(`即將前往 ${platform} 頁面`);
     }
 
     private showNotification(message: string): void {
