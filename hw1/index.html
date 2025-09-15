@@ -25,6 +25,15 @@
     <link rel="stylesheet" href="src/css/styles.css">
 </head>
 <body>
+    <!-- 載入動畫 -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">載入中...</div>
+    </div>
+
+    <!-- 粒子背景 -->
+    <div class="particles" id="particles"></div>
+
     <!-- 滾動進度條 -->
     <div class="scroll-progress">
         <div class="scroll-progress-bar" id="scrollProgress"></div>
@@ -94,7 +103,7 @@
         <section id="about" class="page-section">
             <div class="about-container">
                 <div class="about-content">
-                    <div class="about-text">
+                    <div class="about-text animate-left">
                         <h2 class="section-title">關於我</h2>
                         <h3 class="about-subtitle">台灣大學資訊管理學系三年級學生</h3>
                         <div class="about-description">
@@ -129,7 +138,7 @@
                         </div>
                         <a href="#contact" class="btn btn-primary">聯絡我</a>
                     </div>
-                    <div class="about-image">
+                    <div class="about-image animate-right">
                         <div class="about-photo"></div>
                         <div class="about-badges">
                             <div class="badge">網頁開發者</div>
@@ -144,7 +153,7 @@
         <!-- 作品集區塊 -->
         <section id="portfolio" class="page-section">
             <div class="portfolio-container">
-                <div class="portfolio-header">
+                <div class="portfolio-header animate-on-scroll">
                     <h2 class="section-title">作品集</h2>
                     <p class="section-subtitle">精選的程式設計與專案作品</p>
                 </div>

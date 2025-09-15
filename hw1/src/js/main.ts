@@ -315,21 +315,56 @@ class ImageManager {
 // 動畫管理類別
 class AnimationManager {
     private observer!: IntersectionObserver;
+    private loadingScreen: HTMLElement | null;
+    private particlesContainer: HTMLElement | null;
 
     constructor() {
+        this.loadingScreen = document.getElementById('loadingScreen');
+        this.particlesContainer = document.getElementById('particles');
         this.init();
     }
 
     private init(): void {
+        this.setupLoadingAnimation();
+        this.setupParticles();
         this.setupIntersectionObserver();
         this.setupScrollAnimations();
+    }
+
+    private setupLoadingAnimation(): void {
+        // 模擬載入時間
+        setTimeout(() => {
+            if (this.loadingScreen) {
+                this.loadingScreen.classList.add('hidden');
+                setTimeout(() => {
+                    if (this.loadingScreen) {
+                        this.loadingScreen.style.display = 'none';
+                    }
+                }, 500);
+            }
+        }, 2000);
+    }
+
+    private setupParticles(): void {
+        if (!this.particlesContainer) return;
+
+        // 創建粒子
+        for (let i = 0; i < 50; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 6 + 's';
+            particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+            this.particlesContainer.appendChild(particle);
+        }
     }
 
     private setupIntersectionObserver(): void {
         this.observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.classList.add('animate-in');
+                    entry.target.classList.add('animated');
                 }
             });
         }, {
@@ -338,37 +373,23 @@ class AnimationManager {
         });
 
         // 觀察需要動畫的元素
-        const animatedElements = document.querySelectorAll('.story-title, .story-text, .life-title, .grid-item');
+        const animatedElements = document.querySelectorAll('.animate-on-scroll, .animate-left, .animate-right, .animate-scale, .portfolio-item, .blog-card');
         animatedElements.forEach(el => {
             this.observer.observe(el);
         });
     }
 
     private setupScrollAnimations(): void {
-        // 添加動畫樣式
-        const style = document.createElement('style');
-        style.textContent = `
-            .story-title, .story-text, .life-title, .grid-item {
-                opacity: 0;
-                transform: translateY(30px);
-                transition: all 0.6s ease;
-            }
-            
-            .story-title.animate-in, .story-text.animate-in, .life-title.animate-in, .grid-item.animate-in {
-                opacity: 1;
-                transform: translateY(0);
-            }
-            
-            .grid-item.animate-in {
-                transition-delay: calc(var(--index) * 0.1s);
-            }
-        `;
-        document.head.appendChild(style);
+        // 為作品集項目添加延遲動畫
+        const portfolioItems = document.querySelectorAll('.portfolio-item');
+        portfolioItems.forEach((item, index) => {
+            (item as HTMLElement).style.animationDelay = (index * 0.1) + 's';
+        });
 
-        // 為網格項目設置延遲索引
-        const gridItems = document.querySelectorAll('.grid-item');
-        gridItems.forEach((item, index) => {
-            (item as HTMLElement).style.setProperty('--index', index.toString());
+        // 為部落格卡片添加延遲動畫
+        const blogCards = document.querySelectorAll('.blog-card');
+        blogCards.forEach((card, index) => {
+            (card as HTMLElement).style.animationDelay = (index * 0.15) + 's';
         });
     }
 }
