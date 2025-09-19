@@ -28,6 +28,7 @@ const PLATFORM_HEIGHT = 15;
 const App: React.FC = () => {
   const [gameState, setGameState] = useState<'playing' | 'gameOver'>('playing');
   const [score, setScore] = useState(0);
+  const [highestY, setHighestY] = useState(GAME_HEIGHT - 100); // 記錄最高位置
   const [cameraY, setCameraY] = useState(0); // 相機Y偏移量
   const [targetCameraY, setTargetCameraY] = useState(0); // 目標相機位置
   const [lastJumpY, setLastJumpY] = useState(GAME_HEIGHT - 100); // 記錄上次跳躍的Y位置
@@ -152,9 +153,14 @@ const App: React.FC = () => {
         setGameState('gameOver');
       }
 
-      // 更新分數（基於實際跳躍高度）
-      const newScore = Math.max(0, Math.floor((GAME_HEIGHT - newPlayer.y + cameraY) / 10));
-      setScore(newScore);
+      // 更新最高位置和分數
+      if (newPlayer.y < highestY) {
+        setHighestY(newPlayer.y);
+        // 分數基於跳躍高度：從起始位置到最高位置的距離
+        const jumpHeight = (GAME_HEIGHT - 100) - newPlayer.y;
+        const newScore = Math.max(0, Math.floor(jumpHeight / 10));
+        setScore(newScore);
+      }
 
       // 持續生成新平台
       setPlatforms(prevPlatforms => {
@@ -183,7 +189,7 @@ const App: React.FC = () => {
 
       return newPlayer;
     });
-  }, [gameState, keys, platforms, cameraY, lastJumpY, targetCameraY]);
+  }, [gameState, keys, platforms, cameraY, lastJumpY, targetCameraY, highestY]);
 
   // 統一的遊戲循環 - 使用 requestAnimationFrame
   useEffect(() => {
@@ -225,6 +231,7 @@ const App: React.FC = () => {
   const restartGame = () => {
     setGameState('playing');
     setScore(0);
+    setHighestY(GAME_HEIGHT - 100); // 重置最高位置
     setCameraY(0); // 重置相機位置
     setTargetCameraY(0); // 重置目標相機位置
     setLastJumpY(GAME_HEIGHT - 100); // 重置上次跳躍位置
