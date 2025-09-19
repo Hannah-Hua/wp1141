@@ -17,6 +17,16 @@ interface Platform {
   height: number;
 }
 
+interface Enemy {
+  id: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  velocityX: number;
+  direction: 'left' | 'right';
+}
+
 const GAME_WIDTH = 360;
 const GAME_HEIGHT = 640;
 const GRAVITY = 0.5;
@@ -24,6 +34,10 @@ const JUMP_FORCE = -12;
 const PLAYER_SPEED = 16; // 從 8 增加到 16，讓移動距離再變為兩倍
 const PLATFORM_WIDTH = 60;
 const PLATFORM_HEIGHT = 15;
+const ENEMY_WIDTH = 25;
+const ENEMY_HEIGHT = 25;
+const ENEMY_SPEED = 1; // 敵人移動速度
+const ENEMY_SPAWN_RATE = 0.002; // 每幀生成敵人的機率
 
 const App: React.FC = () => {
   const [gameState, setGameState] = useState<'playing' | 'gameOver'>('playing');
@@ -42,7 +56,9 @@ const App: React.FC = () => {
     height: 30
   });
   const [platforms, setPlatforms] = useState<Platform[]>([]);
+  const [enemies, setEnemies] = useState<Enemy[]>([]);
   const [keys, setKeys] = useState<{ [key: string]: boolean }>({});
+  const [nextEnemyId, setNextEnemyId] = useState(0);
 
   // 初始化平台
   useEffect(() => {
@@ -99,6 +115,16 @@ const App: React.FC = () => {
     );
   };
 
+  // 敵人碰撞檢測
+  const checkEnemyCollision = (player: Player, enemy: Enemy): boolean => {
+    return (
+      player.x < enemy.x + enemy.width &&
+      player.x + player.width > enemy.x &&
+      player.y < enemy.y + enemy.height &&
+      player.y + player.height > enemy.y
+    );
+  };
+
   // 遊戲主循環 - 直接更新狀態，避免在 requestAnimationFrame 中使用 setState
   const gameLoop = useCallback(() => {
     if (gameState !== 'playing') return;
@@ -148,6 +174,13 @@ const App: React.FC = () => {
         setIsCameraMoving(true); // 標記相機開始移動
       }
 
+      // 檢查敵人碰撞
+      enemies.forEach(enemy => {
+        if (checkEnemyCollision(newPlayer, enemy)) {
+          setGameState('gameOver');
+        }
+      });
+
       // 檢查 Game Over：當玩家掉到相機視野下方時
       if (newPlayer.y > GAME_HEIGHT + cameraY) {
         setGameState('gameOver');
@@ -187,9 +220,46 @@ const App: React.FC = () => {
         return filteredPlatforms;
       });
 
+      // 更新敵人
+      setEnemies(prevEnemies => {
+        let newEnemies = [...prevEnemies];
+        
+        // 移動現有敵人
+        newEnemies = newEnemies.map(enemy => ({
+          ...enemy,
+          x: enemy.x + enemy.velocityX
+        }));
+        
+        // 移除超出螢幕邊界的敵人
+        newEnemies = newEnemies.filter(enemy => 
+          enemy.x > -ENEMY_WIDTH && enemy.x < GAME_WIDTH + ENEMY_WIDTH
+        );
+        
+        // 隨機生成新敵人
+        if (Math.random() < ENEMY_SPAWN_RATE) {
+          const direction = Math.random() < 0.5 ? 'left' : 'right';
+          const startX = direction === 'left' ? GAME_WIDTH : -ENEMY_WIDTH;
+          const spawnY = cameraY + Math.random() * GAME_HEIGHT; // 在相機視野內隨機高度生成
+          
+          newEnemies.push({
+            id: nextEnemyId,
+            x: startX,
+            y: spawnY,
+            width: ENEMY_WIDTH,
+            height: ENEMY_HEIGHT,
+            velocityX: direction === 'left' ? -ENEMY_SPEED : ENEMY_SPEED,
+            direction
+          });
+          
+          setNextEnemyId(prev => prev + 1);
+        }
+        
+        return newEnemies;
+      });
+
       return newPlayer;
     });
-  }, [gameState, keys, platforms, cameraY, lastJumpY, targetCameraY, highestY]);
+  }, [gameState, keys, platforms, enemies, cameraY, lastJumpY, targetCameraY, highestY, nextEnemyId]);
 
   // 統一的遊戲循環 - 使用 requestAnimationFrame
   useEffect(() => {
@@ -236,6 +306,8 @@ const App: React.FC = () => {
     setTargetCameraY(0); // 重置目標相機位置
     setLastJumpY(GAME_HEIGHT - 100); // 重置上次跳躍位置
     setIsCameraMoving(false); // 重置相機移動狀態
+    setEnemies([]); // 清空敵人
+    setNextEnemyId(0); // 重置敵人ID計數器
     setPlayer({
       x: GAME_WIDTH / 2 - 15,
       y: GAME_HEIGHT - 100,
@@ -303,6 +375,20 @@ const App: React.FC = () => {
                 top: platform.y,
                 width: platform.width,
                 height: platform.height
+              }}
+            />
+          ))}
+
+          {/* 敵人 */}
+          {enemies.map((enemy) => (
+            <div
+              key={enemy.id}
+              className="enemy"
+              style={{
+                left: enemy.x,
+                top: enemy.y,
+                width: enemy.width,
+                height: enemy.height
               }}
             />
           ))}
