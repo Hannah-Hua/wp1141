@@ -3,17 +3,17 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #D2B48C 0%, #F5DEB3 100%);
   padding: 20px;
 }
 
 .game-canvas {
   position: relative;
-  background: linear-gradient(180deg, #87CEEB 0%, #98FB98 100%);
-  border: 3px solid #333;
+  background: linear-gradient(180deg, #F5DEB3 0%, #DEB887 100%);
+  border: 3px solid #8B4513;
   border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 30px rgba(139, 69, 19, 0.3);
 }
 
 .game-world {
@@ -27,11 +27,11 @@
 
 .player {
   position: absolute;
-  background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+  background: linear-gradient(45deg, #D2691E, #CD853F);
   border-radius: 50%;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 8px rgba(139, 69, 19, 0.3);
   z-index: 10;
-  border: 2px solid #fff;
+  border: 2px solid #F5DEB3;
 }
 
 .player::before {
@@ -65,10 +65,10 @@
 
 .platform {
   position: absolute;
-  background: linear-gradient(90deg, #8B4513, #A0522D);
+  background: linear-gradient(90deg, #A0522D, #CD853F);
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  border: 1px solid #654321;
+  box-shadow: 0 2px 4px rgba(139, 69, 19, 0.4);
+  border: 1px solid #8B4513;
 }
 
 .platform::before {
@@ -91,8 +91,8 @@
   left: 20px;
   font-size: 24px;
   font-weight: bold;
-  color: #333;
-  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8);
+  color: #8B4513;
+  text-shadow: 2px 2px 4px rgba(245, 222, 179, 0.8);
   z-index: 20;
 }
 
@@ -102,10 +102,10 @@
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
-  color: #333;
+  color: #8B4513;
   font-size: 14px;
   font-weight: bold;
-  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+  text-shadow: 1px 1px 2px rgba(245, 222, 179, 0.8);
   z-index: 20;
 }
 
@@ -114,47 +114,62 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 40px;
-  border-radius: 15px;
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.95), rgba(160, 82, 45, 0.95));
+  color: #F5DEB3;
+  padding: 50px 40px;
+  border-radius: 20px;
   text-align: center;
   z-index: 30;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 15px 40px rgba(139, 69, 19, 0.6);
+  border: 3px solid #D2691E;
+  min-width: 280px;
+  max-width: 320px;
 }
 
 .game-over h2 {
-  font-size: 32px;
-  margin-bottom: 20px;
-  color: #FF6B6B;
+  font-size: 36px;
+  margin-bottom: 25px;
+  color: #D2691E;
+  font-weight: 900;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  letter-spacing: 2px;
+  line-height: 1.2;
 }
 
 .game-over p {
-  font-size: 20px;
-  margin-bottom: 30px;
-  color: #4ECDC4;
+  font-size: 22px;
+  margin-bottom: 35px;
+  color: #F5DEB3;
+  font-weight: 600;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  line-height: 1.4;
 }
 
 .restart-button {
-  background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
-  color: white;
-  border: none;
-  padding: 15px 30px;
-  font-size: 18px;
-  font-weight: bold;
-  border-radius: 25px;
+  background: linear-gradient(45deg, #D2691E, #CD853F);
+  color: #F5DEB3;
+  border: 2px solid #8B4513;
+  padding: 18px 35px;
+  font-size: 20px;
+  font-weight: 700;
+  border-radius: 30px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 20px rgba(139, 69, 19, 0.4);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  letter-spacing: 1px;
+  min-width: 160px;
 }
 
 .restart-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(139, 69, 19, 0.5);
+  background: linear-gradient(45deg, #CD853F, #D2691E);
 }
 
 .restart-button:active {
-  transform: translateY(0);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(139, 69, 19, 0.4);
 }
 
 /* 響應式設計 */
@@ -168,16 +183,26 @@
     font-size: 20px;
   }
   
+  .game-over {
+    padding: 40px 30px;
+    min-width: 260px;
+    max-width: 300px;
+  }
+  
   .game-over h2 {
-    font-size: 28px;
+    font-size: 30px;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
   }
   
   .game-over p {
-    font-size: 18px;
+    font-size: 20px;
+    margin-bottom: 30px;
   }
   
   .restart-button {
-    padding: 12px 24px;
-    font-size: 16px;
+    padding: 15px 30px;
+    font-size: 18px;
+    min-width: 140px;
   }
 }

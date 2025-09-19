@@ -21,7 +21,7 @@ const GAME_WIDTH = 360;
 const GAME_HEIGHT = 640;
 const GRAVITY = 0.5;
 const JUMP_FORCE = -12;
-const PLAYER_SPEED = 8; // 從 4 增加到 8，讓移動距離變為兩倍
+const PLAYER_SPEED = 16; // 從 8 增加到 16，讓移動距離再變為兩倍
 const PLATFORM_WIDTH = 60;
 const PLATFORM_HEIGHT = 15;
 
@@ -98,7 +98,7 @@ const App: React.FC = () => {
     );
   };
 
-  // 遊戲主循環
+  // 遊戲主循環 - 直接更新狀態，避免在 requestAnimationFrame 中使用 setState
   const gameLoop = useCallback(() => {
     if (gameState !== 'playing') return;
 
@@ -145,9 +145,6 @@ const App: React.FC = () => {
         setTargetCameraY(newTargetCameraY);
         setLastJumpY(newPlayer.y); // 更新上次跳躍位置
         setIsCameraMoving(true); // 標記相機開始移動
-        
-        // 讓角色保持在跳躍後的位置，但調整相機移動來保持視覺協調
-        // 不需要重置角色位置，讓跳躍看起來更自然
       }
 
       // 檢查 Game Over：當玩家掉到相機視野下方時
@@ -188,28 +185,41 @@ const App: React.FC = () => {
     });
   }, [gameState, keys, platforms, cameraY, lastJumpY, targetCameraY]);
 
-  // 平滑相機移動
+  // 統一的遊戲循環 - 使用 requestAnimationFrame
   useEffect(() => {
-    const cameraInterval = setInterval(() => {
-      setCameraY(prevCameraY => {
-        const diff = targetCameraY - prevCameraY;
-        if (Math.abs(diff) > 0.5) {
-          const newCameraY = prevCameraY + diff * 0.15; // 稍微加快移動速度
-          return newCameraY;
-        } else {
-          setIsCameraMoving(false); // 相機移動完成
-          return targetCameraY;
-        }
-      });
-    }, 16);
-    return () => clearInterval(cameraInterval);
-  }, [targetCameraY]);
-
-  // 遊戲循環
-  useEffect(() => {
-    const interval = setInterval(gameLoop, 16); // 60 FPS
-    return () => clearInterval(interval);
-  }, [gameLoop]);
+    let animationId: number;
+    
+    const unifiedGameLoop = () => {
+      if (gameState === 'playing') {
+        // 執行遊戲邏輯
+        gameLoop();
+        
+        // 執行相機平滑移動
+        setCameraY(prevCameraY => {
+          const diff = targetCameraY - prevCameraY;
+          if (Math.abs(diff) > 0.5) {
+            const newCameraY = prevCameraY + diff * 0.15; // 稍微加快移動速度
+            return newCameraY;
+          } else {
+            setIsCameraMoving(false); // 相機移動完成
+            return targetCameraY;
+          }
+        });
+      }
+      
+      // 繼續下一幀
+      animationId = requestAnimationFrame(unifiedGameLoop);
+    };
+    
+    // 開始動畫循環
+    animationId = requestAnimationFrame(unifiedGameLoop);
+    
+    return () => {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+    };
+  }, [gameState, gameLoop, targetCameraY]);
 
   // 重新開始遊戲
   const restartGame = () => {
@@ -304,7 +314,7 @@ const App: React.FC = () => {
 
         {/* 控制說明 */}
         <div className="controls">
-          <p>使用 A/D 或方向鍵控制移動</p>
+          <p>使用方向鍵控制移動</p>
         </div>
       </div>
     </div>
