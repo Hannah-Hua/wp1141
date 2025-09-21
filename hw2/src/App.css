@@ -3,17 +3,17 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #D2B48C 0%, #F5DEB3 100%);
+  background: #FFFFFF;
   padding: 20px;
 }
 
 .game-canvas {
   position: relative;
-  background: linear-gradient(180deg, #F5DEB3 0%, #DEB887 100%);
-  border: 3px solid #8B4513;
+  background: linear-gradient(180deg, #E0F6FF 0%, #B0E0E6 100%);
+  border: 3px solid #4682B4;
   border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(139, 69, 19, 0.3);
+  box-shadow: 0 10px 30px rgba(70, 130, 180, 0.3);
 }
 
 .game-world {
@@ -27,11 +27,11 @@
 
 .player {
   position: absolute;
-  background: linear-gradient(45deg, #D2691E, #CD853F);
+  background: linear-gradient(45deg, #4682B4, #5F9EA0);
   border-radius: 50%;
-  box-shadow: 0 4px 8px rgba(139, 69, 19, 0.3);
+  box-shadow: 0 4px 8px rgba(70, 130, 180, 0.3);
   z-index: 10;
-  border: 2px solid #F5DEB3;
+  border: 2px solid #FFFFFF;
 }
 
 .player::before {
@@ -65,10 +65,10 @@
 
 .platform {
   position: absolute;
-  background: linear-gradient(90deg, #A0522D, #CD853F);
+  background: linear-gradient(90deg, #FFFFFF, #F0F8FF);
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(139, 69, 19, 0.4);
-  border: 1px solid #8B4513;
+  box-shadow: 0 2px 4px rgba(70, 130, 180, 0.4);
+  border: 1px solid #4682B4;
 }
 
 .platform::before {
@@ -144,8 +144,8 @@
   left: 20px;
   font-size: 24px;
   font-weight: bold;
-  color: #8B4513;
-  text-shadow: 2px 2px 4px rgba(245, 222, 179, 0.8);
+  color: #4682B4;
+  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8);
   z-index: 20;
 }
 
@@ -155,10 +155,10 @@
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
-  color: #8B4513;
+  color: #4682B4;
   font-size: 14px;
   font-weight: bold;
-  text-shadow: 1px 1px 2px rgba(245, 222, 179, 0.8);
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
   z-index: 20;
 }
 
@@ -167,14 +167,14 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: linear-gradient(135deg, rgba(139, 69, 19, 0.95), rgba(160, 82, 45, 0.95));
-  color: #F5DEB3;
+  background: linear-gradient(135deg, rgba(70, 130, 180, 0.95), rgba(95, 158, 160, 0.95));
+  color: #FFFFFF;
   padding: 50px 40px;
   border-radius: 20px;
   text-align: center;
   z-index: 30;
-  box-shadow: 0 15px 40px rgba(139, 69, 19, 0.6);
-  border: 3px solid #D2691E;
+  box-shadow: 0 15px 40px rgba(70, 130, 180, 0.6);
+  border: 3px solid #4682B4;
   min-width: 280px;
   max-width: 320px;
 }
@@ -182,7 +182,7 @@
 .game-over h2 {
   font-size: 36px;
   margin-bottom: 25px;
-  color: #D2691E;
+  color: #4682B4;
   font-weight: 900;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
   letter-spacing: 2px;
@@ -192,23 +192,23 @@
 .game-over p {
   font-size: 22px;
   margin-bottom: 35px;
-  color: #F5DEB3;
+  color: #FFFFFF;
   font-weight: 600;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
   line-height: 1.4;
 }
 
 .restart-button {
-  background: linear-gradient(45deg, #D2691E, #CD853F);
-  color: #F5DEB3;
-  border: 2px solid #8B4513;
+  background: linear-gradient(45deg, #4682B4, #5F9EA0);
+  color: #FFFFFF;
+  border: 2px solid #4682B4;
   padding: 18px 35px;
   font-size: 20px;
   font-weight: 700;
   border-radius: 30px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 6px 20px rgba(139, 69, 19, 0.4);
+  box-shadow: 0 6px 20px rgba(70, 130, 180, 0.4);
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
   letter-spacing: 1px;
   min-width: 160px;
@@ -216,20 +216,20 @@
 
 .restart-button:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(139, 69, 19, 0.5);
-  background: linear-gradient(45deg, #CD853F, #D2691E);
+  box-shadow: 0 8px 25px rgba(70, 130, 180, 0.5);
+  background: linear-gradient(45deg, #5F9EA0, #4682B4);
 }
 
 .restart-button:active {
   transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(139, 69, 19, 0.4);
+  box-shadow: 0 4px 15px rgba(70, 130, 180, 0.4);
 }
 
 /* 響應式設計 */
-@media (max-width: 400px) {
+@media (max-width: 500px) {
   .game-canvas {
-    width: 320px !important;
-    height: 568px !important;
+    width: 360px !important;
+    height: 640px !important;
   }
   
   .score {
