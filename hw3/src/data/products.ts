@@ -1,5 +1,5 @@
 import { Product } from '../types';
-import { parseCSV, updateProductImages } from '../utils/csvParser';
+import { parseCSV } from '../utils/csvParser';
 
 // 動態載入 CSV 資料
 let cachedProducts: Product[] | null = null;
@@ -48,9 +48,9 @@ export const getProducts = async (): Promise<Product[]> => {
     const csvText = decoder.decode(arrayBuffer);
     console.log('Big5 解碼完成，開始解析...');
     
-    // 解析 CSV 並更新圖片
+    // 解析 CSV
     const parsedProducts = parseCSV(csvText);
-    cachedProducts = updateProductImages(parsedProducts);
+    cachedProducts = parsedProducts;
     lastFetchTime = now;
     
     console.log(`成功載入 ${cachedProducts.length} 個商品`);

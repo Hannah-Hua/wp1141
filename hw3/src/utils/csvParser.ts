@@ -74,18 +74,3 @@ const parseCSVLine = (line: string): string[] => {
   return result;
 };
 
-// 隨機選擇圖片
-const imageFiles = ['/img/1.webp', '/img/2.webp', '/img/3.webp', '/img/4.jpg'];
-
-export const getRandomImage = (): string => {
-  return imageFiles[Math.floor(Math.random() * imageFiles.length)];
-};
-
-// 更新商品圖片為隨機圖片
-export const updateProductImages = (products: Product[]): Product[] => {
-  return products.map(product => ({
-    ...product,
-    image_url: getRandomImage(),
-    thumbnail_url: getRandomImage(),
-  }));
-};
