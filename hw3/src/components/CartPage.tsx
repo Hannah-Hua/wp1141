@@ -289,11 +289,11 @@ const CartPage: React.FC<CartPageProps> = ({ cartItems, setCartItems, onCloseCar
                   NT$ {calculateSelectedTotal().toLocaleString()}
                 </Typography>
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  共{cartItems.length}件商品
+                  共{selectedCount}件商品
                 </Typography>
                 {selectedCount > 0 && (
                   <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    (已選中{selectedCount}件，金額: NT$ {calculateSelectedTotal().toLocaleString()})
+                    (購物車總共{cartItems.length}件商品)
                   </Typography>
                 )}
               </Box>
