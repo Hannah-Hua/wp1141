@@ -69,16 +69,6 @@ const CartPage: React.FC<CartPageProps> = ({ cartItems, setCartItems, onCloseCar
     setCartItems(prev => prev.map(item => ({ ...item, isSelected: !allSelected })));
   };
 
-  // 計算總金額
-  const calculateTotal = () => {
-    const total = cartItems.reduce((total, item) => {
-      const itemTotal = item.product.price_twd * item.quantity;
-      console.log(`商品: ${item.product.product_name}, 單價: ${item.product.price_twd}, 數量: ${item.quantity}, 小計: ${itemTotal}`);
-      return total + itemTotal;
-    }, 0);
-    console.log(`總金額: ${total}`);
-    return total;
-  };
 
   // 計算選中商品總金額
   const calculateSelectedTotal = () => {
@@ -293,10 +283,10 @@ const CartPage: React.FC<CartPageProps> = ({ cartItems, setCartItems, onCloseCar
             <Grid item xs={6}>
               <Box sx={{ textAlign: 'right' }}>
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  商品總金額
+                  已選商品總金額
                 </Typography>
                 <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'red' }}>
-                  NT$ {calculateTotal().toLocaleString()}
+                  NT$ {calculateSelectedTotal().toLocaleString()}
                 </Typography>
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                   共{cartItems.length}件商品
