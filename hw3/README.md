@@ -1,4 +1,4 @@
-# K-pop 周邊商品購買平台（HW3）
+# K-pop 周邊商品購買平台
 
 React + TypeScript + Material-UI 打造的 K-pop 周邊電商前端。提供商品探索、收藏、購物車、下單與訂單歷史等完整體驗。
 
