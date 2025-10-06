@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hannah - 台灣大學資管系學生 | 程式設計與資料分析</title>
+    <meta name="description" content="Hannah 是台灣大學資訊管理學系三年級學生，專精於網頁開發、資料分析與程式設計。分享學習心得與技術見解。">
+    <meta name="keywords" content="Hannah, 台灣大學, 資管系, 程式設計, 資料分析, 網頁開發, 學生作品集">
+    <meta name="author" content="Hannah">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Hannah - 台灣大學資管系學生 | 程式設計與資料分析">
+    <meta property="og:description" content="台灣大學資訊管理學系三年級學生，專精於網頁開發、資料分析與程式設計，分享學習心得與技術見解">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://hannah.ntu.edu.tw">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👩‍💼</text></svg>">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="src/css/styles.css">
+</head>
+<body>
+    <!-- 載入動畫 -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">載入中...</div>
+    </div>
+
+    <!-- 粒子背景 -->
+    <div class="particles" id="particles"></div>
+
+    <!-- 滾動進度條 -->
+    <div class="scroll-progress">
+        <div class="scroll-progress-bar" id="scrollProgress"></div>
+    </div>
+
+    <!-- 導航列 -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <h1>Hannah</h1>
+            <span class="nav-subtitle">B12705022</span>
+        </div>
+        <div class="nav-menu">
+            <a href="#home" class="nav-link active">首頁</a>
+            <a href="#about" class="nav-link">關於我</a>
+            <a href="#portfolio" class="nav-link">作品集</a>
+            <a href="#blog" class="nav-link">部落格</a>
+            <a href="#contact" class="nav-link">聯絡我</a>
+        </div>
+        <button class="mobile-menu-toggle" id="mobileMenuToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </nav>
+
+    <!-- 主內容區域 -->
+    <main class="main-content">
+        <!-- 首頁區塊 -->
+        <section id="home" class="page-section">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <h1 class="hero-title">Hannah</h1>
+                        <h2 class="hero-subtitle">台灣大學資訊管理學系三年級</h2>
+                        <div class="hero-line"></div>
+                        <p class="hero-description">熱愛程式設計與資料分析的資管系學生，致力於將技術知識應用於解決實際問題，並分享學習歷程與技術見解。</p>
+                        <div class="hero-buttons">
+                            <a href="#portfolio" class="btn btn-primary">查看作品</a>
+                            <a href="#contact" class="btn btn-secondary">聯絡我</a>
+                        </div>
+                    </div>
+                    <div class="hero-image">
+                        <div class="hero-photo"></div>
+                        <div class="hero-badge">
+                            <span class="badge-text">2+ 年經驗</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">15+</span>
+                        <span class="stat-label">專案作品</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">3.8</span>
+                        <span class="stat-label">學期GPA</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">2+</span>
+                        <span class="stat-label">年學習經驗</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 關於我區塊 -->
+        <section id="about" class="page-section">
+            <div class="about-container">
+                <div class="about-content">
+                    <div class="about-text animate-left">
+                        <h2 class="section-title">關於我</h2>
+                        <h3 class="about-subtitle">台灣大學資訊管理學系三年級學生</h3>
+                        <div class="about-description">
+                            <p>我是 Hannah，目前就讀於台灣大學資訊管理學系三年級。對資訊科技與商業管理的結合充滿熱忱，致力於學習最新的技術趨勢並將其應用於實際問題解決中。</p>
+                            <p>在學期間積極參與各種專案和競賽，專精於網頁開發、資料分析、系統設計等領域。同時也熱愛分享學習心得，透過部落格記錄學習歷程，希望能與同儕交流技術見解，共同成長。</p>
+                        </div>
+                        <div class="about-skills">
+                            <div class="skill-item">
+                                <span class="skill-name">網頁開發 (HTML/CSS/JavaScript)</span>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 85%"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <span class="skill-name">資料分析與視覺化</span>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 80%"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <span class="skill-name">Python 程式設計</span>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 75%"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <span class="skill-name">資料庫管理</span>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 70%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="#contact" class="btn btn-primary">聯絡我</a>
+                    </div>
+                    <div class="about-image animate-right">
+                        <div class="about-photo"></div>
+                        <div class="about-badges">
+                            <div class="badge">網頁開發者</div>
+                            <div class="badge">資料分析師</div>
+                            <div class="badge">學習分享者</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 作品集區塊 -->
+        <section id="portfolio" class="page-section">
+            <div class="portfolio-container">
+                <div class="portfolio-header animate-on-scroll">
+                    <h2 class="section-title">作品集</h2>
+                    <p class="section-subtitle">精選的程式設計與專案作品</p>
+                </div>
+                <div class="portfolio-filter">
+                    <button class="filter-btn active" data-filter="all">全部</button>
+                    <button class="filter-btn" data-filter="web">網頁開發</button>
+                    <button class="filter-btn" data-filter="data">資料分析</button>
+                    <button class="filter-btn" data-filter="mobile">行動應用</button>
+                </div>
+                <div class="portfolio-grid">
+                    <div class="portfolio-item" data-category="web">
+                        <div class="portfolio-image">
+                            <img src="src/images/個人網頁.png" alt="個人作品集網站" class="portfolio-photo">
+                            <div class="portfolio-overlay">
+                                <h3>個人作品集網站</h3>
+                                <p>使用 HTML/CSS/JavaScript 開發的響應式個人網站</p>
+                                <a href="#" class="portfolio-link">查看詳情</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="portfolio-item" data-category="data">
+                        <div class="portfolio-image">
+                            <img src="src/images/電商.webp" alt="電商銷售資料分析" class="portfolio-photo">
+                            <div class="portfolio-overlay">
+                                <h3>電商銷售資料分析</h3>
+                                <p>使用 Python 分析電商平台銷售數據並製作視覺化圖表</p>
+                                <a href="#" class="portfolio-link">查看詳情</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="portfolio-item" data-category="web">
+                        <div class="portfolio-image">
+                            <img src="src/images/圖書館.jpg" alt="圖書館管理系統" class="portfolio-photo">
+                            <div class="portfolio-overlay">
+                                <h3>圖書館管理系統</h3>
+                                <p>基於 Web 的圖書借還管理系統，整合資料庫功能</p>
+                                <a href="#" class="portfolio-link">查看詳情</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="portfolio-item" data-category="mobile">
+                        <div class="portfolio-image">
+                            <img src="src/images/校園活動.jpg" alt="校園活動 APP" class="portfolio-photo">
+                            <div class="portfolio-overlay">
+                                <h3>校園活動 APP</h3>
+                                <p>React Native 開發的校園活動資訊與報名應用</p>
+                                <a href="#" class="portfolio-link">查看詳情</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="portfolio-item" data-category="data">
+                        <div class="portfolio-image">
+                            <img src="src/images/學習成效分析.jpg" alt="學生學習成效分析" class="portfolio-photo">
+                            <div class="portfolio-overlay">
+                                <h3>學生學習成效分析</h3>
+                                <p>分析學生學習數據，提供個人化學習建議</p>
+                                <a href="#" class="portfolio-link">查看詳情</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="portfolio-item" data-category="web">
+                        <div class="portfolio-image">
+                            <img src="src/images/學習平台.jpg" alt="線上學習平台" class="portfolio-photo">
+                            <div class="portfolio-overlay">
+                                <h3>線上學習平台</h3>
+                                <p>全端開發的線上課程管理與學習平台</p>
+                                <a href="#" class="portfolio-link">查看詳情</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 部落格區塊 -->
+        <section id="blog" class="page-section">
+            <div class="blog-container">
+                <div class="blog-header">
+                    <h2 class="section-title">最新文章</h2>
+                    <p class="section-subtitle">分享程式設計學習心得與校園生活體驗</p>
+                </div>
+                <div class="blog-grid">
+                    <article class="blog-card featured">
+                        <div class="blog-image">
+                            <img src="src/images/javascript學習筆記.jpg" alt="JavaScript 學習筆記" class="blog-photo">
+                            <div class="blog-category">程式設計</div>
+                        </div>
+                        <div class="blog-content">
+                            <h3 class="blog-title">JavaScript ES6+ 新特性學習筆記</h3>
+                            <p class="blog-excerpt">整理學習 JavaScript 現代語法的心得，包括箭頭函數、解構賦值、Promise 等實用技巧。</p>
+                            <div class="blog-meta">
+                                <span class="blog-date">2024年3月15日</span>
+                                <span class="blog-read-time">8 分鐘閱讀</span>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="blog-card">
+                        <div class="blog-image">
+                            <img src="src/images/電商.webp" alt="資料分析專案分享" class="blog-photo">
+                            <div class="blog-category">資料分析</div>
+                        </div>
+                        <div class="blog-content">
+                            <h3 class="blog-title">Python 資料視覺化實戰分享</h3>
+                            <p class="blog-excerpt">使用 Matplotlib 和 Seaborn 進行資料分析與視覺化的實作經驗分享。</p>
+                            <div class="blog-meta">
+                                <span class="blog-date">2024年3月10日</span>
+                                <span class="blog-read-time">6 分鐘閱讀</span>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="blog-card">
+                        <div class="blog-image">
+                            <img src="src/images/資管系心得.jpg" alt="校園生活分享" class="blog-photo">
+                            <div class="blog-category">校園生活</div>
+                        </div>
+                        <div class="blog-content">
+                            <h3 class="blog-title">台大資管系三年級學習心得</h3>
+                            <p class="blog-excerpt">分享在台大資管系的學習歷程，包括課程選擇、專案經驗與未來規劃。</p>
+                            <div class="blog-meta">
+                                <span class="blog-date">2024年3月5日</span>
+                                <span class="blog-read-time">5 分鐘閱讀</span>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                <div class="blog-cta">
+                    <a href="#" class="btn btn-primary">查看更多文章</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 聯絡我區塊 -->
+        <section id="contact" class="page-section">
+            <div class="contact-container">
+                <div class="contact-header">
+                    <h2 class="section-title">聯絡我</h2>
+                    <p class="section-subtitle">歡迎交流技術心得或合作機會</p>
+                </div>
+                <div class="contact-content">
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <div class="contact-icon">📧</div>
+                            <div class="contact-details">
+                                <h3>電子郵件</h3>
+                                <p>hannah@ntu.edu.tw</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon">🎓</div>
+                            <div class="contact-details">
+                                <h3>學號</h3>
+                                <p>B12705022</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon">📍</div>
+                            <div class="contact-details">
+                                <h3>位置</h3>
+                                <p>台灣大學，台北市</p>
+                            </div>
+                        </div>
+                    </div>
+                    <form class="contact-form">
+                        <div class="form-group">
+                            <input type="text" id="name" name="name" placeholder="您的姓名" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" id="email" name="email" placeholder="您的電子郵件" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="subject" name="subject" placeholder="主旨" required>
+                        </div>
+                        <div class="form-group">
+                            <textarea id="message" name="message" placeholder="您的訊息" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">發送訊息</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 左側社交媒體按鈕 -->
+    <div class="social-sidebar">
+        <a href="https://www.facebook.com/share/17PipnP7YU/?mibextid=wwXIfr" target="_blank" class="social-link facebook">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+        </a>
+        <a href="https://www.instagram.com/ziyen__hua?igsh=cHFpeXlidnB3OTFp&utm_source=qr" target="_blank" class="social-link instagram">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.919-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+        </a>
+    </div>
+
+    <!-- 頁面快轉按鈕 -->
+    <div class="page-indicator">
+        <button class="indicator-btn active" data-page="home"></button>
+        <button class="indicator-btn" data-page="about"></button>
+        <button class="indicator-btn" data-page="portfolio"></button>
+        <button class="indicator-btn" data-page="blog"></button>
+        <button class="indicator-btn" data-page="contact"></button>
+    </div>
+
+    <!-- 滾動提示 -->
+    <div class="scroll-hint" id="scrollHint">
+        <div>滾動或使用方向鍵瀏覽</div>
+        <div style="font-size: 12px; margin-top: 5px;">↓ ↑ ← →</div>
+    </div>
+
+    <!-- TypeScript 編譯後的 JavaScript 檔案 -->
+    <script type="module" src="dist/js/main.js"></script>
+    
+    <!-- 備用方案：如果模組載入失敗，顯示提示 -->
+    <script>
+        // 檢查是否在 file:// 協議下運行
+        if (window.location.protocol === 'file:') {
+            console.warn('直接開啟 HTML 檔案可能無法正常載入 JavaScript 模組');
+            console.warn('建議使用本地伺服器：yarn serve 然後訪問 http://localhost:8000');
+            
+            // 嘗試載入 JavaScript 作為普通腳本
+            const script = document.createElement('script');
+            script.src = 'dist/js/main.js';
+            script.onerror = function() {
+                alert('無法載入 JavaScript 檔案。請使用本地伺服器開啟網站：\n1. 在終端執行 yarn serve\n2. 訪問 http://localhost:8000');
+            };
+            document.head.appendChild(script);
+        }
+    </script>
+</body>
+</html>

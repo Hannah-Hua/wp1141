@@ -1,0 +1,261 @@
+.game-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #FFFFFF;
+  padding: 20px;
+}
+
+.game-canvas {
+  position: relative;
+  background: linear-gradient(180deg, #E0F6FF 0%, #B0E0E6 100%);
+  border: 3px solid #4682B4;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(70, 130, 180, 0.3);
+}
+
+.game-world {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.1s ease-out;
+}
+
+.player {
+  position: absolute;
+  background: linear-gradient(45deg, #4682B4, #5F9EA0);
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(70, 130, 180, 0.3);
+  z-index: 10;
+  border: 2px solid #FFFFFF;
+}
+
+.player::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60%;
+  height: 60%;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+}
+
+/* 相機移動時的跳躍動畫 */
+.player.camera-moving {
+  animation: jumpDuringCamera 0.3s ease-out;
+}
+
+@keyframes jumpDuringCamera {
+  0% {
+    transform: scale(1) translateY(0);
+  }
+  50% {
+    transform: scale(1.1) translateY(-5px);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+  }
+}
+
+.platform {
+  position: absolute;
+  background: linear-gradient(90deg, #FFFFFF, #F0F8FF);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(70, 130, 180, 0.4);
+  border: 1px solid #4682B4;
+}
+
+.platform::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, 
+    rgba(255, 255, 255, 0.1) 0%, 
+    transparent 50%, 
+    rgba(0, 0, 0, 0.1) 100%);
+  border-radius: 8px;
+}
+
+.enemy {
+  position: absolute;
+  background: linear-gradient(45deg, #DC143C, #B22222);
+  border-radius: 50%;
+  box-shadow: 0 3px 6px rgba(220, 20, 60, 0.4);
+  z-index: 8;
+  border: 2px solid #8B0000;
+  animation: enemyFloat 2s ease-in-out infinite;
+}
+
+.enemy::before {
+  content: '👹';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 16px;
+  filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+.enemy::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(circle, rgba(255, 0, 0, 0.2) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: enemyPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes enemyFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes enemyPulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+.score {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #4682B4;
+  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8);
+  z-index: 20;
+}
+
+.controls {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  color: #4682B4;
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+  z-index: 20;
+}
+
+.game-over {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(135deg, rgba(70, 130, 180, 0.95), rgba(95, 158, 160, 0.95));
+  color: #FFFFFF;
+  padding: 50px 40px;
+  border-radius: 20px;
+  text-align: center;
+  z-index: 30;
+  box-shadow: 0 15px 40px rgba(70, 130, 180, 0.6);
+  border: 3px solid #4682B4;
+  min-width: 280px;
+  max-width: 320px;
+}
+
+.game-over h2 {
+  font-size: 36px;
+  margin-bottom: 25px;
+  color: #4682B4;
+  font-weight: 900;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  letter-spacing: 2px;
+  line-height: 1.2;
+}
+
+.game-over p {
+  font-size: 22px;
+  margin-bottom: 35px;
+  color: #FFFFFF;
+  font-weight: 600;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  line-height: 1.4;
+}
+
+.restart-button {
+  background: linear-gradient(45deg, #4682B4, #5F9EA0);
+  color: #FFFFFF;
+  border: 2px solid #4682B4;
+  padding: 18px 35px;
+  font-size: 20px;
+  font-weight: 700;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(70, 130, 180, 0.4);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  letter-spacing: 1px;
+  min-width: 160px;
+}
+
+.restart-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(70, 130, 180, 0.5);
+  background: linear-gradient(45deg, #5F9EA0, #4682B4);
+}
+
+.restart-button:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(70, 130, 180, 0.4);
+}
+
+/* 響應式設計 */
+@media (max-width: 500px) {
+  .game-canvas {
+    width: 360px !important;
+    height: 640px !important;
+  }
+  
+  .score {
+    font-size: 20px;
+  }
+  
+  .game-over {
+    padding: 40px 30px;
+    min-width: 260px;
+    max-width: 300px;
+  }
+  
+  .game-over h2 {
+    font-size: 30px;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+  }
+  
+  .game-over p {
+    font-size: 20px;
+    margin-bottom: 30px;
+  }
+  
+  .restart-button {
+    padding: 15px 30px;
+    font-size: 18px;
+    min-width: 140px;
+  }
+}
