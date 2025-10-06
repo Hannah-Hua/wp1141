@@ -20,6 +20,7 @@ import {
   ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
 import { Product } from '../types';
+import { getImageWithFallback, DEFAULT_GROUP_IMAGE } from '../utils/groupImages';
 
 interface ProductDetailProps {
   product: Product | null;
@@ -136,18 +137,25 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
               )}
             </Box>
 
-            {/* 商品圖片佔位符 */}
-            <Typography
-              variant="h6"
+            {/* 商品圖片 */}
+            <Box
+              component="img"
+              src={getImageWithFallback(product.group_name)}
+              alt={`${product.group_name} 團體合照`}
               sx={{
-                color: '#666',
-                fontWeight: 'bold',
-                mb: 2,
+                width: '100%',
+                aspectRatio: '1 / 1',
+                objectFit: 'cover',
+                borderRadius: 1,
+                backgroundColor: '#f8f8f8',
               }}
-            >
-              商品圖片
-            </Typography>
-            <Typography variant="body2" sx={{ color: '#999' }}>
+              onError={(e) => {
+                // 當圖片載入失敗時，使用預設圖片
+                const target = e.target as HTMLImageElement;
+                target.src = DEFAULT_GROUP_IMAGE;
+              }}
+            />
+            <Typography variant="body2" sx={{ color: '#999', mt: 2 }}>
               {product.product_name}
             </Typography>
           </Box>
