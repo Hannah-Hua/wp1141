@@ -9,6 +9,7 @@ import {
   Rating,
 } from '@mui/material';
 import { Product } from '../types';
+import { getImageWithFallback, DEFAULT_GROUP_IMAGE } from '../utils/groupImages';
 
 interface ProductCardProps {
   product: Product;
@@ -44,22 +45,50 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
     >
       <Box sx={{ position: 'relative', backgroundColor: '#f8f8f8' }}>
         <CardMedia
-          component="div"
+          component="img"
+          image={getImageWithFallback(product.group_name)}
+          alt={`${product.group_name} 團體合照`}
           sx={{
             height: 250,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            objectFit: 'cover',
             backgroundColor: '#f8f8f8',
-            fontSize: '0.9rem',
-            color: '#666',
-            fontWeight: 'bold',
-            textAlign: 'center',
-            padding: 2,
+          }}
+          onError={(e) => {
+            // 當圖片載入失敗時，使用預設圖片
+            const target = e.target as HTMLImageElement;
+            target.src = DEFAULT_GROUP_IMAGE;
+          }}
+        />
+        {/* 商品名稱疊加文字 */}
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
+            padding: '20px 16px 16px',
+            zIndex: 1,
           }}
         >
-          {product.product_name}
-        </CardMedia>
+          <Typography
+            variant="h6"
+            sx={{
+              color: 'white',
+              fontWeight: 'bold',
+              fontSize: '1rem',
+              textAlign: 'center',
+              textShadow: '0 2px 4px rgba(0,0,0,0.5)',
+              lineHeight: 1.2,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
+            {product.product_name}
+          </Typography>
+        </Box>
         {product.limited_edition && (
           <Chip
             label="限量版"
@@ -73,6 +102,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
               fontWeight: 'bold',
               fontSize: '0.75rem',
               borderRadius: '12px',
+              zIndex: 2,
             }}
           />
         )}
@@ -89,6 +119,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
               fontWeight: 'bold',
               fontSize: '0.75rem',
               borderRadius: '12px',
+              zIndex: 2,
             }}
           />
         )}
