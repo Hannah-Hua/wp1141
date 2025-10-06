@@ -69,3 +69,4 @@ public/images/groups/
 
 ## 預設圖片
 當團體圖片不存在時，系統會自動使用 `default.jpg` 作為預設圖片。建議準備一張通用的 K-Pop 風格圖片作為預設。
+

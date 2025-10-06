@@ -21,3 +21,4 @@ export const getImageWithFallback = (groupName: string): string => {
 
 // 預設圖片路徑（當團體圖片不存在時使用）
 export const DEFAULT_GROUP_IMAGE = '/images/groups/default.jpg';
+
