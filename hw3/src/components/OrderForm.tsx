@@ -108,13 +108,10 @@ const OrderForm: React.FC<OrderFormProps> = ({
     return `ORD${year}${month}${day}${random}`;
   };
 
-  // 格式化訂單日期
+  // 格式化訂單日期 - 使用 ISO 格式以便正確排序
   const formatOrderDate = () => {
     const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth() + 1;
-    const day = now.getDate() + 3; // 預計3天後送達
-    return `${year}年${month}月${day}日`;
+    return now.toISOString(); // 使用 ISO 格式: "2025-01-07T10:30:00.000Z"
   };
 
   // 處理訂單提交

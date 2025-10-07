@@ -67,6 +67,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({ onClose }) => {
         minute: '2-digit'
       });
     } catch (error) {
+      console.error('日期格式化錯誤:', error, '原始日期:', dateString);
       return dateString;
     }
   };

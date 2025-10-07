@@ -35,6 +35,37 @@ interface OrderConfirmationProps {
 }
 
 const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ orderData, onClose }) => {
+  // 格式化日期顯示
+  const formatDisplayDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('zh-TW', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      return dateString;
+    }
+  };
+
+  // 計算預計送達日期（訂單日期 + 3天）
+  const getExpectedDeliveryDate = (orderDate: string) => {
+    try {
+      const date = new Date(orderDate);
+      date.setDate(date.getDate() + 3);
+      return date.toLocaleDateString('zh-TW', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+    } catch (error) {
+      return '3天內';
+    }
+  };
+
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
       {/* Header */}
@@ -60,7 +91,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ orderData, onClos
                 訂單已成功送出！
               </Typography>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                我們會盡快與您聯繫確認訂單詳情，預計 {orderData.orderDate} 前送達。
+                我們會盡快與您聯繫確認訂單詳情，預計 {getExpectedDeliveryDate(orderData.orderDate)} 前送達。
               </Typography>
             </Box>
           </Box>
@@ -92,7 +123,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ orderData, onClos
                     訂單日期
                   </Typography>
                   <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                    {orderData.orderDate}
+                    {formatDisplayDate(orderData.orderDate)}
                   </Typography>
                 </Box>
                 
