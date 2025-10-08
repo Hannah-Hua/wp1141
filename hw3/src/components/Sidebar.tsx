@@ -6,33 +6,22 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
-  Collapse,
   CircularProgress,
 } from '@mui/material';
-import {
-  ExpandLess,
-  ExpandMore,
-} from '@mui/icons-material';
-import { getEntertainments, getGroupsByEntertainment } from '../data/products';
+import { getEntertainments } from '../data/products';
 
 interface SidebarProps {
   selectedEntertainment?: string;
-  selectedGroup?: string;
   onEntertainmentSelect: (entertainment: string) => void;
-  onGroupSelect: (group: string) => void;
   onClearFilters: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
   selectedEntertainment,
-  selectedGroup,
   onEntertainmentSelect,
-  onGroupSelect,
   onClearFilters,
 }) => {
-  const [entertainmentOpen, setEntertainmentOpen] = React.useState<{ [key: string]: boolean }>({});
   const [entertainments, setEntertainments] = useState<string[]>([]);
-  const [groups, setGroups] = useState<{ [key: string]: string[] }>({});
   const [isLoading, setIsLoading] = useState(true);
 
   // 載入側邊欄資料
@@ -40,20 +29,8 @@ const Sidebar: React.FC<SidebarProps> = ({
     const loadSidebarData = async () => {
       try {
         setIsLoading(true);
-        const [entertainmentsData] = await Promise.all([
-          getEntertainments()
-        ]);
-        
+        const entertainmentsData = await getEntertainments();
         setEntertainments(entertainmentsData);
-        
-        // 載入每個娛樂公司的團體
-        const groupsData: { [key: string]: string[] } = {};
-        for (const entertainment of entertainmentsData) {
-          const groupsForEntertainment = await getGroupsByEntertainment(entertainment);
-          groupsData[entertainment] = groupsForEntertainment;
-        }
-        setGroups(groupsData);
-        
       } catch (error) {
         console.error('載入側邊欄資料失敗:', error);
       } finally {
@@ -65,14 +42,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   }, []);
 
   const handleEntertainmentClick = (entertainment: string) => {
-    setEntertainmentOpen(prev => ({
-      ...prev,
-      [entertainment]: !prev[entertainment]
-    }));
-  };
-
-  const handleGroupClick = (group: string) => {
-    onGroupSelect(group);
+    onEntertainmentSelect(entertainment);
   };
 
 
@@ -112,7 +82,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 sx={{
                   borderRadius: 1,
                   mb: 0.5,
-                  backgroundColor: !selectedEntertainment && !selectedGroup ? 'rgba(0,0,0,0.08)' : 'transparent',
+                  backgroundColor: !selectedEntertainment ? 'rgba(0,0,0,0.08)' : 'transparent',
                   '&:hover': {
                     backgroundColor: 'rgba(0,0,0,0.04)',
                   },
@@ -121,7 +91,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <ListItemText
                   primary="最熱門商品"
                   primaryTypographyProps={{
-                    fontWeight: !selectedEntertainment && !selectedGroup ? 'bold' : 'normal',
+                    fontWeight: !selectedEntertainment ? 'bold' : 'normal',
                     textTransform: 'uppercase',
                   }}
                 />
@@ -129,7 +99,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             </ListItem>
           </List>
 
-          {/* Artist Section */}
+          {/* Entertainment Section */}
           <Typography
             variant="h6"
             sx={{
@@ -139,68 +109,33 @@ const Sidebar: React.FC<SidebarProps> = ({
               color: 'black',
             }}
           >
-            ARTIST
+            ENTERTAINMENT
           </Typography>
 
           <List sx={{ mb: 3 }}>
-            {entertainments.map((entertainment) => {
-              const entertainmentGroups = groups[entertainment] || [];
-              const isOpen = entertainmentOpen[entertainment];
-
-              return (
-                <React.Fragment key={entertainment}>
-                  <ListItem disablePadding>
-                    <ListItemButton
-                      onClick={() => handleEntertainmentClick(entertainment)}
-                      sx={{
-                        borderRadius: 1,
-                        mb: 0.5,
-                        '&:hover': {
-                          backgroundColor: 'rgba(0,0,0,0.04)',
-                        },
-                      }}
-                    >
-                      <ListItemText
-                        primary={entertainment}
-                        primaryTypographyProps={{
-                          fontWeight: 'bold',
-                          textTransform: 'uppercase',
-                        }}
-                      />
-                      {isOpen ? <ExpandLess /> : <ExpandMore />}
-                    </ListItemButton>
-                  </ListItem>
-                  <Collapse in={isOpen} timeout="auto" unmountOnExit>
-                    <List component="div" disablePadding>
-                      {entertainmentGroups.map((group) => (
-                        <ListItem key={group} disablePadding>
-                          <ListItemButton
-                            onClick={() => handleGroupClick(group)}
-                            sx={{
-                              pl: 4,
-                              borderRadius: 1,
-                              mb: 0.5,
-                              backgroundColor: selectedGroup === group ? 'rgba(0,0,0,0.08)' : 'transparent',
-                              '&:hover': {
-                                backgroundColor: 'rgba(0,0,0,0.04)',
-                              },
-                            }}
-                          >
-                            <ListItemText
-                              primary={group}
-                              primaryTypographyProps={{
-                                fontWeight: selectedGroup === group ? 'bold' : 'normal',
-                                textTransform: 'uppercase',
-                              }}
-                            />
-                          </ListItemButton>
-                        </ListItem>
-                      ))}
-                    </List>
-                  </Collapse>
-                </React.Fragment>
-              );
-            })}
+            {entertainments.map((entertainment) => (
+              <ListItem key={entertainment} disablePadding>
+                <ListItemButton
+                  onClick={() => handleEntertainmentClick(entertainment)}
+                  sx={{
+                    borderRadius: 1,
+                    mb: 0.5,
+                    backgroundColor: selectedEntertainment === entertainment ? 'rgba(0,0,0,0.08)' : 'transparent',
+                    '&:hover': {
+                      backgroundColor: 'rgba(0,0,0,0.04)',
+                    },
+                  }}
+                >
+                  <ListItemText
+                    primary={entertainment}
+                    primaryTypographyProps={{
+                      fontWeight: selectedEntertainment === entertainment ? 'bold' : 'normal',
+                      textTransform: 'uppercase',
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            ))}
           </List>
 
         </>

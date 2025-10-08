@@ -117,17 +117,12 @@ export const searchProducts = async (searchTerm: string): Promise<Product[]> => 
 // 根據篩選條件獲取商品
 export const getFilteredProducts = async (filters: {
   entertainment?: string;
-  group_name?: string;
 }): Promise<Product[]> => {
   const products = await getProducts();
   let filtered = [...products];
 
   if (filters.entertainment) {
     filtered = filtered.filter(product => product.entertainment === filters.entertainment);
-  }
-
-  if (filters.group_name) {
-    filtered = filtered.filter(product => product.group_name === filters.group_name);
   }
 
   return filtered;

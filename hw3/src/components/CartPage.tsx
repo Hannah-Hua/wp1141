@@ -350,9 +350,14 @@ const CartPage: React.FC<CartPageProps> = ({ cartItems, setCartItems, onCloseCar
 
                         {/* Price and Actions */}
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
-                          <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'red' }}>
-                            NT$ {(item.product.price_twd * item.quantity).toLocaleString()}
-                          </Typography>
+                          <Box>
+                            <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.8rem' }}>
+                              單價: NT$ {item.product.price_twd.toLocaleString()}
+                            </Typography>
+                            <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'red' }}>
+                              小計: NT$ {(item.product.price_twd * item.quantity).toLocaleString()}
+                            </Typography>
+                          </Box>
                           
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             {/* Quantity Controls */}

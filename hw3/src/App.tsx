@@ -102,13 +102,6 @@ const App: React.FC = () => {
     setSearchTerm(''); // 清除搜尋
   };
 
-  const handleGroupSelect = (group: string) => {
-    // 只保留團體篩選，清除其他所有篩選條件
-    setFilters({
-      group_name: group,
-    });
-    setSearchTerm(''); // 清除搜尋
-  };
 
 
   const clearFilters = () => {
@@ -317,16 +310,14 @@ const App: React.FC = () => {
     }
 
     // 檢查是否有任何篩選條件
-    const hasFilters = filters.entertainment || filters.group_name;
+    const hasFilters = filters.entertainment;
     
     if (hasFilters) {
       // 有篩選條件時，顯示篩選後的商品
       const filteredProducts = await getFilteredProducts(filters);
       let title = '';
       
-      if (filters.group_name) {
-        title = `${filters.group_name} 商品`;
-      } else if (filters.entertainment) {
+      if (filters.entertainment) {
         title = `${filters.entertainment} 商品`;
       }
       
@@ -557,9 +548,7 @@ const App: React.FC = () => {
         {!showFavorites && (
           <Sidebar
             selectedEntertainment={filters.entertainment}
-            selectedGroup={filters.group_name}
             onEntertainmentSelect={handleEntertainmentSelect}
-            onGroupSelect={handleGroupSelect}
             onClearFilters={clearFilters}
           />
         )}
