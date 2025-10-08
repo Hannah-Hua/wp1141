@@ -17,8 +17,10 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
+  const isOutOfStock = product.stock === 0;
+  
   const handleClick = () => {
-    if (onClick) {
+    if (onClick && !isOutOfStock) {
       onClick(product);
     }
   };
@@ -31,18 +33,53 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        cursor: onClick ? 'pointer' : 'default',
+        cursor: isOutOfStock ? 'not-allowed' : (onClick ? 'pointer' : 'default'),
         transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
         '&:hover': {
-          transform: 'translateY(-4px)',
-          boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
+          transform: isOutOfStock ? 'none' : 'translateY(-4px)',
+          boxShadow: isOutOfStock ? 'none' : '0 8px 25px rgba(0,0,0,0.15)',
         },
         borderRadius: 2,
         overflow: 'hidden',
         backgroundColor: '#ffffff',
         border: '1px solid #f0f0f0',
+        opacity: isOutOfStock ? 0.6 : 1,
+        position: 'relative',
       }}
     >
+      {/* 庫存為0時的遮罩 */}
+      {isOutOfStock && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(128, 128, 128, 0.3)',
+            zIndex: 10,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            pointerEvents: 'none',
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{
+              color: 'white',
+              fontWeight: 'bold',
+              textShadow: '0 2px 4px rgba(0,0,0,0.8)',
+              backgroundColor: 'rgba(0, 0, 0, 0.7)',
+              px: 2,
+              py: 1,
+              borderRadius: 1,
+            }}
+          >
+            缺貨中
+          </Typography>
+        </Box>
+      )}
       <Box sx={{ position: 'relative', backgroundColor: '#f8f8f8' }}>
         <CardMedia
           component="img"
