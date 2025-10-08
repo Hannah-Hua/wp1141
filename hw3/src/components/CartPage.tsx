@@ -90,11 +90,14 @@ const CartPage: React.FC<CartPageProps> = ({ cartItems, setCartItems, onCloseCar
     ));
   };
 
-  // 全選/取消全選（以商品種類為單位）
+  // 全選/取消全選（以選項為單位）
   const handleSelectAll = () => {
     const allSelected = cartItems.every(item => item.isSelected);
     setCartItems(prev => prev.map(item => ({ ...item, isSelected: !allSelected })));
   };
+
+  // 計算已選中商品種類數量
+  const selectedItemCount = cartItems.filter(item => item.isSelected).length;
 
 
   // 計算選中商品總金額
@@ -194,7 +197,7 @@ const CartPage: React.FC<CartPageProps> = ({ cartItems, setCartItems, onCloseCar
         flexShrink: 0,
       }}>
         <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'black' }}>
-          購物車 ({cartItems.length}件商品)
+          購物車 ({selectedCount}件商品)
         </Typography>
         <IconButton
           onClick={handleCloseCart}
@@ -234,12 +237,12 @@ const CartPage: React.FC<CartPageProps> = ({ cartItems, setCartItems, onCloseCar
             }}>
               <Checkbox
                 checked={cartItems.length > 0 && cartItems.every(item => item.isSelected)}
-                indeterminate={selectedCount > 0 && selectedCount < cartItems.length}
+                indeterminate={selectedItemCount > 0 && selectedItemCount < cartItems.length}
                 onChange={handleSelectAll}
                 size="small"
               />
               <Typography variant="body2" sx={{ ml: 1, fontSize: '0.9rem' }}>
-                全選 ({selectedCount}/{cartItems.length})
+                全選 ({selectedItemCount}/{cartItems.length})
               </Typography>
             </Box>
 
