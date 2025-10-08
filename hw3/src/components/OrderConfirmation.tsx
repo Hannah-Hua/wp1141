@@ -42,9 +42,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ orderData, onClos
       return date.toLocaleDateString('zh-TW', {
         year: 'numeric',
         month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
+        day: '2-digit'
       });
     } catch (error) {
       return dateString;
@@ -182,10 +180,11 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ orderData, onClos
                   <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
                     {item.product.product_name}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
-                    {item.product.group_name}
-                    {item.selectedOption && ` - ${item.selectedOption}`}
-                  </Typography>
+                  {item.selectedOption && (
+                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
+                      選項: {item.selectedOption}
+                    </Typography>
+                  )}
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                       數量: {item.quantity} × NT$ {item.product.price_twd.toLocaleString()}

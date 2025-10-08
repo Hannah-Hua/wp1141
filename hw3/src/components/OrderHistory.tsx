@@ -62,9 +62,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({ onClose }) => {
       return date.toLocaleDateString('zh-TW', {
         year: 'numeric',
         month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
+        day: '2-digit'
       });
     } catch (error) {
       console.error('日期格式化錯誤:', error, '原始日期:', dateString);
@@ -163,7 +161,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({ onClose }) => {
                               訂單日期
                             </Typography>
                             <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                              {order.orderDate}
+                              {formatDisplayDate(order.orderDate)}
                             </Typography>
                           </Box>
                           
@@ -222,10 +220,11 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({ onClose }) => {
                             <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
                               {item.product.product_name}
                             </Typography>
-                            <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
-                              {item.product.group_name}
-                              {item.selectedOption && ` - ${item.selectedOption}`}
-                            </Typography>
+                            {item.selectedOption && (
+                              <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
+                                選項: {item.selectedOption}
+                              </Typography>
+                            )}
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                                 數量: {item.quantity} × NT$ {item.product.price_twd.toLocaleString()}
