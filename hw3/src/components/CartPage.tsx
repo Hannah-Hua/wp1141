@@ -90,7 +90,7 @@ const CartPage: React.FC<CartPageProps> = ({ cartItems, setCartItems, onCloseCar
     ));
   };
 
-  // 全選/取消全選
+  // 全選/取消全選（以商品種類為單位）
   const handleSelectAll = () => {
     const allSelected = cartItems.every(item => item.isSelected);
     setCartItems(prev => prev.map(item => ({ ...item, isSelected: !allSelected })));
@@ -304,16 +304,6 @@ const CartPage: React.FC<CartPageProps> = ({ cartItems, setCartItems, onCloseCar
                           }}
                         >
                           {item.product.product_name}
-                        </Typography>
-                        <Typography 
-                          variant="body2" 
-                          sx={{ 
-                            color: 'text.secondary', 
-                            mb: 0.5,
-                            fontSize: '0.8rem'
-                          }}
-                        >
-                          {item.product.group_name}
                         </Typography>
                         
                         {/* Option Display/Edit */}
