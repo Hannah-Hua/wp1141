@@ -1,30 +1,30 @@
 ﻿product_id,sku,group_name,entertainment,product_name,category,price_twd,stock,description,limited_edition,preorder,rating,sold_count,max_purchase_qty,shipping_days_estimate
-LSTK-0001,BTS-LIGHTSTICK-001,BTS,HYBE,BTS OFFICIAL LIGHT STICK Special Edition 官方應援手燈特別版,Official Light Stick,1470,28,BTS 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.5,137,2,5
-LSTK-0002,LESSERAFIM-LIGHTSTICK-002,LE SSERAFIM,HYBE,LE SSERAFIM Official Light Stick 官方應援手燈,Official Light Stick,1590,31,LE SSERAFIM 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.6,154,2,5
-LSTK-0003,NEWJEANS-LIGHTSTICK-003,NewJeans,HYBE,NewJeans Official Light Stick Binky Bong 官方應援手燈,Official Light Stick,1570,34,NewJeans 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.7,171,2,5
-LSTK-0004,TXT-LIGHTSTICK-004,TXT,HYBE,TOMORROW X TOGETHER Official Light Stick Ver.2 官方二代應援手燈,Official Light Stick,1470,37,TXT 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.8,188,2,5
-LSTK-0005,ENHYPEN-LIGHTSTICK-005,ENHYPEN,HYBE,ENHYPEN Official Light Stick Ver.2 官方二代應援手燈,Official Light Stick,1470,40,ENHYPEN 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.9,205,2,5
-LSTK-0006,SEVENTEEN-LIGHTSTICK-006,SEVENTEEN,HYBE,SEVENTEEN OFFICIAL LIGHT STICK VER.3 10th Anniv. 官方三代手燈(十周年紀念版),Official Light Stick,1470,43,SEVENTEEN 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.4,222,2,5
-LSTK-0008,BOYNEXTDOOR-LIGHTSTICK-008,BOYNEXTDOOR,HYBE,BOYNEXTDOOR OFFICIAL LIGHT STICK 官方應援手燈,Official Light Stick,1570,49,BOYNEXTDOOR 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.6,256,2,5
-LSTK-0009,ILLIT-LIGHTSTICK-009,ILLIT,HYBE,ILLIT Official Light Stick 官方應援手燈,Official Light Stick,1470,52,ILLIT 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.7,273,2,5
-LSTK-0010,TWICE-LIGHTSTICK-010,TWICE,JYP,TWICE CANDYBONG ∞ 官方三代應援手燈,Official Light Stick,1470,55,TWICE 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.8,290,2,5
-LSTK-0011,ITZY-LIGHTSTICK-011,ITZY,JYP,ITZY OFFICIAL LIGHT RING VER 2 官方二代應援手燈,Official Light Stick,1470,58,ITZY 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.9,307,2,5
-LSTK-0012,NMIXX-LIGHTSTICK-012,NMIXX,JYP,NMIXX OFFICIAL LIGHT STICK 官方應援手燈,Official Light Stick,1470,61,NMIXX 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.4,324,2,5
-LSTK-0013,STRAYKIDS-LIGHTSTICK-013,Stray Kids,JYP,Stray Kids OFFICIAL LIGHT STICK ver.2 官方二代手燈,Official Light Stick,1470,64,Stray Kids 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.5,341,2,5
-LSTK-0014,2PM-LIGHTSTICK-014,2PM,JYP,2PM OFFICIAL LIGHT STICK 官方應援手燈,Official Light Stick,1470,67,2PM 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.6,358,2,5
-LSTK-0015,AESPA-LIGHTSTICK-015,aespa,SM,aespa OFFICIAL FANLIGHT ver.2 官方二代應援手燈,Official Light Stick,1470,25,aespa 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.7,375,2,5
-LSTK-0016,NCT-LIGHTSTICK-016,NCT DREAM,SM,NCT DREAM OFFICIAL FANLIGHT 官方應援手燈,Official Light Stick,1470,28,NCT 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.8,392,2,5
-LSTK-0017,REDVELVET-LIGHTSTICK-017,Red Velvet,SM,Red Velvet OFFICIAL FANLIGHT 官方應援手燈,Official Light Stick,1470,31,Red Velvet 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.9,409,2,5
-LSTK-0018,SHINEE-LIGHTSTICK-018,SHINee,SM,SHINee OFFICIAL FANLIGHT 官方應援手燈,Official Light Stick,1470,34,SHINee 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.4,126,2,5
-LSTK-0019,SUPERJUNIOR-LIGHTSTICK-019,SUPER JUNIOR,SM,SUPER JUNIOR OFFICIAL LIGHT STICK VER2 官方應援二代手燈,Official Light Stick,1420,0,SUPER JUNIOR 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.5,143,0,5
-LSTK-0020,東方神起-LIGHTSTICK-020,TVXQ,SM,TVXQ! 東方神起 OFFICIAL FANLIGHT 官方應援手燈,Official Light Stick,1470,40,東方神起 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.6,160,2,5
-LSTK-0021,少女時代-LIGHTSTICK-021,Girls Generation,SM,少女時代 GIRLS' GENERATION OFFICIAL FANLIGHT 官方應援手燈,Official Light Stick,1470,43,少女時代 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.7,177,2,5
-LSTK-0022,EXO-LIGHTSTICK-022,EXO,SM,EXO OFFICIAL FANLIGHT VER.3.0 官方應援三代手燈,Official Light Stick,1470,46,EXO 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.8,194,2,5
-LSTK-0023,WAYV-LIGHTSTICK-023,WayV,SM,WayV OFFICIAL FANLIGHT VER.2.0 官方應援手燈,Official Light Stick,1470,49,WayV 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.9,211,2,5
-LSTK-0024,RIIZE-LIGHTSTICK-024,RIIZE,SM,RIIZE OFFICIAL FANLIGHT 官方應援手燈,Official Light Stick,1520,52,RIIZE 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.4,228,2,5
-LSTK-0025,BLACKPINK-LIGHTSTICK-025,BLACKPINK,YG,BLACKPINK OFFICIAL LIGHT STICK Ver.2 二代官方應援手燈,Official Light Stick,1320,0,BLACKPINK 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.5,245,0,5
-LSTK-0026,BABYMONSTER-LIGHTSTICK-026,BABYMONSTER,YG,BABYMONSTER OFFICIAL LIGHT STICK 官方應援手燈,Official Light Stick,1470,58,BABYMONSTER 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.6,262,2,5
-LSTK-0027,TREASURE-LIGHTSTICK-027,TREASURE,YG,TREASURE Official Light Stick 官方應援手燈,Official Light Stick,1350,61,TREASURE 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.7,279,2,5
-LSTK-0028,IKON-LIGHTSTICK-028,iKON,YG,iKON OFFICIAL LIGHT STICK VER.2023 官方應援手燈,Official Light Stick,1470,64,iKON 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.8,296,2,5
-LSTK-0029,G-DRAGON-LIGHTSTICK-029,G-DRAGON,YG,G-DRAGON OFFICIAL LIGHT STICK 官方應援手燈,Official Light Stick,1470,67,G-DRAGON 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.9,313,2,5
-LSTK-0030,2NE1-LIGHTSTICK-030,2NE1,YG,2NE1 OFFICIAL LIGHT STICK 官方應援手燈,Official Light Stick,1350,25,2NE1 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.4,330,2,5
+1,BTS-LIGHTSTICK-001,BTS,HYBE,BTS OFFICIAL LIGHT STICK Special Edition 官方應援手燈特別版,Official Light Stick,1470,28,BTS 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.5,137,2,5
+2,LESSERAFIM-LIGHTSTICK-002,LE SSERAFIM,HYBE,LE SSERAFIM Official Light Stick 官方應援手燈,Official Light Stick,1590,31,LE SSERAFIM 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.6,154,2,5
+3,NEWJEANS-LIGHTSTICK-003,NewJeans,HYBE,NewJeans Official Light Stick Binky Bong 官方應援手燈,Official Light Stick,1570,34,NewJeans 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.7,171,2,5
+4,TXT-LIGHTSTICK-004,TXT,HYBE,TOMORROW X TOGETHER Official Light Stick Ver.2 官方二代應援手燈,Official Light Stick,1470,37,TXT 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.8,188,2,5
+5,ENHYPEN-LIGHTSTICK-005,ENHYPEN,HYBE,ENHYPEN Official Light Stick Ver.2 官方二代應援手燈,Official Light Stick,1470,40,ENHYPEN 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.9,205,2,5
+6,SEVENTEEN-LIGHTSTICK-006,SEVENTEEN,HYBE,SEVENTEEN OFFICIAL LIGHT STICK VER.3 10th Anniv. 官方三代手燈(十周年紀念版),Official Light Stick,1470,43,SEVENTEEN 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.4,222,2,5
+7,BOYNEXTDOOR-LIGHTSTICK-008,BOYNEXTDOOR,HYBE,BOYNEXTDOOR OFFICIAL LIGHT STICK 官方應援手燈,Official Light Stick,1570,49,BOYNEXTDOOR 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.6,256,2,5
+8,ILLIT-LIGHTSTICK-009,ILLIT,HYBE,ILLIT Official Light Stick 官方應援手燈,Official Light Stick,1470,52,ILLIT 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.7,273,2,5
+9,TWICE-LIGHTSTICK-010,TWICE,JYP,TWICE CANDYBONG ∞ 官方三代應援手燈,Official Light Stick,1470,55,TWICE 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.8,290,2,5
+10,ITZY-LIGHTSTICK-011,ITZY,JYP,ITZY OFFICIAL LIGHT RING VER 2 官方二代應援手燈,Official Light Stick,1470,58,ITZY 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.9,307,2,5
+11,NMIXX-LIGHTSTICK-012,NMIXX,JYP,NMIXX OFFICIAL LIGHT STICK 官方應援手燈,Official Light Stick,1470,61,NMIXX 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.4,324,2,5
+12,STRAYKIDS-LIGHTSTICK-013,Stray Kids,JYP,Stray Kids OFFICIAL LIGHT STICK ver.2 官方二代手燈,Official Light Stick,1470,64,Stray Kids 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.5,341,2,5
+13,2PM-LIGHTSTICK-014,2PM,JYP,2PM OFFICIAL LIGHT STICK 官方應援手燈,Official Light Stick,1470,67,2PM 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.6,358,2,5
+14,AESPA-LIGHTSTICK-015,aespa,SM,aespa OFFICIAL FANLIGHT ver.2 官方二代應援手燈,Official Light Stick,1470,25,aespa 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.7,375,2,5
+15,NCT-LIGHTSTICK-016,NCT DREAM,SM,NCT DREAM OFFICIAL FANLIGHT 官方應援手燈,Official Light Stick,1470,28,NCT 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.8,392,2,5
+16,REDVELVET-LIGHTSTICK-017,Red Velvet,SM,Red Velvet OFFICIAL FANLIGHT 官方應援手燈,Official Light Stick,1470,31,Red Velvet 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.9,409,2,5
+17,SHINEE-LIGHTSTICK-018,SHINee,SM,SHINee OFFICIAL FANLIGHT 官方應援手燈,Official Light Stick,1470,34,SHINee 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.4,126,2,5
+18,SUPERJUNIOR-LIGHTSTICK-019,SUPER JUNIOR,SM,SUPER JUNIOR OFFICIAL LIGHT STICK VER2 官方應援二代手燈,Official Light Stick,1420,0,SUPER JUNIOR 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.5,143,0,5
+19,東方神起-LIGHTSTICK-020,TVXQ,SM,TVXQ! 東方神起 OFFICIAL FANLIGHT 官方應援手燈,Official Light Stick,1470,40,東方神起 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.6,160,2,5
+20,少女時代-LIGHTSTICK-021,Girls Generation,SM,少女時代 GIRLS' GENERATION OFFICIAL FANLIGHT 官方應援手燈,Official Light Stick,1470,43,少女時代 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.7,177,2,5
+21,EXO-LIGHTSTICK-022,EXO,SM,EXO OFFICIAL FANLIGHT VER.3.0 官方應援三代手燈,Official Light Stick,1470,46,EXO 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.8,194,2,5
+22,WAYV-LIGHTSTICK-023,WayV,SM,WayV OFFICIAL FANLIGHT VER.2.0 官方應援手燈,Official Light Stick,1470,49,WayV 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.9,211,2,5
+23,RIIZE-LIGHTSTICK-024,RIIZE,SM,RIIZE OFFICIAL FANLIGHT 官方應援手燈,Official Light Stick,1520,52,RIIZE 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.4,228,2,5
+24,BLACKPINK-LIGHTSTICK-025,BLACKPINK,YG,BLACKPINK OFFICIAL LIGHT STICK Ver.2 二代官方應援手燈,Official Light Stick,1320,0,BLACKPINK 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.5,245,0,5
+25,BABYMONSTER-LIGHTSTICK-026,BABYMONSTER,YG,BABYMONSTER OFFICIAL LIGHT STICK 官方應援手燈,Official Light Stick,1470,58,BABYMONSTER 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.6,262,2,5
+26,TREASURE-LIGHTSTICK-027,TREASURE,YG,TREASURE Official Light Stick 官方應援手燈,Official Light Stick,1350,61,TREASURE 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.7,279,2,5
+27,IKON-LIGHTSTICK-028,iKON,YG,iKON OFFICIAL LIGHT STICK VER.2023 官方應援手燈,Official Light Stick,1470,64,iKON 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.8,296,2,5
+28,G-DRAGON-LIGHTSTICK-029,G-DRAGON,YG,G-DRAGON OFFICIAL LIGHT STICK 官方應援手燈,Official Light Stick,1470,67,G-DRAGON 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.9,313,2,5
+29,2NE1-LIGHTSTICK-030,2NE1,YG,2NE1 OFFICIAL LIGHT STICK 官方應援手燈,Official Light Stick,1350,25,2NE1 官方應援手燈。最新版本設計，內含手燈主體、腕帶與使用說明書。官方授權商品，適用於演唱會與活動應援。,FALSE,FALSE,4.4,330,2,5

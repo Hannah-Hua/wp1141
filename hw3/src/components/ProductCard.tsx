@@ -59,36 +59,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
             target.src = DEFAULT_GROUP_IMAGE;
           }}
         />
-        {/* 商品名稱疊加文字 */}
-        <Box
-          sx={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
-            padding: '20px 16px 16px',
-            zIndex: 1,
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              color: 'white',
-              fontWeight: 'bold',
-              fontSize: '1rem',
-              textAlign: 'center',
-              textShadow: '0 2px 4px rgba(0,0,0,0.5)',
-              lineHeight: 1.2,
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-            }}
-          >
-            {product.product_name}
-          </Typography>
-        </Box>
         {product.limited_edition && (
           <Chip
             label="限量版"
