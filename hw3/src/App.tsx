@@ -110,13 +110,6 @@ const App: React.FC = () => {
     setSearchTerm(''); // 清除搜尋
   };
 
-  const handleCategorySelect = (category: string) => {
-    // 只保留分類篩選，清除其他所有篩選條件
-    setFilters({
-      category,
-    });
-    setSearchTerm(''); // 清除搜尋
-  };
 
   const clearFilters = () => {
     setFilters({});
@@ -304,16 +297,14 @@ const App: React.FC = () => {
     }
 
     // 檢查是否有任何篩選條件
-    const hasFilters = filters.entertainment || filters.group_name || filters.category;
+    const hasFilters = filters.entertainment || filters.group_name;
     
     if (hasFilters) {
       // 有篩選條件時，顯示篩選後的商品
       const filteredProducts = await getFilteredProducts(filters);
       let title = '';
       
-      if (filters.category) {
-        title = `${filters.category} 商品`;
-      } else if (filters.group_name) {
+      if (filters.group_name) {
         title = `${filters.group_name} 商品`;
       } else if (filters.entertainment) {
         title = `${filters.entertainment} 商品`;
@@ -321,11 +312,11 @@ const App: React.FC = () => {
       
       return { products: filteredProducts, title };
     } else {
-      // 沒有篩選條件時，顯示最熱門的商品（前20個）
-      const popularProducts = await getPopularProducts(20);
+      // 沒有篩選條件時，顯示最熱門的商品（前10個）
+      const popularProducts = await getPopularProducts(10);
       return { 
         products: popularProducts, 
-        title: '熱門商品 TOP 20' 
+        title: '熱門商品 TOP 10' 
       };
     }
   };
@@ -547,10 +538,8 @@ const App: React.FC = () => {
           <Sidebar
             selectedEntertainment={filters.entertainment}
             selectedGroup={filters.group_name}
-            selectedCategory={filters.category}
             onEntertainmentSelect={handleEntertainmentSelect}
             onGroupSelect={handleGroupSelect}
-            onCategorySelect={handleCategorySelect}
             onClearFilters={clearFilters}
           />
         )}

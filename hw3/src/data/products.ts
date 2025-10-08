@@ -118,7 +118,6 @@ export const searchProducts = async (searchTerm: string): Promise<Product[]> => 
 export const getFilteredProducts = async (filters: {
   entertainment?: string;
   group_name?: string;
-  category?: string;
 }): Promise<Product[]> => {
   const products = await getProducts();
   let filtered = [...products];
@@ -129,10 +128,6 @@ export const getFilteredProducts = async (filters: {
 
   if (filters.group_name) {
     filtered = filtered.filter(product => product.group_name === filters.group_name);
-  }
-
-  if (filters.category) {
-    filtered = filtered.filter(product => product.category === filters.category);
   }
 
   return filtered;

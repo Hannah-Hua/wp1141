@@ -31,7 +31,6 @@ export interface Product {
 export interface FilterOptions {
   entertainment?: string;
   group_name?: string;
-  category?: string;
   sortBy?: 'newest' | 'price_low' | 'price_high' | 'popular' | 'rating' | 'clicks';
 }
 

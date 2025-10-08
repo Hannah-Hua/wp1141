@@ -13,30 +13,25 @@ import {
   ExpandLess,
   ExpandMore,
 } from '@mui/icons-material';
-import { getEntertainments, getGroupsByEntertainment, getCategories } from '../data/products';
+import { getEntertainments, getGroupsByEntertainment } from '../data/products';
 
 interface SidebarProps {
   selectedEntertainment?: string;
   selectedGroup?: string;
-  selectedCategory?: string;
   onEntertainmentSelect: (entertainment: string) => void;
   onGroupSelect: (group: string) => void;
-  onCategorySelect: (category: string) => void;
   onClearFilters: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
   selectedEntertainment,
   selectedGroup,
-  selectedCategory,
   onEntertainmentSelect,
   onGroupSelect,
-  onCategorySelect,
   onClearFilters,
 }) => {
   const [entertainmentOpen, setEntertainmentOpen] = React.useState<{ [key: string]: boolean }>({});
   const [entertainments, setEntertainments] = useState<string[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
   const [groups, setGroups] = useState<{ [key: string]: string[] }>({});
   const [isLoading, setIsLoading] = useState(true);
 
@@ -45,13 +40,11 @@ const Sidebar: React.FC<SidebarProps> = ({
     const loadSidebarData = async () => {
       try {
         setIsLoading(true);
-        const [entertainmentsData, categoriesData] = await Promise.all([
-          getEntertainments(),
-          getCategories()
+        const [entertainmentsData] = await Promise.all([
+          getEntertainments()
         ]);
         
         setEntertainments(entertainmentsData);
-        setCategories(categoriesData);
         
         // 載入每個娛樂公司的團體
         const groupsData: { [key: string]: string[] } = {};
@@ -82,11 +75,6 @@ const Sidebar: React.FC<SidebarProps> = ({
     onGroupSelect(group);
   };
 
-  const handleCategoryClick = (category: string) => {
-    // 點擊分類時清除其他篩選，只保留分類篩選
-    onClearFilters();
-    onCategorySelect(category);
-  };
 
   return (
     <Box
@@ -124,7 +112,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 sx={{
                   borderRadius: 1,
                   mb: 0.5,
-                  backgroundColor: !selectedEntertainment && !selectedGroup && !selectedCategory ? 'rgba(0,0,0,0.08)' : 'transparent',
+                  backgroundColor: !selectedEntertainment && !selectedGroup ? 'rgba(0,0,0,0.08)' : 'transparent',
                   '&:hover': {
                     backgroundColor: 'rgba(0,0,0,0.04)',
                   },
@@ -133,7 +121,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <ListItemText
                   primary="最熱門商品"
                   primaryTypographyProps={{
-                    fontWeight: !selectedEntertainment && !selectedGroup && !selectedCategory ? 'bold' : 'normal',
+                    fontWeight: !selectedEntertainment && !selectedGroup ? 'bold' : 'normal',
                     textTransform: 'uppercase',
                   }}
                 />
@@ -215,44 +203,6 @@ const Sidebar: React.FC<SidebarProps> = ({
             })}
           </List>
 
-          {/* Category Section */}
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 'bold',
-              textTransform: 'uppercase',
-              mb: 2,
-              color: 'black',
-            }}
-          >
-            CATEGORY
-          </Typography>
-
-          <List>
-            {categories.map((category) => (
-              <ListItem key={category} disablePadding>
-                <ListItemButton
-                  onClick={() => handleCategoryClick(category)}
-                  sx={{
-                    borderRadius: 1,
-                    mb: 0.5,
-                    backgroundColor: selectedCategory === category ? 'rgba(0,0,0,0.08)' : 'transparent',
-                    '&:hover': {
-                      backgroundColor: 'rgba(0,0,0,0.04)',
-                    },
-                  }}
-                >
-                  <ListItemText
-                    primary={category}
-                    primaryTypographyProps={{
-                      fontWeight: selectedCategory === category ? 'bold' : 'normal',
-                      textTransform: 'uppercase',
-                    }}
-                  />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
         </>
       )}
     </Box>
