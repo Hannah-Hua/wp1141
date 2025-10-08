@@ -547,7 +547,7 @@ const App: React.FC = () => {
         onFavoriteClick={handleFavoriteClick}
         favoriteCount={favorites.length}
         onCartClick={handleCartClick}
-        cartCount={cartItems.length}
+        cartCount={cartItems.reduce((total, item) => total + item.quantity, 0)}
         onOrderHistoryClick={handleOrderHistoryClick}
       />
 

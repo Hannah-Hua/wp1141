@@ -107,8 +107,10 @@ const CartPage: React.FC<CartPageProps> = ({ cartItems, setCartItems, onCloseCar
     return total;
   };
 
-  // 計算選中商品數量
-  const selectedCount = cartItems.filter(item => item.isSelected).length;
+  // 計算選中商品數量（以商品數量為單位）
+  const selectedCount = cartItems
+    .filter(item => item.isSelected)
+    .reduce((total, item) => total + item.quantity, 0);
 
   // 檢查商品是否需要選項
   const needsOption = (category: string) => {
@@ -434,7 +436,7 @@ const CartPage: React.FC<CartPageProps> = ({ cartItems, setCartItems, onCloseCar
               </Typography>
             </Box>
             <Typography variant="body2" sx={{ color: 'text.secondary', textAlign: 'right' }}>
-              共{selectedCount}件商品 (購物車總共{cartItems.length}件商品)
+              共{selectedCount}件商品
             </Typography>
           </Box>
           

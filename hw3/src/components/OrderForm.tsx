@@ -163,10 +163,11 @@ const OrderForm: React.FC<OrderFormProps> = ({
                   <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                     {item.product.product_name}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    {item.product.group_name}
-                    {item.selectedOption && ` - ${item.selectedOption}`}
-                  </Typography>
+                  {item.selectedOption && (
+                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                      選項: {item.selectedOption}
+                    </Typography>
+                  )}
                   <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                     數量: {item.quantity} × NT$ {item.product.price_twd.toLocaleString()}
                   </Typography>
