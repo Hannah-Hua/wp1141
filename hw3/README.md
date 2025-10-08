@@ -70,7 +70,6 @@ src/
 ## 資料來源與快取
 
 - **商品資料**：從 `public/data/merchandise.csv` 載入手燈商品資訊
-- **團體圖片**：29個 K-pop 團體封面照，載入失敗使用預設圖
 - **本地儲存**：使用者狀態以 `localStorage` 保存
   - `kpop-merchandise-favorites` - 最愛手燈清單
   - `kpop-merchandise-cart` - 購物車商品
