@@ -163,10 +163,6 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
 
         {/* 商品詳細資訊區域 */}
         <Grid item xs={12} md={6}>
-          {/* 店家列 */}
-          <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>
-            店家列
-          </Typography>
 
           {/* 商品名稱 */}
           <Typography

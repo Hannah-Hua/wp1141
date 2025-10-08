@@ -95,27 +95,26 @@ const App: React.FC = () => {
   }, [cartItems]);
 
   const handleEntertainmentSelect = (entertainment: string) => {
-    setFilters(prev => ({
-      ...prev,
+    // 只保留娛樂公司篩選，清除其他所有篩選條件
+    setFilters({
       entertainment,
-      group_name: undefined, // 清除團體選擇
-    }));
+    });
     setSearchTerm(''); // 清除搜尋
   };
 
   const handleGroupSelect = (group: string) => {
-    setFilters(prev => ({
-      ...prev,
+    // 只保留團體篩選，清除其他所有篩選條件
+    setFilters({
       group_name: group,
-    }));
+    });
     setSearchTerm(''); // 清除搜尋
   };
 
   const handleCategorySelect = (category: string) => {
-    setFilters(prev => ({
-      ...prev,
+    // 只保留分類篩選，清除其他所有篩選條件
+    setFilters({
       category,
-    }));
+    });
     setSearchTerm(''); // 清除搜尋
   };
 
@@ -176,10 +175,10 @@ const App: React.FC = () => {
     );
 
     if (existingItemIndex >= 0) {
-      // 如果商品已存在，更新數量（而不是增加）
+      // 如果商品已存在，累加數量
       setCartItems(prev => prev.map((item, index) => 
         index === existingItemIndex 
-          ? { ...item, quantity: quantity }
+          ? { ...item, quantity: item.quantity + quantity }
           : item
       ));
     } else {
@@ -193,10 +192,8 @@ const App: React.FC = () => {
       setCartItems(prev => [...prev, newCartItem]);
     }
 
-    // 跳轉到購物車畫面
+    // 跳轉到購物車畫面，但保持原本的瀏覽狀態
     setShowCart(true);
-    setSearchTerm('');
-    setFilters({});
     setSelectedProduct(null);
     setShowFavorites(false);
   };
@@ -205,8 +202,6 @@ const App: React.FC = () => {
     setShowCart(true);
     setShowFavorites(false); // 關閉最愛
     setShowOrderHistory(false); // 關閉訂單歷史
-    setSearchTerm('');
-    setFilters({});
     setSelectedProduct(null);
   };
 
@@ -283,14 +278,6 @@ const App: React.FC = () => {
         cartItems: selectedItems,
         totalAmount,
         title: '填寫訂單資料'
-      };
-    }
-
-    // 如果顯示購物車，優先顯示購物車
-    if (showCart) {
-      return {
-        cartItems,
-        title: `購物車 (${cartItems.length} 件商品)`
       };
     }
 
@@ -555,8 +542,8 @@ const App: React.FC = () => {
 
       {/* Main Content */}
       <Box sx={{ display: 'flex', flex: 1 }}>
-        {/* Sidebar - 如果顯示最愛或購物車則隱藏 */}
-        {!showFavorites && !showCart && (
+        {/* Sidebar - 如果顯示最愛則隱藏，購物車時保持顯示 */}
+        {!showFavorites && (
           <Sidebar
             selectedEntertainment={filters.entertainment}
             selectedGroup={filters.group_name}
@@ -568,16 +555,9 @@ const App: React.FC = () => {
           />
         )}
 
-        {/* Product Grid or Cart */}
+        {/* Product Grid */}
         <Box sx={{ flex: 1, backgroundColor: '#ffffff' }}>
-          {showCart ? (
-            <CartPage 
-              cartItems={cartItems}
-              setCartItems={setCartItems}
-              onCloseCart={handleCloseCart}
-              onCheckout={handleCheckout}
-            />
-          ) : showFavorites ? (
+          {showFavorites ? (
             <ProductGrid 
               products={displayProducts} 
               title={title} 
@@ -595,6 +575,16 @@ const App: React.FC = () => {
           )}
         </Box>
       </Box>
+
+      {/* 浮動購物車 */}
+      {showCart && (
+        <CartPage 
+          cartItems={cartItems}
+          setCartItems={setCartItems}
+          onCloseCart={handleCloseCart}
+          onCheckout={handleCheckout}
+        />
+      )}
     </Box>
   );
 };
