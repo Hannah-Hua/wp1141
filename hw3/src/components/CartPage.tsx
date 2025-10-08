@@ -60,6 +60,12 @@ const CartPage: React.FC<CartPageProps> = ({ cartItems, setCartItems, onCloseCar
   const handleQuantityChange = (index: number, newQuantity: number) => {
     if (newQuantity < 1) return;
     
+    // 檢查不能超過庫存數量
+    const item = cartItems[index];
+    if (newQuantity > item.product.stock) {
+      return; // 不允許超過庫存
+    }
+    
     setCartItems(prev => prev.map((item, i) => 
       i === index ? { ...item, quantity: newQuantity } : item
     ));
@@ -383,6 +389,7 @@ const CartPage: React.FC<CartPageProps> = ({ cartItems, setCartItems, onCloseCar
                               <IconButton
                                 size="small"
                                 onClick={() => handleQuantityChange(index, item.quantity + 1)}
+                                disabled={item.quantity >= item.product.stock}
                                 sx={{ width: 24, height: 24 }}
                               >
                                 <AddIcon sx={{ fontSize: 16 }} />

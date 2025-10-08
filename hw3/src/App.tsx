@@ -162,6 +162,12 @@ const App: React.FC = () => {
 
   // 處理購物車
   const handleAddToCart = (product: Product, selectedOption?: string, quantity: number = 1) => {
+    // 檢查庫存限制
+    if (quantity > product.stock) {
+      console.warn(`無法加入購物車：請求數量 ${quantity} 超過庫存 ${product.stock}`);
+      return;
+    }
+
     // 正規化選項值，確保 undefined 和空字串被視為相同
     const normalizedOption = selectedOption || undefined;
     
@@ -171,13 +177,22 @@ const App: React.FC = () => {
     );
 
     if (existingItemIndex >= 0) {
+      // 如果商品已存在，檢查累加後是否超過庫存
+      const currentQuantity = cartItems[existingItemIndex].quantity;
+      const newTotalQuantity = currentQuantity + quantity;
+      
+      if (newTotalQuantity > product.stock) {
+        console.warn(`無法累加數量：累加後數量 ${newTotalQuantity} 超過庫存 ${product.stock}`);
+        return;
+      }
+      
       // 如果商品已存在，累加數量
       setCartItems(prev => prev.map((item, index) => 
         index === existingItemIndex 
           ? { ...item, quantity: item.quantity + quantity }
           : item
       ));
-      console.log(`商品 ${product.product_name} 已存在，累加數量 ${quantity}，新總數: ${cartItems[existingItemIndex].quantity + quantity}`);
+      console.log(`商品 ${product.product_name} 已存在，累加數量 ${quantity}，新總數: ${newTotalQuantity}`);
     } else {
       // 如果商品不存在，新增到購物車
       const newCartItem: CartItem = {

@@ -60,7 +60,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
 
   // 處理數量變化
   const handleQuantityChange = (newQuantity: number) => {
-    if (newQuantity >= 1 && newQuantity <= (product?.max_purchase_qty || 10)) {
+    if (newQuantity >= 1 && newQuantity <= (product?.stock || 0)) {
       setQuantity(newQuantity);
     }
   };
@@ -272,14 +272,14 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
               <Button
                 variant="outlined"
                 onClick={() => handleQuantityChange(quantity + 1)}
-                disabled={quantity >= (product.max_purchase_qty || 10)}
+                disabled={quantity >= (product.stock || 0)}
                 sx={{ minWidth: 40, height: 40 }}
               >
                 +
               </Button>
             </Box>
             <Typography variant="body2" sx={{ color: '#666', mt: 1 }}>
-              最多可購買 {product.max_purchase_qty || 10} 件
+              庫存：{product.stock} 件，最多可購買 {product.stock} 件
             </Typography>
           </Box>
 
