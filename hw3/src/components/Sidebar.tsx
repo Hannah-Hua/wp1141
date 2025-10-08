@@ -50,18 +50,25 @@ const Sidebar: React.FC<SidebarProps> = ({
     <Box
       sx={{
         width: 250,
-        minHeight: '100vh',
         backgroundColor: '#fafafa',
         borderRight: '1px solid #e0e0e0',
-        p: 2,
       }}
     >
-      {isLoading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-          <CircularProgress size={40} />
-        </Box>
-      ) : (
-        <>
+      <Box
+        sx={{
+          position: 'sticky',
+          top: 88, // Header 的高度 + 一些間距
+          maxHeight: 'calc(100vh - 88px)',
+          overflowY: 'auto',
+          p: 2,
+        }}
+      >
+        {isLoading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+            <CircularProgress size={40} />
+          </Box>
+        ) : (
+          <>
           {/* Popular Products */}
           <Typography
             variant="h6"
@@ -140,6 +147,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
         </>
       )}
+      </Box>
     </Box>
   );
 };

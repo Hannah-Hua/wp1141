@@ -209,11 +209,6 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
             {product.shipping_days_estimate} 天內出貨
           </Typography>
 
-          {/* 商品庫存 */}
-          <Typography variant="body1" sx={{ mb: 2 }}>
-            商品庫存： {product.stock}件
-          </Typography>
-
           <Divider sx={{ my: 3 }} />
 
           {/* 尺寸選項 */}

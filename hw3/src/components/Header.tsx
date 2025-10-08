@@ -54,7 +54,17 @@ const Header: React.FC<HeaderProps> = ({ onSearchChange, searchTerm, onFavoriteC
   };
 
   return (
-    <AppBar position="static" color="transparent" elevation={0} sx={{ zIndex: 1000 }}>
+    <AppBar 
+      position="sticky" 
+      color="transparent" 
+      elevation={1} 
+      sx={{ 
+        zIndex: 1100,
+        top: 0,
+        backgroundColor: 'white',
+        borderBottom: '1px solid #e0e0e0',
+      }}
+    >
       <Toolbar sx={{ justifyContent: 'space-between', py: 1 }}>
         {/* Logo */}
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
