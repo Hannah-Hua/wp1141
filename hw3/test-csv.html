@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV 編碼測試</title>
+</head>
+<body>
+    <h1>CSV 編碼測試</h1>
+    <div id="output"></div>
+    
+    <script>
+        async function testCSV() {
+            try {
+                console.log('開始測試 CSV 載入...');
+                const response = await fetch('/data/merchandise.csv');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                // 讀取為 ArrayBuffer 來處理 UTF-8 編碼
+                const arrayBuffer = await response.arrayBuffer();
+                console.log('CSV 檔案載入成功，開始解碼 UTF-8...');
+                
+                // 使用 TextDecoder 解碼 UTF-8（自動處理 BOM）
+                const decoder = new TextDecoder('utf-8');
+                const csvText = decoder.decode(arrayBuffer);
+                console.log('UTF-8 解碼完成');
+                
+                // 顯示前幾行
+                const lines = csvText.split('\n');
+                const output = document.getElementById('output');
+                output.innerHTML = '<h2>CSV 內容預覽：</h2>';
+                
+                for (let i = 0; i < Math.min(5, lines.length); i++) {
+                    const line = lines[i];
+                    const div = document.createElement('div');
+                    div.style.marginBottom = '10px';
+                    div.style.padding = '5px';
+                    div.style.border = '1px solid #ccc';
+                    div.innerHTML = `<strong>第 ${i + 1} 行：</strong> ${line}`;
+                    output.appendChild(div);
+                }
+                
+                console.log('測試完成');
+                
+            } catch (error) {
+                console.error('測試失敗:', error);
+                document.getElementById('output').innerHTML = `<p style="color: red;">錯誤: ${error.message}</p>`;
+            }
+        }
+        
+        // 頁面載入後執行測試
+        window.addEventListener('load', testCSV);
+    </script>
+</body>
+</html>

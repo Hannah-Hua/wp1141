@@ -39,14 +39,14 @@ export const getProducts = async (): Promise<Product[]> => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     
-    // 讀取為 ArrayBuffer 來處理 Big5 編碼
+    // 讀取為 ArrayBuffer 來處理 UTF-8 編碼
     const arrayBuffer = await response.arrayBuffer();
-    console.log('CSV 檔案載入成功，開始解碼 Big5...');
+    console.log('CSV 檔案載入成功，開始解碼 UTF-8...');
     
-    // 使用 TextDecoder 解碼 Big5
-    const decoder = new TextDecoder('big5');
+    // 使用 TextDecoder 解碼 UTF-8（自動處理 BOM）
+    const decoder = new TextDecoder('utf-8');
     const csvText = decoder.decode(arrayBuffer);
-    console.log('Big5 解碼完成，開始解析...');
+    console.log('UTF-8 解碼完成，開始解析...');
     
     // 解析 CSV
     const parsedProducts = parseCSV(csvText);
