@@ -162,9 +162,12 @@ const App: React.FC = () => {
 
   // 處理購物車
   const handleAddToCart = (product: Product, selectedOption?: string, quantity: number = 1) => {
+    // 正規化選項值，確保 undefined 和空字串被視為相同
+    const normalizedOption = selectedOption || undefined;
+    
     const existingItemIndex = cartItems.findIndex(
       item => item.product.product_id === product.product_id && 
-      item.selectedOption === selectedOption
+      (item.selectedOption || undefined) === normalizedOption
     );
 
     if (existingItemIndex >= 0) {
@@ -174,15 +177,17 @@ const App: React.FC = () => {
           ? { ...item, quantity: item.quantity + quantity }
           : item
       ));
+      console.log(`商品 ${product.product_name} 已存在，累加數量 ${quantity}，新總數: ${cartItems[existingItemIndex].quantity + quantity}`);
     } else {
       // 如果商品不存在，新增到購物車
       const newCartItem: CartItem = {
         product,
         quantity,
-        selectedOption,
+        selectedOption: normalizedOption,
         isSelected: true
       };
       setCartItems(prev => [...prev, newCartItem]);
+      console.log(`新增商品 ${product.product_name} 到購物車，數量: ${quantity}，選項: ${normalizedOption || '無'}`);
     }
 
     // 跳轉到購物車畫面，但保持原本的瀏覽狀態
