@@ -1,0 +1,200 @@
+### 辦公咖啡廳清單 API 測試
+### 使用 REST Client (VS Code Extension) 或 curl 測試
+
+@baseUrl = http://localhost:3000
+@token = YOUR_JWT_TOKEN_HERE
+
+### =====================
+### 1. 測試伺服器連線
+### =====================
+GET {{baseUrl}}
+
+### =====================
+### 2. 使用者認證測試
+### =====================
+
+### 2.1 註冊新使用者
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "username": "測試使用者",
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+### 2.2 登入
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+### 2.3 取得當前使用者資訊（需要 Token）
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{token}}
+
+### =====================
+### 3. 咖啡廳 API 測試
+### =====================
+
+### 3.1 取得所有咖啡廳（公開）
+GET {{baseUrl}}/api/cafes
+
+### 3.2 搜尋咖啡廳
+GET {{baseUrl}}/api/cafes?q=咖啡
+
+### 3.3 依類別篩選
+GET {{baseUrl}}/api/cafes?category=辦公友善
+
+### 3.4 取得單一咖啡廳
+GET {{baseUrl}}/api/cafes/1
+
+### 3.5 新增咖啡廳（需要認證）
+POST {{baseUrl}}/api/cafes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "測試咖啡廳",
+  "description": "這是一間很棒的咖啡廳，適合工作",
+  "address": "台北市信義區信義路五段 7 號",
+  "category": "辦公友善",
+  "rating": 4.5,
+  "priceLevel": 2,
+  "hasWifi": true,
+  "hasPowerOutlets": true,
+  "hasTimeLimit": false,
+  "isNoisy": false,
+  "hasGoodLighting": true,
+  "hasAvailableSeats": true
+}
+
+### 3.6 更新咖啡廳（需要認證，且必須是建立者）
+PUT {{baseUrl}}/api/cafes/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "更新後的咖啡廳名稱",
+  "description": "更新後的描述",
+  "rating": 5.0
+}
+
+### 3.7 刪除咖啡廳（需要認證，且必須是建立者）
+DELETE {{baseUrl}}/api/cafes/1
+Authorization: Bearer {{token}}
+
+### =====================
+### 4. 到訪記錄 API 測試
+### =====================
+
+### 4.1 取得我的所有到訪記錄
+GET {{baseUrl}}/api/visits
+Authorization: Bearer {{token}}
+
+### 4.2 取得特定咖啡廳的到訪記錄
+GET {{baseUrl}}/api/visits/cafe/1
+Authorization: Bearer {{token}}
+
+### 4.3 新增到訪記錄
+POST {{baseUrl}}/api/visits
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "cafeId": 1,
+  "visitDate": "2025-10-22",
+  "notes": "環境很棒，咖啡也好喝",
+  "rating": 5
+}
+
+### 4.4 更新到訪記錄
+PUT {{baseUrl}}/api/visits/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "notes": "更新後的備註",
+  "rating": 4
+}
+
+### 4.5 刪除到訪記錄
+DELETE {{baseUrl}}/api/visits/1
+Authorization: Bearer {{token}}
+
+### =====================
+### 5. 願望清單 API 測試
+### =====================
+
+### 5.1 取得我的願望清單
+GET {{baseUrl}}/api/wishlist
+Authorization: Bearer {{token}}
+
+### 5.2 檢查咖啡廳是否在願望清單中
+GET {{baseUrl}}/api/wishlist/check/1
+Authorization: Bearer {{token}}
+
+### 5.3 加入願望清單
+POST {{baseUrl}}/api/wishlist
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "cafeId": 1,
+  "notes": "想去試試看他們的手沖咖啡"
+}
+
+### 5.4 更新願望清單備註
+PUT {{baseUrl}}/api/wishlist/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "notes": "更新後的備註"
+}
+
+### 5.5 從願望清單移除（使用 ID）
+DELETE {{baseUrl}}/api/wishlist/1
+Authorization: Bearer {{token}}
+
+### 5.6 從願望清單移除（使用咖啡廳 ID）
+DELETE {{baseUrl}}/api/wishlist/cafe/1
+Authorization: Bearer {{token}}
+
+### =====================
+### 6. 錯誤測試
+### =====================
+
+### 6.1 未認證訪問受保護資源
+POST {{baseUrl}}/api/cafes
+Content-Type: application/json
+
+{
+  "name": "測試"
+}
+
+### 6.2 無效的 Token
+POST {{baseUrl}}/api/cafes
+Authorization: Bearer invalid_token_here
+Content-Type: application/json
+
+{
+  "name": "測試"
+}
+
+### 6.3 缺少必填欄位
+POST {{baseUrl}}/api/cafes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "只有名稱"
+}
+
+### 6.4 訪問不存在的資源
+GET {{baseUrl}}/api/cafes/99999
+

@@ -1,0 +1,23 @@
+{
+  "name": "cafe-map-app",
+  "version": "1.0.0",
+  "description": "辦公咖啡廳清單 - 地圖導向應用",
+  "scripts": {
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "dev": "npm run dev:frontend",
+    "install:frontend": "cd frontend && npm install",
+    "install:backend": "cd backend && npm install",
+    "install:all": "npm run install:frontend && npm run install:backend"
+  },
+  "keywords": [
+    "cafe",
+    "map",
+    "react",
+    "express",
+    "google-maps"
+  ],
+  "author": "Hannah",
+  "license": "ISC"
+}
+
