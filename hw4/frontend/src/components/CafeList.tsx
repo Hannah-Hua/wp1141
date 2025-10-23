@@ -5,10 +5,12 @@ import { useAppContext } from '../context/AppContext';
 interface CafeListProps {
   cafes: Cafe[];
   onCafeClick: (cafeId: number) => void;
+  onCafeFocus: (cafeId: number) => void;
   selectedCafeId: number | null;
+  onCafeHover?: (cafeId: number | null) => void;
 }
 
-const CafeList: React.FC<CafeListProps> = ({ cafes, onCafeClick, selectedCafeId }) => {
+const CafeList: React.FC<CafeListProps> = ({ cafes, onCafeClick, onCafeFocus, selectedCafeId, onCafeHover }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const { isInWishlist } = useAppContext();
@@ -84,8 +86,17 @@ const CafeList: React.FC<CafeListProps> = ({ cafes, onCafeClick, selectedCafeId 
           filteredCafes.map(cafe => (
             <div
               key={cafe.id}
-              onClick={() => onCafeClick(cafe.id)}
-              className={`bg-white rounded-lg p-4 cursor-pointer transition border-2 hover:shadow-lg ${
+              onClick={(e) => {
+                // 如果點擊的是按鈕，不觸發卡片點擊
+                if ((e.target as HTMLElement).closest('button')) {
+                  return;
+                }
+                // 點擊卡片其他地方，聚焦到地圖
+                onCafeFocus(cafe.id);
+              }}
+              onMouseEnter={() => onCafeHover?.(cafe.id)}
+              onMouseLeave={() => onCafeHover?.(null)}
+              className={`bg-white rounded-lg p-4 cursor-pointer transition-all duration-200 border-2 hover:shadow-lg hover:scale-[1.02] ${
                 selectedCafeId === cafe.id
                   ? 'border-amber-500 shadow-md'
                   : 'border-transparent shadow'
@@ -143,6 +154,19 @@ const CafeList: React.FC<CafeListProps> = ({ cafes, onCafeClick, selectedCafeId 
                     🪑 有座位
                   </span>
                 )}
+              </div>
+              
+              {/* 詳細資訊按鈕 */}
+              <div className="mt-4 flex justify-end">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation(); // 阻止事件冒泡
+                    onCafeClick(cafe.id);
+                  }}
+                  className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
+                >
+                  詳細資訊
+                </button>
               </div>
             </div>
           ))

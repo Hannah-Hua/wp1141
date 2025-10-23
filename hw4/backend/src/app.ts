@@ -4,7 +4,7 @@ dotenv.config();
 
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-import { initializeDatabase } from './database';
+import { initializeDatabase, resetTestData } from './database';
 import { authenticateToken } from './middleware/auth';
 
 // 初始化 Express 應用
@@ -34,6 +34,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 // 初始化資料庫
 initializeDatabase();
+resetTestData();
 
 // 匯入路由
 import authRoutes from './routes/auth';

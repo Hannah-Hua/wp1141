@@ -5,19 +5,49 @@ import MapView from '../components/MapView';
 import CafeList from '../components/CafeList';
 
 const HomePage: React.FC = () => {
-  const { cafes, auth, logout, selectedCafeId, setSelectedCafeId, loadCafes, loading } = useAppContext();
+  const { cafes, auth, logout, selectedCafeId, setSelectedCafeId, loadCafes, loading, wishlist } = useAppContext();
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<'split' | 'map' | 'list'>('split');
+  const [hoveredCafeId, setHoveredCafeId] = useState<number | null>(null);
+  const [userHasInteractedWithMap, setUserHasInteractedWithMap] = useState(false);
 
   // 載入咖啡廳列表
   useEffect(() => {
     loadCafes();
   }, []);
 
-  const handleCafeClick = (cafeId: number) => {
+  // 處理地圖標記點擊 - 只高亮，不跳轉
+  const handleMapMarkerClick = (cafeId: number) => {
+    setSelectedCafeId(cafeId);
+  };
+
+  // 處理清單項目點擊 - 高亮並跳轉到詳情頁
+  const handleCafeListClick = (cafeId: number) => {
     setSelectedCafeId(cafeId);
     navigate(`/cafe/${cafeId}`);
   };
+
+  // 處理清單項目聚焦 - 只聚焦地圖，不跳轉
+  const handleCafeFocus = (cafeId: number) => {
+    setSelectedCafeId(cafeId);
+    // 每次點擊都重置互動狀態，允許聚焦
+    setUserHasInteractedWithMap(false);
+  };
+
+  // 處理地圖用戶互動
+  const handleMapUserInteraction = () => {
+    setUserHasInteractedWithMap(true);
+    // 用戶手動操作地圖後，清除選中狀態
+    setSelectedCafeId(null);
+  };
+
+  // 處理清單項目 hover
+  const handleCafeHover = (cafeId: number | null) => {
+    setHoveredCafeId(cafeId);
+  };
+
+  // 獲取願望清單中的咖啡廳 ID 列表
+  const wishlistCafeIds = wishlist.map(item => item.cafeId);
 
   const handleLogout = () => {
     logout();
@@ -113,14 +143,19 @@ const HomePage: React.FC = () => {
               <MapView
                 cafes={cafes}
                 selectedCafeId={selectedCafeId}
-                onCafeClick={handleCafeClick}
+                hoveredCafeId={hoveredCafeId}
+                wishlistCafeIds={wishlistCafeIds}
+                onCafeClick={handleMapMarkerClick}
+                onUserInteraction={handleMapUserInteraction}
               />
             </div>
             <div className="w-2/5 border-l">
               <CafeList
                 cafes={cafes}
                 selectedCafeId={selectedCafeId}
-                onCafeClick={handleCafeClick}
+                onCafeClick={handleCafeListClick}
+                onCafeFocus={handleCafeFocus}
+                onCafeHover={handleCafeHover}
               />
             </div>
           </>
@@ -129,7 +164,10 @@ const HomePage: React.FC = () => {
             <MapView
               cafes={cafes}
               selectedCafeId={selectedCafeId}
-              onCafeClick={handleCafeClick}
+              hoveredCafeId={hoveredCafeId}
+              wishlistCafeIds={wishlistCafeIds}
+              onCafeClick={handleMapMarkerClick}
+              onUserInteraction={handleMapUserInteraction}
             />
           </div>
         ) : viewMode === 'list' ? (
@@ -137,7 +175,9 @@ const HomePage: React.FC = () => {
             <CafeList
               cafes={cafes}
               selectedCafeId={selectedCafeId}
-              onCafeClick={handleCafeClick}
+              onCafeClick={handleCafeListClick}
+              onCafeFocus={handleCafeFocus}
+              onCafeHover={handleCafeHover}
             />
           </div>
         ) : null}
