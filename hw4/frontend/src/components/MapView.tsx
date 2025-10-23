@@ -18,6 +18,7 @@ interface MapViewProps {
   onCafeClick: (cafeId: number) => void;
   onMapClick?: (lat: number, lng: number) => void;
   onUserInteraction?: () => void;
+  onAddCafeFromMap?: (lat: number, lng: number, address: string, name: string) => void;
 }
 
 const MapView: React.FC<MapViewProps> = ({
@@ -28,6 +29,7 @@ const MapView: React.FC<MapViewProps> = ({
   onCafeClick,
   onMapClick,
   onUserInteraction,
+  onAddCafeFromMap,
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
@@ -36,6 +38,12 @@ const MapView: React.FC<MapViewProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userHasInteracted, setUserHasInteracted] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<google.maps.places.PlaceResult[]>([]);
+  const [searchService, setSearchService] = useState<google.maps.places.PlacesService | null>(null);
+  const [autocompleteService, setAutocompleteService] = useState<google.maps.places.AutocompleteService | null>(null);
+  const [predictions, setPredictions] = useState<google.maps.places.AutocompletePrediction[]>([]);
+  const [showPredictions, setShowPredictions] = useState(false);
 
   const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_JS_KEY;
 
@@ -119,14 +127,46 @@ const MapView: React.FC<MapViewProps> = ({
       setMap(mapInstance);
       setIsLoading(false);
 
+      // 初始化搜尋服務
+      const placesService = new google.maps.places.PlacesService(mapInstance);
+      const autocompleteService = new google.maps.places.AutocompleteService();
+      setSearchService(placesService);
+      setAutocompleteService(autocompleteService);
+
       // 地圖點擊事件
-      if (onMapClick) {
-        mapInstance.addListener('click', (e: google.maps.MapMouseEvent) => {
-          if (e.latLng) {
-            onMapClick(e.latLng.lat(), e.latLng.lng());
+      mapInstance.addListener('click', async (e: google.maps.MapMouseEvent) => {
+        if (e.latLng) {
+          const lat = e.latLng.lat();
+          const lng = e.latLng.lng();
+          
+          // 使用反向地理編碼獲取地址
+          const geocoder = new google.maps.Geocoder();
+          try {
+            const result = await new Promise<google.maps.GeocoderResult[]>((resolve, reject) => {
+              geocoder.geocode({ location: e.latLng }, (results, status) => {
+                if (status === 'OK' && results) {
+                  resolve(results);
+                } else {
+                  reject(new Error(`Geocoding failed: ${status}`));
+                }
+              });
+            });
+
+            if (result.length > 0) {
+              const address = result[0].formatted_address;
+              // 使用 Google Maps 上顯示的名稱，優先使用 name，其次是 formatted_address
+              const name = result[0].name || result[0].formatted_address.split(',')[0] || '新地點';
+              
+              // 調用回調函數
+              onAddCafeFromMap?.(lat, lng, address, name);
+            }
+          } catch (error) {
+            console.error('反向地理編碼失敗:', error);
+            // 即使失敗也提供基本資訊
+            onAddCafeFromMap?.(lat, lng, `緯度: ${lat.toFixed(6)}, 經度: ${lng.toFixed(6)}`, '新地點');
           }
-        });
-      }
+        }
+      });
 
       // 監聽用戶手動縮放和拖曳
       mapInstance.addListener('zoom_changed', () => {
@@ -198,11 +238,11 @@ const MapView: React.FC<MapViewProps> = ({
                 anchor: new google.maps.Point(12, 12),
               };
             } else {
-              // 一般咖啡廳：咖啡杯符號
+              // 一般咖啡廳：藍色星星符號
               iconConfig = {
-                path: 'M19,7H18V6A2,2 0 0,0 16,4H8A2,2 0 0,0 6,6V7H5A1,1 0 0,0 4,8V19A3,3 0 0,0 7,22H17A3,3 0 0,0 20,19V8A1,1 0 0,0 19,7M8,6H16V7H8V6M18,19A1,1 0 0,1 17,20H7A1,1 0 0,1 6,19V9H18V19Z',
+                path: 'M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z',
                 scale: isSelected ? 1.3 : isHovered ? 1.15 : 1,
-                fillColor: '#8B4513',
+                fillColor: '#3B82F6',
                 fillOpacity: isSelected ? 1 : isHovered ? 0.9 : 0.8,
                 strokeColor: '#ffffff',
                 strokeWeight: isSelected ? 3 : 2,
@@ -313,8 +353,160 @@ const MapView: React.FC<MapViewProps> = ({
     }
   }, [map, selectedCafeId, markers, cafes]);
 
+  // 搜尋地點
+  const handleSearch = async (query: string) => {
+    if (!searchService || !query.trim()) return;
+
+    const request = {
+      query: query,
+      fields: ['name', 'formatted_address', 'geometry', 'place_id'],
+    };
+
+    searchService.textSearch(request, (results, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+        setSearchResults(results);
+        
+        // 聚焦到第一個搜尋結果
+        if (results.length > 0) {
+          const place = results[0];
+          if (place.geometry?.location) {
+            map?.panTo(place.geometry.location);
+            map?.setZoom(16);
+          }
+        }
+      }
+    });
+  };
+
+  // 自動完成搜尋
+  const handleAutocomplete = (query: string) => {
+    if (!autocompleteService || !query.trim()) {
+      setPredictions([]);
+      setShowPredictions(false);
+      return;
+    }
+
+    const request = {
+      input: query,
+      types: ['establishment'],
+    };
+
+    autocompleteService.getPlacePredictions(request, (predictions, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
+        setPredictions(predictions);
+        setShowPredictions(true);
+      } else {
+        setPredictions([]);
+        setShowPredictions(false);
+      }
+    });
+  };
+
+  // 處理預測點擊 - 直接跳轉到新增咖啡廳頁面
+  const handlePredictionClick = (prediction: google.maps.places.AutocompletePrediction) => {
+    if (!searchService) return;
+
+    const request = {
+      placeId: prediction.place_id,
+      fields: ['name', 'formatted_address', 'geometry'],
+    };
+
+    searchService.getDetails(request, (place, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK && place) {
+        setSearchQuery(prediction.description);
+        setShowPredictions(false);
+        
+        // 直接跳轉到新增咖啡廳頁面
+        if (place.geometry?.location) {
+          const lat = place.geometry.location.lat();
+          const lng = place.geometry.location.lng();
+          const address = place.formatted_address || '';
+          const name = place.name || prediction.structured_formatting?.main_text || '';
+          
+          onAddCafeFromMap?.(lat, lng, address, name);
+        }
+      }
+    });
+  };
+
+  // 處理搜尋結果點擊 - 新增到清單
+  const handleSearchResultClick = (place: google.maps.places.PlaceResult) => {
+    if (place.geometry?.location) {
+      const lat = place.geometry.location.lat();
+      const lng = place.geometry.location.lng();
+      const address = place.formatted_address || '';
+      const name = place.name || '';
+      
+      onAddCafeFromMap?.(lat, lng, address, name);
+    }
+  };
+
   return (
     <div className="w-full h-full rounded-lg shadow-lg overflow-hidden relative" style={{ minHeight: '400px' }}>
+      {/* 搜尋框 */}
+      <div className="absolute top-4 left-4 right-4 z-20">
+        <div className="relative">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              handleAutocomplete(e.target.value);
+            }}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                handleSearch(searchQuery);
+                setShowPredictions(false);
+              }
+            }}
+            placeholder="搜尋地點以新增咖啡廳..."
+            className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <button
+            onClick={() => {
+              handleSearch(searchQuery);
+              setShowPredictions(false);
+            }}
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+          >
+            🔍
+          </button>
+        </div>
+
+        {/* 自動完成建議 */}
+        {showPredictions && predictions.length > 0 && (
+          <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg shadow-lg mt-1 max-h-60 overflow-y-auto z-30">
+            {predictions.map((prediction, index) => (
+              <div
+                key={index}
+                onClick={() => handlePredictionClick(prediction)}
+                className="px-4 py-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+              >
+                <div className="font-medium">{prediction.structured_formatting?.main_text}</div>
+                <div className="text-sm text-gray-500">{prediction.structured_formatting?.secondary_text}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* 搜尋結果 */}
+        {searchResults.length > 0 && (
+          <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg shadow-lg mt-1 max-h-60 overflow-y-auto z-30">
+            {searchResults.map((place, index) => (
+              <div
+                key={index}
+                onClick={() => handleSearchResultClick(place)}
+                className="px-4 py-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+              >
+                <div className="font-medium">{place.name}</div>
+                <div className="text-sm text-gray-500">{place.formatted_address}</div>
+                <div className="text-xs text-blue-500 mt-1">點擊新增到咖啡廳清單</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* 載入狀態覆蓋層 */}
       {isLoading && (
         <div className="absolute inset-0 bg-gray-100 flex items-center justify-center z-10">

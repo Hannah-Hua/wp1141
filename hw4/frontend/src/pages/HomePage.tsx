@@ -34,6 +34,16 @@ const HomePage: React.FC = () => {
     setUserHasInteractedWithMap(false);
   };
 
+  // 處理地圖點擊 - 加入新咖啡廳
+  const handleMapClick = (lat: number, lng: number, address: string, name: string) => {
+    // 將地址和名稱編碼到 URL 中
+    const encodedAddress = encodeURIComponent(address);
+    const encodedName = encodeURIComponent(name);
+    
+    // 跳轉到新增咖啡廳頁面，並帶上預填資料
+    navigate(`/add-cafe?lat=${lat}&lng=${lng}&address=${encodedAddress}&name=${encodedName}`);
+  };
+
   // 處理地圖用戶互動
   const handleMapUserInteraction = () => {
     setUserHasInteractedWithMap(true);
@@ -147,6 +157,7 @@ const HomePage: React.FC = () => {
                 wishlistCafeIds={wishlistCafeIds}
                 onCafeClick={handleMapMarkerClick}
                 onUserInteraction={handleMapUserInteraction}
+                onAddCafeFromMap={handleMapClick}
               />
             </div>
             <div className="w-2/5 border-l">
@@ -168,6 +179,7 @@ const HomePage: React.FC = () => {
               wishlistCafeIds={wishlistCafeIds}
               onCafeClick={handleMapMarkerClick}
               onUserInteraction={handleMapUserInteraction}
+              onAddCafeFromMap={handleMapClick}
             />
           </div>
         ) : viewMode === 'list' ? (

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 
 const CafeFormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { addCafe, updateCafe, getCafeById } = useAppContext();
   const isEdit = Boolean(id);
 
@@ -44,8 +45,20 @@ const CafeFormPage: React.FC = () => {
           hasAvailableSeats: cafe.hasAvailableSeats,
         });
       }
+    } else {
+      // 新增模式：檢查是否有 URL 參數預填資料
+      const urlName = searchParams.get('name');
+      const urlAddress = searchParams.get('address');
+      
+      if (urlName || urlAddress) {
+        setFormData(prev => ({
+          ...prev,
+          name: urlName ? decodeURIComponent(urlName) : '',
+          address: urlAddress ? decodeURIComponent(urlAddress) : '',
+        }));
+      }
     }
-  }, [isEdit, id, getCafeById]);
+  }, [isEdit, id, getCafeById, searchParams]);
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
