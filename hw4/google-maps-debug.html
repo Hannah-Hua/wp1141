@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Maps 深度診斷</title>
+    <style>
+        body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
+        #map { height: 400px; width: 100%; border: 1px solid #ccc; }
+        .status { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .loading { background: #d1ecf1; color: #0c5460; }
+        .info { background: #e2e3e5; color: #383d41; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .log { background: #f8f9fa; padding: 10px; border-radius: 4px; font-family: monospace; white-space: pre-wrap; max-height: 200px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <h1>Google Maps API 深度診斷</h1>
+    
+    <div class="test-section">
+        <h3>🔑 API Key 資訊</h3>
+        <div id="key-info" class="info">
+            <p><strong>API Key:</strong> <span id="api-key"></span></p>
+            <p><strong>當前網址:</strong> <span id="current-url"></span></p>
+            <p><strong>User Agent:</strong> <span id="user-agent"></span></p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>🧪 測試 1: 直接載入 Google Maps API</h3>
+        <button onclick="testDirectLoad()">開始測試</button>
+        <div id="test1-result" class="status loading">等待測試...</div>
+    </div>
+
+    <div class="test-section">
+        <h3>🧪 測試 2: 使用 Loader 載入</h3>
+        <button onclick="testLoaderLoad()">開始測試</button>
+        <div id="test2-result" class="status loading">等待測試...</div>
+    </div>
+
+    <div class="test-section">
+        <h3>🧪 測試 3: 檢查 API 限制</h3>
+        <button onclick="testApiRestrictions()">開始測試</button>
+        <div id="test3-result" class="status loading">等待測試...</div>
+    </div>
+
+    <div class="test-section">
+        <h3>🗺️ 地圖顯示區域</h3>
+        <div id="map"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>📝 詳細日誌</h3>
+        <div id="log" class="log"></div>
+        <button onclick="clearLog()">清除日誌</button>
+    </div>
+
+    <script>
+        const API_KEY = 'AIzaSyAtw3HZu2HmnAzhU1sB3_R3DJo5EmroRQg';
+        let logElement = document.getElementById('log');
+        
+        // 顯示基本資訊
+        document.getElementById('api-key').textContent = API_KEY.substring(0, 10) + '...';
+        document.getElementById('current-url').textContent = window.location.href;
+        document.getElementById('user-agent').textContent = navigator.userAgent.substring(0, 100) + '...';
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.textContent += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(message);
+        }
+        
+        function clearLog() {
+            logElement.textContent = '';
+        }
+        
+        function updateResult(testId, message, type = 'loading') {
+            const element = document.getElementById(`${testId}-result`);
+            element.textContent = message;
+            element.className = `status ${type}`;
+        }
+        
+        // 測試 1: 直接載入
+        function testDirectLoad() {
+            log('開始測試 1: 直接載入 Google Maps API');
+            updateResult('test1', '正在載入...', 'loading');
+            
+            // 清除之前的腳本
+            const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+            if (existingScript) {
+                existingScript.remove();
+            }
+            
+            // 設定錯誤處理
+            window.gm_authFailure = function() {
+                log('❌ gm_authFailure 被觸發 - API Key 認證失敗');
+                updateResult('test1', '❌ 認證失敗 - 請檢查 API Key 和限制設定', 'error');
+            };
+            
+            // 載入成功回調
+            window.initMapDirect = function() {
+                log('✅ Google Maps API 載入成功');
+                updateResult('test1', '✅ 載入成功', 'success');
+                
+                try {
+                    // 建立地圖
+                    const map = new google.maps.Map(document.getElementById('map'), {
+                        center: { lat: 25.0330, lng: 121.5654 },
+                        zoom: 15
+                    });
+                    
+                    // 加入標記
+                    new google.maps.Marker({
+                        position: { lat: 25.0330, lng: 121.5654 },
+                        map: map,
+                        title: '台北101'
+                    });
+                    
+                    log('✅ 地圖建立成功');
+                    updateResult('test1', '✅ 地圖建立成功', 'success');
+                    
+                } catch (error) {
+                    log('❌ 地圖建立失敗: ' + error.message);
+                    updateResult('test1', '❌ 地圖建立失敗: ' + error.message, 'error');
+                }
+            };
+            
+            // 建立腳本標籤
+            const script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&libraries=places&callback=initMapDirect`;
+            script.async = true;
+            script.defer = true;
+            
+            script.onerror = function() {
+                log('❌ 腳本載入失敗');
+                updateResult('test1', '❌ 腳本載入失敗', 'error');
+            };
+            
+            script.onload = function() {
+                log('✅ 腳本載入完成');
+            };
+            
+            document.head.appendChild(script);
+            
+            // 設定超時
+            setTimeout(() => {
+                if (document.getElementById('test1-result').textContent.includes('正在載入')) {
+                    log('⏰ 測試 1 超時');
+                    updateResult('test1', '⏰ 載入超時（10秒）', 'error');
+                }
+            }, 10000);
+        }
+        
+        // 測試 2: 使用 Loader
+        function testLoaderLoad() {
+            log('開始測試 2: 使用 Loader 載入');
+            updateResult('test2', '正在載入...', 'loading');
+            
+            // 動態載入 Loader
+            const loaderScript = document.createElement('script');
+            loaderScript.src = 'https://unpkg.com/@googlemaps/js-api-loader@2.0.1/dist/index.min.js';
+            loaderScript.onload = function() {
+                log('✅ Loader 腳本載入完成');
+                
+                const loader = new google.maps.places.PlacesService ? 
+                    new google.maps.places.PlacesService(document.createElement('div')) :
+                    null;
+                
+                if (!loader) {
+                    // 使用正確的 Loader 類別
+                    const Loader = window.google?.maps?.loader?.Loader || 
+                                  window.google?.maps?.jsApiLoader?.Loader;
+                    
+                    if (!Loader) {
+                        log('❌ 無法找到 Loader 類別');
+                        updateResult('test2', '❌ 無法找到 Loader 類別', 'error');
+                        return;
+                    }
+                    
+                    const loaderInstance = new Loader({
+                        apiKey: API_KEY,
+                        version: 'weekly',
+                        libraries: ['places']
+                    });
+                    
+                    loaderInstance.load()
+                        .then(() => {
+                            log('✅ Loader 載入成功');
+                            updateResult('test2', '✅ Loader 載入成功', 'success');
+                        })
+                        .catch((error) => {
+                            log('❌ Loader 載入失敗: ' + error.message);
+                            updateResult('test2', '❌ Loader 載入失敗: ' + error.message, 'error');
+                        });
+                }
+            };
+            
+            loaderScript.onerror = function() {
+                log('❌ Loader 腳本載入失敗');
+                updateResult('test2', '❌ Loader 腳本載入失敗', 'error');
+            };
+            
+            document.head.appendChild(loaderScript);
+        }
+        
+        // 測試 3: 檢查 API 限制
+        function testApiRestrictions() {
+            log('開始測試 3: 檢查 API 限制');
+            updateResult('test3', '正在檢查...', 'loading');
+            
+            // 嘗試不同的網域
+            const testUrls = [
+                'https://maps.googleapis.com/maps/api/js?key=' + API_KEY + '&libraries=places',
+                'https://maps.googleapis.com/maps/api/geocode/json?address=test&key=' + API_KEY
+            ];
+            
+            let completedTests = 0;
+            let successCount = 0;
+            
+            testUrls.forEach((url, index) => {
+                fetch(url)
+                    .then(response => {
+                        completedTests++;
+                        if (response.ok) {
+                            successCount++;
+                            log(`✅ 測試 ${index + 1} 成功: ${response.status}`);
+                        } else {
+                            log(`❌ 測試 ${index + 1} 失敗: ${response.status} ${response.statusText}`);
+                        }
+                        
+                        if (completedTests === testUrls.length) {
+                            if (successCount === testUrls.length) {
+                                updateResult('test3', '✅ 所有 API 測試通過', 'success');
+                            } else {
+                                updateResult('test3', `❌ ${successCount}/${testUrls.length} 測試通過`, 'error');
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        completedTests++;
+                        log(`❌ 測試 ${index + 1} 網路錯誤: ${error.message}`);
+                        
+                        if (completedTests === testUrls.length) {
+                            updateResult('test3', `❌ ${successCount}/${testUrls.length} 測試通過`, 'error');
+                        }
+                    });
+            });
+        }
+        
+        // 頁面載入時自動開始測試
+        window.onload = function() {
+            log('頁面載入完成，開始自動測試');
+            setTimeout(() => {
+                testDirectLoad();
+            }, 1000);
+        };
+    </script>
+</body>
+</html>

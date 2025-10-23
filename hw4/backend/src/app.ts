@@ -1,11 +1,11 @@
+// 載入環境變數（必須在所有 import 之前）
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import { initializeDatabase } from './database';
 import { authenticateToken } from './middleware/auth';
-
-// 載入環境變數
-dotenv.config();
 
 // 初始化 Express 應用
 const app = express();
@@ -40,6 +40,7 @@ import authRoutes from './routes/auth';
 import cafesRoutes from './routes/cafes';
 import visitsRoutes from './routes/visits';
 import wishlistRoutes from './routes/wishlist';
+import mapsRoutes from './routes/maps';
 
 // 公開路由
 app.get('/', (req: Request, res: Response) => {
@@ -86,6 +87,9 @@ app.use('/api/visits', authenticateToken, visitsRoutes);
 
 // 願望清單路由（全部需要認證）
 app.use('/api/wishlist', authenticateToken, wishlistRoutes);
+
+// Google Maps 路由（公開，但建議需要認證）
+app.use('/api/maps', mapsRoutes);
 
 // 404 處理
 app.use((req: Request, res: Response) => {
