@@ -68,25 +68,112 @@ cd hw4
 **⚠️ 重要：請替換為您自己的 API Key**
 
 #### 前端設定 (`frontend/.env`)
-```bash
-# 複製範例檔案
-cp frontend/.env.example frontend/.env
 
-# 編輯 .env 檔案，替換 YOUR_BROWSER_KEY
+**步驟 1：複製範例檔案**
+```bash
+# 在專案根目錄執行
+cp frontend/.env.example frontend/.env
+```
+
+**步驟 2：編輯前端環境變數**
+```bash
+# 使用文字編輯器開啟檔案
+nano frontend/.env
+# 或使用 VS Code
+code frontend/.env
+# 或使用 vim
+vim frontend/.env
+```
+
+**步驟 3：替換 API Key**
+將檔案內容修改為：
+```bash
+# Google Maps JavaScript API (Browser Key)
+# 請替換為您自己的 Browser Key
 VITE_GOOGLE_MAPS_JS_KEY=YOUR_BROWSER_KEY
+
+# 後端 API 位址
+VITE_API_BASE_URL=http://localhost:3000
+```
+
+**範例：**
+```bash
+# 將 YOUR_BROWSER_KEY 替換為實際的 Browser Key
+VITE_GOOGLE_MAPS_JS_KEY=AIzaSyBxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 VITE_API_BASE_URL=http://localhost:3000
 ```
 
 #### 後端設定 (`backend/.env`)
+
+**步驟 1：複製範例檔案**
+```bash
+# 在專案根目錄執行
+cp backend/.env.example backend/.env
+```
+
+**步驟 2：編輯後端環境變數**
+```bash
+# 使用文字編輯器開啟檔案
+nano backend/.env
+# 或使用 VS Code
+code backend/.env
+# 或使用 vim
+vim backend/.env
+```
+
+**步驟 3：替換 API Key**
+將檔案內容修改為：
+```bash
+# 伺服器設定
+PORT=3000
+CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+
+# 資料庫設定
+DATABASE_URL=file:./dev.db
+
+# Google Maps Server Key (啟用 Geocoding/Places/Directions)
+# 請替換為您自己的 Server Key
+GOOGLE_MAPS_SERVER_KEY=YOUR_SERVER_KEY
+```
+
+**範例：**
+```bash
+# 將 YOUR_SERVER_KEY 替換為實際的 Server Key
+PORT=3000
+CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+DATABASE_URL=file:./dev.db
+GOOGLE_MAPS_SERVER_KEY=AIzaSyAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+#### 快速設定指令（可選）
+
+如果您偏好使用指令列快速設定：
+
+**前端快速設定：**
+```bash
+# 複製範例檔案
+cp frontend/.env.example frontend/.env
+
+# 使用 sed 替換（請將 YOUR_ACTUAL_BROWSER_KEY 替換為實際的 Browser Key）
+sed -i '' 's/YOUR_BROWSER_KEY/YOUR_ACTUAL_BROWSER_KEY/g' frontend/.env
+```
+
+**後端快速設定：**
 ```bash
 # 複製範例檔案
 cp backend/.env.example backend/.env
 
-# 編輯 .env 檔案，替換 YOUR_SERVER_KEY
-GOOGLE_MAPS_SERVER_KEY=YOUR_SERVER_KEY
-PORT=3000
-CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
-DATABASE_URL=file:./dev.db
+# 使用 sed 替換（請將 YOUR_ACTUAL_SERVER_KEY 替換為實際的 Server Key）
+sed -i '' 's/YOUR_SERVER_KEY/YOUR_ACTUAL_SERVER_KEY/g' backend/.env
+```
+
+**驗證設定：**
+```bash
+# 檢查前端環境變數
+cat frontend/.env
+
+# 檢查後端環境變數
+cat backend/.env
 ```
 
 ### 3. 安裝依賴
