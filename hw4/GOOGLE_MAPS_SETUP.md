@@ -27,7 +27,7 @@
 2. 搜尋並啟用以下 **4 個 API**：
 
    **前端使用**：
-   - ✅ Maps JavaScript API
+   - ✅ 不限制金鑰
 
    **後端使用**（統一規格）：
    - ✅ Geocoding API

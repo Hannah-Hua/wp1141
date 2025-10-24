@@ -1,6 +1,7 @@
-# 辦公咖啡廳清單 - 地圖導向應用
+# 辦公咖啡廳共享清單
 
-> 一個類似 Cafeting 的咖啡廳地圖管理應用，採用前後端分離架構（React + Node/Express）
+> 類似 Cafeting ，讓使用者之間可以共享的辦公咖啡廳清單
+> 允許使用者各自儲存願望清單與到訪心得
 
 ## 📋 專案概述
 
@@ -91,6 +92,8 @@ cp .env.example .env
 # 編輯 .env 檔案，設定 Google Maps API Key
 ```
 
+> **重要**: `.env` 檔案包含敏感資訊，不得上傳到版本控制系統。專案已提供 `.env.example` 範例檔案供參考。
+
 ### 3. 設定 Google Maps API
 
 請參考 [GOOGLE_MAPS_SETUP.md](./GOOGLE_MAPS_SETUP.md) 詳細設定指南。
@@ -127,6 +130,18 @@ npm run dev
 
 ## 🔐 認證與安全性
 
+### 認證機制
+本專案使用 **JWT (JSON Web Token)** 進行使用者認證，而非 Session + Cookie 機制。
+
+**JWT 認證流程**：
+1. 使用者登入時，後端驗證 email/password
+2. 驗證成功後，後端產生 JWT Token（包含 userId、email 等資訊）
+3. 前端將 Token 儲存在 localStorage 中
+4. 每次 API 請求時，在 Authorization header 中攜帶 `Bearer <token>`
+5. 後端驗證 Token 有效性和過期時間
+6. Token 預設有效期為 7 天
+
+**安全性特點**：
 - ✅ **帳號欄位**: email + password
 - ✅ **密碼雜湊**: bcrypt（10 rounds）
 - ✅ **認證機制**: JWT Token（7天有效期）
@@ -211,20 +226,35 @@ npm run dev
 - **地圖服務**: `/api/maps/*` (Google Maps API 代理)
 
 ### 環境變數
-**後端 (.env)**:
-```
+**後端 (.env.example)**:
+```bash
+# 伺服器設定
 PORT=3000
+
+# CORS 設定
 CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+
+# 資料庫設定
 DATABASE_URL=file:./dev.db
-JWT_SECRET=your_jwt_secret
-GOOGLE_MAPS_SERVER_KEY=your_server_key
+
+# JWT 認證設定
+JWT_SECRET=your_super_secret_jwt_key_here
+JWT_EXPIRES_IN=7d
+
+# Google Maps API 設定
+GOOGLE_MAPS_SERVER_KEY=your_google_maps_server_key_here
 ```
 
-**前端 (.env)**:
-```
+**前端 (.env.example)**:
+```bash
+# 後端 API 位址
 VITE_API_BASE_URL=http://localhost:3000
-VITE_GOOGLE_MAPS_JS_KEY=your_browser_key
+
+# Google Maps JavaScript API Key (Browser Key)
+VITE_GOOGLE_MAPS_JS_KEY=your_google_maps_browser_key_here
 ```
+
+> **注意**: 請複製 `.env.example` 為 `.env` 並填入實際值。`.env` 檔案不得上傳到版本控制系統。
 
 ## 📄 授權
 
