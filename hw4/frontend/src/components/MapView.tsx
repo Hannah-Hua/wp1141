@@ -44,6 +44,13 @@ const MapView: React.FC<MapViewProps> = ({
   const [autocompleteService, setAutocompleteService] = useState<google.maps.places.AutocompleteService | null>(null);
   const [predictions, setPredictions] = useState<google.maps.places.AutocompletePrediction[]>([]);
   const [showPredictions, setShowPredictions] = useState(false);
+  const [mapClickInfo, setMapClickInfo] = useState<{
+    lat: number;
+    lng: number;
+    address: string;
+    name: string;
+  } | null>(null);
+  const [selectedPrediction, setSelectedPrediction] = useState<google.maps.places.AutocompletePrediction | null>(null);
 
   const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_JS_KEY;
 
@@ -154,16 +161,56 @@ const MapView: React.FC<MapViewProps> = ({
 
             if (result.length > 0) {
               const address = result[0].formatted_address;
-              // 使用 Google Maps 上顯示的名稱，優先使用 name，其次是 formatted_address
-              const name = result[0].name || result[0].formatted_address.split(',')[0] || '新地點';
+              let name = '新地點';
               
-              // 調用回調函數
-              onAddCafeFromMap?.(lat, lng, address, name);
+              // 直接使用 Google Places API 獲取店名
+              if (result[0].place_id && searchService) {
+                try {
+                  const placeDetails = await new Promise<google.maps.places.PlaceResult>((resolve, reject) => {
+                    const request = {
+                      placeId: result[0].place_id,
+                      fields: ['name', 'types'],
+                    };
+                    
+                    searchService.getDetails(request, (place, status) => {
+                      if (status === google.maps.places.PlacesServiceStatus.OK && place) {
+                        resolve(place);
+                      } else {
+                        reject(new Error(`Place details failed: ${status}`));
+                      }
+                    });
+                  });
+                  
+                  // 直接使用 Places API 的 name
+                  if (placeDetails.name) {
+                    name = placeDetails.name;
+                  }
+                } catch (error) {
+                  console.log('無法獲取地點詳細資訊，使用預設邏輯');
+                }
+              }
+              
+              // 如果沒有獲取到店名，使用智能提取邏輯
+              if (name === '新地點') {
+                const addressParts = address.split(',');
+                const firstPart = addressParts[0]?.trim();
+                
+                // 如果第一部分看起來像店名（包含中文字符或英文字母）
+                if (firstPart && /[\u4e00-\u9fff\u3400-\u4dbfa-zA-Z]/.test(firstPart) && firstPart.length > 2) {
+                  name = firstPart;
+                }
+              }
+              
+              console.log('地圖點擊 - 地址:', address);
+              console.log('地圖點擊 - 店名:', name);
+              console.log('地圖點擊 - 類型:', result[0].types);
+              
+              setMapClickInfo({ lat, lng, address, name });
             }
           } catch (error) {
             console.error('反向地理編碼失敗:', error);
-            // 即使失敗也提供基本資訊
-            onAddCafeFromMap?.(lat, lng, `緯度: ${lat.toFixed(6)}, 經度: ${lng.toFixed(6)}`, '新地點');
+            const address = `緯度: ${lat.toFixed(6)}, 經度: ${lng.toFixed(6)}`;
+            setMapClickInfo({ lat, lng, address, name: '新地點' });
           }
         }
       });
@@ -238,11 +285,11 @@ const MapView: React.FC<MapViewProps> = ({
                 anchor: new google.maps.Point(12, 12),
               };
             } else {
-              // 一般咖啡廳：藍色星星符號
+              // 一般咖啡廳：橘黃色星星符號
               iconConfig = {
                 path: 'M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z',
                 scale: isSelected ? 1.3 : isHovered ? 1.15 : 1,
-                fillColor: '#3B82F6',
+                fillColor: '#FF8C00', // Orange for regular cafes
                 fillOpacity: isSelected ? 1 : isHovered ? 0.9 : 0.8,
                 strokeColor: '#ffffff',
                 strokeWeight: isSelected ? 3 : 2,
@@ -271,7 +318,7 @@ const MapView: React.FC<MapViewProps> = ({
               `,
             });
 
-            // 標記點擊事件 - 只高亮，不跳轉到詳情頁
+            // 標記點擊事件 - 跳轉到詳情頁
             marker.addListener('click', () => {
               // 關閉其他資訊視窗
               newInfoWindows.forEach(iw => iw.close());
@@ -279,7 +326,7 @@ const MapView: React.FC<MapViewProps> = ({
               // 開啟當前資訊視窗
               infoWindow.open(map, marker);
               
-              // 只呼叫高亮回調，不跳轉到詳情頁
+              // 跳轉到詳情頁
               onCafeClick(cafe.id);
             });
 
@@ -416,33 +463,74 @@ const MapView: React.FC<MapViewProps> = ({
         setSearchQuery(prediction.description);
         setShowPredictions(false);
         
-        // 直接跳轉到新增咖啡廳頁面
+        // 聚焦到該地點
         if (place.geometry?.location) {
           const lat = place.geometry.location.lat();
           const lng = place.geometry.location.lng();
           const address = place.formatted_address || '';
           const name = place.name || prediction.structured_formatting?.main_text || '';
           
-          onAddCafeFromMap?.(lat, lng, address, name);
+          setMapClickInfo({ lat, lng, address, name });
+          
+          // 聚焦到該地點
+          map.panTo({ lat, lng });
+          map.setZoom(16);
         }
       }
     });
   };
 
-  // 處理搜尋結果點擊 - 新增到清單
+  // 處理「新增咖啡廳」按鈕點擊
+  const handleAddCafeClick = () => {
+    if (mapClickInfo) {
+      onAddCafeFromMap?.(mapClickInfo.lat, mapClickInfo.lng, mapClickInfo.address, mapClickInfo.name);
+      clearLocationMarker();
+    }
+  };
+
+  // 處理搜尋結果點擊 - 聚焦地圖
   const handleSearchResultClick = (place: google.maps.places.PlaceResult) => {
-    if (place.geometry?.location) {
+    if (place.geometry?.location && map) {
       const lat = place.geometry.location.lat();
       const lng = place.geometry.location.lng();
       const address = place.formatted_address || '';
       const name = place.name || '';
       
-      onAddCafeFromMap?.(lat, lng, address, name);
+      setMapClickInfo({ lat, lng, address, name });
+      
+      // 聚焦到該地點
+      map.panTo({ lat, lng });
+      map.setZoom(16);
+    }
+  };
+
+  // 清除相關狀態
+  const clearLocationMarker = () => {
+    setMapClickInfo(null);
+    setSelectedPrediction(null);
+  };
+
+  // 處理地圖點擊空白處，聚焦到該地點
+  const handleMapFocusClick = () => {
+    if (mapClickInfo) {
+      map?.panTo({ lat: mapClickInfo.lat, lng: mapClickInfo.lng });
+      map?.setZoom(16);
+      setMapClickInfo(null);
+      setSelectedPrediction(null);
     }
   };
 
   return (
-    <div className="w-full h-full rounded-lg shadow-lg overflow-hidden relative" style={{ minHeight: '400px' }}>
+    <div 
+      className="w-full h-full rounded-lg shadow-lg overflow-hidden relative" 
+      style={{ minHeight: '400px' }}
+      onClick={(e) => {
+        // 如果點擊的是地圖容器本身（不是子元素），則清除位置標記
+        if (e.target === e.currentTarget) {
+          clearLocationMarker();
+        }
+      }}
+    >
       {/* 搜尋框 */}
       <div className="absolute top-4 left-4 right-4 z-20">
         <div className="relative">
@@ -500,12 +588,39 @@ const MapView: React.FC<MapViewProps> = ({
               >
                 <div className="font-medium">{place.name}</div>
                 <div className="text-sm text-gray-500">{place.formatted_address}</div>
-                <div className="text-xs text-blue-500 mt-1">點擊新增到咖啡廳清單</div>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* 地圖點擊資訊顯示 */}
+      {mapClickInfo && (
+        <div className="absolute bottom-4 left-4 right-4 z-20">
+          <div className="bg-white rounded-lg shadow-lg p-4 border-2 border-amber-500">
+            <div className="flex justify-between items-start mb-3">
+              <div className="flex-1">
+                <h3 className="font-semibold text-lg text-gray-800">{mapClickInfo.name}</h3>
+                <p className="text-sm text-gray-600 mt-1">{mapClickInfo.address}</p>
+              </div>
+              <button
+                onClick={clearLocationMarker}
+                className="text-gray-400 hover:text-gray-600 ml-2"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={handleAddCafeClick}
+                className="w-full bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              >
+                新增咖啡廳
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 載入狀態覆蓋層 */}
       {isLoading && (

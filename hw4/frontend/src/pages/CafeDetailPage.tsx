@@ -117,7 +117,6 @@ const CafeDetailPage: React.FC = () => {
           <div className="flex justify-between items-start mb-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-800 mb-2">{cafe.name}</h1>
-              <p className="text-gray-600">{cafe.category}</p>
             </div>
             {auth.isAuthenticated && (
               <div className="flex gap-2">

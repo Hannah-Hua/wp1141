@@ -13,7 +13,7 @@ router.get('/', (req: Request, res: Response) => {
 
     const wishlist = db.prepare(`
       SELECT w.*, c.name as cafeName, c.address as cafeAddress, 
-             c.category, c.rating, c.priceLevel
+             c.rating, c.priceLevel
       FROM wishlist w
       JOIN cafes c ON w.cafeId = c.id
       WHERE w.userId = ?

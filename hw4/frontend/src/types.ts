@@ -4,7 +4,6 @@ export interface Cafe {
   name: string;
   description: string;
   address: string;
-  category: string;
   rating?: number;
   priceLevel?: number; // 1-4
   hasWifi: boolean;

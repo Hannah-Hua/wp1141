@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 
@@ -9,6 +9,11 @@ const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAppContext();
   const navigate = useNavigate();
+
+  // 調試：監控錯誤狀態變化
+  useEffect(() => {
+    console.log('錯誤狀態變化:', error);
+  }, [error]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,9 +27,34 @@ const LoginPage: React.FC = () => {
     try {
       setIsLoading(true);
       await login(email, password);
+      // 登入成功才導航
       navigate('/');
     } catch (err: any) {
-      setError(err.message || '登入失敗，請檢查您的帳號密碼');
+      console.log('登入錯誤:', err); // 調試信息
+      
+      // 根據不同的錯誤類型顯示不同的提示
+      let errorMessage = '登入失敗';
+      
+      if (err.response?.status === 401) {
+        // 使用後端回傳的具體錯誤訊息
+        errorMessage = err.response?.data?.error || '查無此帳號或密碼錯誤';
+      } else if (err.response?.status === 400) {
+        errorMessage = err.response?.data?.error || '請檢查輸入格式';
+      } else if (err.response?.status >= 500) {
+        errorMessage = '伺服器錯誤，請稍後再試';
+      } else if (err.message) {
+        errorMessage = err.message;
+      } else {
+        errorMessage = '網路連線錯誤，請檢查網路連線';
+      }
+      
+      console.log('設置錯誤訊息:', errorMessage); // 調試信息
+      
+      // 使用 setTimeout 確保錯誤訊息能正確設置
+      setTimeout(() => {
+        setError(errorMessage);
+        console.log('錯誤訊息已設置:', errorMessage);
+      }, 100);
     } finally {
       setIsLoading(false);
     }
@@ -40,8 +70,19 @@ const LoginPage: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">
-              {error}
+            <div className={`border p-4 rounded-lg text-sm font-medium ${
+              error.includes('查無此帳號') 
+                ? 'bg-orange-50 border-orange-200 text-orange-700' 
+                : error.includes('密碼錯誤')
+                ? 'bg-red-50 border-red-200 text-red-700'
+                : 'bg-red-50 border-red-200 text-red-700'
+            }`}>
+              <div className="flex items-center">
+                <span className="mr-2">
+                  {error.includes('查無此帳號') ? '❓' : '🔒'}
+                </span>
+                {error}
+              </div>
             </div>
           )}
 

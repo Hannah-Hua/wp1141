@@ -85,9 +85,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       // 登入後載入資料
       await Promise.all([loadCafes(), loadVisits(), loadWishlist()]);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.error || '登入失敗';
-      setError(errorMessage);
-      throw new Error(errorMessage);
+      // 保持原始錯誤物件，讓 LoginPage 可以根據狀態碼處理
+      setError(err.response?.data?.error || err.message || '登入失敗');
+      throw err; // 重新拋出原始錯誤物件
     } finally {
       setLoading(false);
     }

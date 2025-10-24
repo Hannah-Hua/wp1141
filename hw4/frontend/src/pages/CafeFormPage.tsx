@@ -13,7 +13,6 @@ const CafeFormPage: React.FC = () => {
     name: '',
     description: '',
     address: '',
-    category: '辦公友善',
     rating: 0,
     priceLevel: 2,
     hasWifi: true,
@@ -34,7 +33,6 @@ const CafeFormPage: React.FC = () => {
           name: cafe.name,
           description: cafe.description,
           address: cafe.address,
-          category: cafe.category,
           rating: cafe.rating || 0,
           priceLevel: cafe.priceLevel || 2,
           hasWifi: cafe.hasWifi,
@@ -150,26 +148,6 @@ const CafeFormPage: React.FC = () => {
                 placeholder="例：Cafe Nomad"
               />
               {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
-            </div>
-
-            {/* 類別 */}
-            <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
-                類別
-              </label>
-              <select
-                id="category"
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none"
-              >
-                <option value="辦公友善">辦公友善</option>
-                <option value="精品咖啡">精品咖啡</option>
-                <option value="連鎖咖啡">連鎖咖啡</option>
-                <option value="獨立咖啡">獨立咖啡</option>
-                <option value="其他">其他</option>
-              </select>
             </div>
 
             {/* 描述 */}

@@ -16,9 +16,10 @@ const HomePage: React.FC = () => {
     loadCafes();
   }, []);
 
-  // 處理地圖標記點擊 - 只高亮，不跳轉
+  // 處理地圖標記點擊 - 高亮並跳轉到詳情頁
   const handleMapMarkerClick = (cafeId: number) => {
     setSelectedCafeId(cafeId);
+    navigate(`/cafe/${cafeId}`);
   };
 
   // 處理清單項目點擊 - 高亮並跳轉到詳情頁
@@ -69,7 +70,7 @@ const HomePage: React.FC = () => {
       {/* 頂部導航欄 */}
       <nav className="bg-white shadow-md px-6 py-4 flex justify-between items-center">
         <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold text-amber-600">☕ 辦公咖啡廳清單</h1>
+          <h1 className="text-2xl font-bold text-amber-600">☕ 辦公咖啡廳共享清單</h1>
         </div>
 
         <div className="flex items-center gap-4">

@@ -80,13 +80,13 @@ router.post('/login', async (req: Request, res: Response) => {
     ).get(email.toLowerCase()) as User | undefined;
 
     if (!user) {
-      return res.status(401).json({ error: 'Email 或密碼錯誤' });
+      return res.status(401).json({ error: '查無此帳號' });
     }
 
     // 驗證密碼
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ error: 'Email 或密碼錯誤' });
+      return res.status(401).json({ error: '密碼錯誤' });
     }
 
     // 產生 JWT Token

@@ -12,16 +12,49 @@ interface CafeListProps {
 
 const CafeList: React.FC<CafeListProps> = ({ cafes, onCafeClick, onCafeFocus, selectedCafeId, onCafeHover }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [facilityFilter, setFacilityFilter] = useState('all');
   const { isInWishlist } = useAppContext();
 
-  const categories = ['all', ...Array.from(new Set(cafes.map(c => c.category)))];
+  // 設施與環境篩選選項
+  const facilityOptions = [
+    { value: 'all', label: '全部' },
+    { value: 'hasWifi', label: '📶 有 WiFi' },
+    { value: 'hasPowerOutlets', label: '🔌 有插座' },
+    { value: 'noTimeLimit', label: '⏰ 無限時' },
+    { value: 'quiet', label: '🔇 安靜' },
+    { value: 'goodLighting', label: '💡 光線佳' },
+    { value: 'hasSeats', label: '🪑 有座位' },
+  ];
 
   const filteredCafes = cafes.filter(cafe => {
     const matchesSearch = cafe.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       cafe.address.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = categoryFilter === 'all' || cafe.category === categoryFilter;
-    return matchesSearch && matchesCategory;
+    
+    let matchesFacility = true;
+    if (facilityFilter !== 'all') {
+      switch (facilityFilter) {
+        case 'hasWifi':
+          matchesFacility = cafe.hasWifi;
+          break;
+        case 'hasPowerOutlets':
+          matchesFacility = cafe.hasPowerOutlets;
+          break;
+        case 'noTimeLimit':
+          matchesFacility = !cafe.hasTimeLimit;
+          break;
+        case 'quiet':
+          matchesFacility = !cafe.isNoisy;
+          break;
+        case 'goodLighting':
+          matchesFacility = cafe.hasGoodLighting;
+          break;
+        case 'hasSeats':
+          matchesFacility = cafe.hasAvailableSeats;
+          break;
+      }
+    }
+
+    return matchesSearch && matchesFacility;
   });
 
   const renderStars = (rating?: number) => {
@@ -60,17 +93,17 @@ const CafeList: React.FC<CafeListProps> = ({ cafes, onCafeClick, onCafeFocus, se
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none"
         />
         <div className="flex gap-2 overflow-x-auto">
-          {categories.map(category => (
+          {facilityOptions.map(option => (
             <button
-              key={category}
-              onClick={() => setCategoryFilter(category)}
+              key={option.value}
+              onClick={() => setFacilityFilter(option.value)}
               className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition ${
-                categoryFilter === category
+                facilityFilter === option.value
                   ? 'bg-amber-600 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              {category === 'all' ? '全部' : category}
+              {option.label}
             </button>
           ))}
         </div>
@@ -108,7 +141,6 @@ const CafeList: React.FC<CafeListProps> = ({ cafes, onCafeClick, onCafeFocus, se
                     {cafe.name}
                     {isInWishlist(cafe.id) && <span className="text-red-500">♥</span>}
                   </h3>
-                  <p className="text-sm text-gray-600 mb-1">{cafe.category}</p>
                 </div>
                 {renderPriceLevel(cafe.priceLevel)}
               </div>

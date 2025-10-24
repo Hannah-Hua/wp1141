@@ -10,6 +10,14 @@ const api = axios.create({
   },
 });
 
+// 建立不需要認證的 Axios 實例（用於咖啡廳操作）
+const publicApi = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
 // 請求攔截器：自動加入 JWT Token
 api.interceptors.request.use(
   (config) => {
@@ -39,4 +47,5 @@ api.interceptors.response.use(
 );
 
 export default api;
+export { publicApi };
 

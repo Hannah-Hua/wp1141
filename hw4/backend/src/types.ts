@@ -13,7 +13,6 @@ export interface Cafe {
   name: string;
   description: string;
   address: string;
-  category: string;
   rating: number | null;
   priceLevel: number | null; // 1-4
   hasWifi: number; // SQLite boolean (0 or 1)

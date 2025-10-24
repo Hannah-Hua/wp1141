@@ -1,14 +1,13 @@
 import { Router, Request, Response } from 'express';
 import db from '../database';
 import { Cafe } from '../types';
-import { authenticateToken } from '../middleware/auth';
 
 const router = Router();
 
 // 取得所有咖啡廳（支援搜尋和篩選）
 router.get('/', (req: Request, res: Response) => {
   try {
-    const { q, category } = req.query;
+    const { q } = req.query;
     
     let query = 'SELECT * FROM cafes';
     const params: any[] = [];
@@ -19,12 +18,6 @@ router.get('/', (req: Request, res: Response) => {
       conditions.push('(name LIKE ? OR address LIKE ? OR description LIKE ?)');
       const searchTerm = `%${q}%`;
       params.push(searchTerm, searchTerm, searchTerm);
-    }
-
-    // 類別篩選
-    if (category && typeof category === 'string') {
-      conditions.push('category = ?');
-      params.push(category);
     }
 
     if (conditions.length > 0) {
@@ -58,18 +51,13 @@ router.get('/:id', (req: Request, res: Response) => {
   }
 });
 
-// 新增咖啡廳（需要認證）
-router.post('/', authenticateToken, (req: Request, res: Response) => {
+// 新增咖啡廳（公開，任何人都可以新增）
+router.post('/', (req: Request, res: Response) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({ error: '請先登入' });
-    }
-
     const {
       name,
       description,
       address,
-      category,
       rating,
       priceLevel,
       hasWifi,
@@ -81,7 +69,7 @@ router.post('/', authenticateToken, (req: Request, res: Response) => {
     } = req.body;
 
     // 輸入驗證
-    if (!name || !description || !address || !category) {
+    if (!name || !description || !address) {
       return res.status(400).json({ error: '請提供所有必填欄位' });
     }
 
@@ -112,18 +100,17 @@ router.post('/', authenticateToken, (req: Request, res: Response) => {
       }
     }
 
-    // 新增咖啡廳
+    // 新增咖啡廳（createdBy 設為 null，表示公開創建）
     const result = db.prepare(`
       INSERT INTO cafes (
-        name, description, address, category, rating, priceLevel,
+        name, description, address, rating, priceLevel,
         hasWifi, hasPowerOutlets, hasTimeLimit, isNoisy, hasGoodLighting, hasAvailableSeats,
         createdBy
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       name.trim(),
       description.trim(),
       address.trim(),
-      category,
       rating || null,
       priceLevel || null,
       hasWifi ? 1 : 0,
@@ -132,7 +119,7 @@ router.post('/', authenticateToken, (req: Request, res: Response) => {
       isNoisy ? 1 : 0,
       hasGoodLighting ? 1 : 0,
       hasAvailableSeats ? 1 : 0,
-      req.user.userId
+      null // 公開創建，不需要認證
     );
 
     const cafeId = result.lastInsertRowid as number;
@@ -148,13 +135,9 @@ router.post('/', authenticateToken, (req: Request, res: Response) => {
   }
 });
 
-// 更新咖啡廳（需要認證且是建立者）
-router.put('/:id', authenticateToken, (req: Request, res: Response) => {
+// 更新咖啡廳（公開，任何人都可以更新）
+router.put('/:id', (req: Request, res: Response) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({ error: '請先登入' });
-    }
-
     const { id } = req.params;
     const cafe = db.prepare('SELECT * FROM cafes WHERE id = ?').get(id) as Cafe | undefined;
 
@@ -162,16 +145,10 @@ router.put('/:id', authenticateToken, (req: Request, res: Response) => {
       return res.status(404).json({ error: '找不到此咖啡廳' });
     }
 
-    // 檢查權限
-    if (cafe.createdBy !== req.user.userId) {
-      return res.status(403).json({ error: '您沒有權限修改此咖啡廳' });
-    }
-
     const {
       name,
       description,
       address,
-      category,
       rating,
       priceLevel,
       hasWifi,
@@ -215,7 +192,6 @@ router.put('/:id', authenticateToken, (req: Request, res: Response) => {
         name = ?,
         description = ?,
         address = ?,
-        category = ?,
         rating = ?,
         priceLevel = ?,
         hasWifi = ?,
@@ -230,7 +206,6 @@ router.put('/:id', authenticateToken, (req: Request, res: Response) => {
       name !== undefined ? name.trim() : cafe.name,
       description !== undefined ? description.trim() : cafe.description,
       address !== undefined ? address.trim() : cafe.address,
-      category !== undefined ? category : cafe.category,
       rating !== undefined ? rating : cafe.rating,
       priceLevel !== undefined ? priceLevel : cafe.priceLevel,
       hasWifi !== undefined ? (hasWifi ? 1 : 0) : cafe.hasWifi,
@@ -254,23 +229,14 @@ router.put('/:id', authenticateToken, (req: Request, res: Response) => {
   }
 });
 
-// 刪除咖啡廳（需要認證且是建立者）
-router.delete('/:id', authenticateToken, (req: Request, res: Response) => {
+// 刪除咖啡廳（公開，任何人都可以刪除）
+router.delete('/:id', (req: Request, res: Response) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({ error: '請先登入' });
-    }
-
     const { id } = req.params;
     const cafe = db.prepare('SELECT * FROM cafes WHERE id = ?').get(id) as Cafe | undefined;
 
     if (!cafe) {
       return res.status(404).json({ error: '找不到此咖啡廳' });
-    }
-
-    // 檢查權限
-    if (cafe.createdBy !== req.user.userId) {
-      return res.status(403).json({ error: '您沒有權限刪除此咖啡廳' });
     }
 
     db.prepare('DELETE FROM cafes WHERE id = ?').run(id);
