@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Cafe } from '../types';
 
+/// <reference types="@types/google.maps" />
+
 // 擴展 Window 介面以包含 Google Maps API
 declare global {
   interface Window {
-    google: typeof google;
+    google: any;
     gm_authFailure: () => void;
     initMapCallback: () => void;
   }
@@ -162,14 +164,15 @@ const MapView: React.FC<MapViewProps> = ({
             if (result.length > 0) {
               const address = result[0].formatted_address;
               let name = '新地點';
+              let foundName = false;
               
-              // 直接使用 Google Places API 獲取店名
+              // 方法1: 使用 Google Places API 獲取店名（最準確）
               if (result[0].place_id && searchService) {
                 try {
                   const placeDetails = await new Promise<google.maps.places.PlaceResult>((resolve, reject) => {
                     const request = {
                       placeId: result[0].place_id,
-                      fields: ['name', 'types'],
+                      fields: ['name', 'types', 'business_status'],
                     };
                     
                     searchService.getDetails(request, (place, status) => {
@@ -181,34 +184,84 @@ const MapView: React.FC<MapViewProps> = ({
                     });
                   });
                   
-                  // 直接使用 Places API 的 name
-                  if (placeDetails.name) {
-                    name = placeDetails.name;
+                  // 使用 Places API 的 name（如果是商家或景點）
+                  if (placeDetails.name && placeDetails.types) {
+                    // 檢查是否為商家、景點等有意義的地點類型
+                    const meaningfulTypes = [
+                      'point_of_interest', 'establishment', 'restaurant', 'cafe',
+                      'store', 'shopping_mall', 'lodging', 'museum', 'park',
+                      'tourist_attraction', 'stadium', 'university', 'school',
+                      'hospital', 'church', 'mosque', 'synagogue', 'hindu_temple'
+                    ];
+                    
+                    const hasMeaningfulType = placeDetails.types.some(type => 
+                      meaningfulTypes.includes(type)
+                    );
+                    
+                    if (hasMeaningfulType) {
+                      name = placeDetails.name;
+                      foundName = true;
+                      console.log('✅ 使用 Places API 名稱:', name);
+                    }
                   }
                 } catch (error) {
-                  console.log('無法獲取地點詳細資訊，使用預設邏輯');
+                  console.log('⚠️ 無法獲取地點詳細資訊:', error);
                 }
               }
               
-              // 如果沒有獲取到店名，使用智能提取邏輯
-              if (name === '新地點') {
+              // 方法2: 從 Geocoding 結果中提取地點名稱
+              if (!foundName) {
+                // 嘗試從 address_components 中找到地點名稱
+                const components = result[0].address_components;
+                if (components) {
+                  // 尋找 point_of_interest, establishment 等類型
+                  const poiComponent = components.find(c => 
+                    c.types.includes('point_of_interest') || 
+                    c.types.includes('establishment') ||
+                    c.types.includes('premise')
+                  );
+                  
+                  if (poiComponent && poiComponent.long_name) {
+                    name = poiComponent.long_name;
+                    foundName = true;
+                    console.log('✅ 從 address_components 提取名稱:', name);
+                  }
+                }
+              }
+              
+              // 方法3: 從地址字符串智能提取
+              if (!foundName) {
                 const addressParts = address.split(',');
                 const firstPart = addressParts[0]?.trim();
                 
-                // 如果第一部分看起來像店名（包含中文字符或英文字母）
-                if (firstPart && /[\u4e00-\u9fff\u3400-\u4dbfa-zA-Z]/.test(firstPart) && firstPart.length > 2) {
+                // 檢查第一部分是否看起來像地點名稱
+                // 排除純數字、過短的字符串、包含「號」的街道地址
+                if (firstPart && 
+                    /[\u4e00-\u9fff\u3400-\u4dbfa-zA-Z]/.test(firstPart) && 
+                    firstPart.length > 2 &&
+                    !firstPart.match(/^\d+$/) &&
+                    !firstPart.includes('號') &&
+                    !firstPart.match(/^[\d\-]+/)) {
                   name = firstPart;
+                  foundName = true;
+                  console.log('✅ 從地址字符串提取名稱:', name);
                 }
               }
               
-              console.log('地圖點擊 - 地址:', address);
-              console.log('地圖點擊 - 店名:', name);
-              console.log('地圖點擊 - 類型:', result[0].types);
+              // 如果所有方法都失敗，保持「新地點」
+              if (!foundName) {
+                console.log('ℹ️ 無法識別地點名稱，使用預設值: 新地點');
+              }
+              
+              console.log('📍 地圖點擊結果:');
+              console.log('  - 名稱:', name);
+              console.log('  - 地址:', address);
+              console.log('  - 類型:', result[0].types);
               
               setMapClickInfo({ lat, lng, address, name });
             }
           } catch (error) {
-            console.error('反向地理編碼失敗:', error);
+            console.error('❌ 反向地理編碼失敗:', error);
             const address = `緯度: ${lat.toFixed(6)}, 經度: ${lng.toFixed(6)}`;
             setMapClickInfo({ lat, lng, address, name: '新地點' });
           }
