@@ -8,7 +8,6 @@ import CafeDetailPage from './pages/CafeDetailPage';
 import CafeFormPage from './pages/CafeFormPage';
 import VisitsPage from './pages/VisitsPage';
 import WishlistPage from './pages/WishlistPage';
-import MapTestPage from './pages/MapTestPage';
 
 // 受保護的路由組件
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -21,7 +20,6 @@ const AppRoutes: React.FC = () => {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      <Route path="/map-test" element={<MapTestPage />} />
       <Route
         path="/"
         element={
