@@ -1,261 +1,254 @@
-# 辦公咖啡廳共享清單
+# 辦公咖啡廳清單 🍵
 
-> 類似 Cafeting ，讓使用者之間可以共享的辦公咖啡廳清單
-> 允許使用者各自儲存願望清單與到訪心得
+一個基於地圖的咖啡廳管理應用，採用前後端分離架構，整合 Google Maps API 提供完整的地圖導向功能。
 
-## 📋 專案概述
+## 🚀 功能特色
 
-這是一個完整的全端應用程式，讓使用者可以：
+- **地圖導向介面**：直觀的地圖與列表雙向互動
+- **咖啡廳管理**：新增、編輯、刪除咖啡廳資訊
+- **個人記錄**：記錄到訪歷史與願望清單
+- **智能搜尋**：Google Places API 自動完成搜尋
+- **環境標記**：記錄時間限制、噪音、光線、座位等環境資訊
+- **用戶認證**：JWT 認證系統，保護個人資料
 
-- ☕ **建立/瀏覽/編輯/刪除咖啡廳**（Place CRUD）
-- 📝 **記錄「已去過」的到訪**（Visit）
-- ♥️ **收藏「想去」清單**（Wishlist）
-- 🗺️ **在地圖與列表之間雙向互動**
-  - 列表點某間店，地圖定位
-  - 點地圖新增店家
-  - 搜尋地點並新增咖啡廳
+## 🛠 技術棧
 
-## 🏗️ 技術架構
+### 前端
+- **React 18** + **TypeScript**
+- **Vite** 建置工具
+- **TailwindCSS** UI 框架
+- **React Router** 路由管理
+- **Axios** HTTP 客戶端
+- **Google Maps JavaScript API**
 
-### 前端（Frontend）
-- **框架**: React 18 + TypeScript
-- **建置工具**: Vite
-- **路由**: React Router v6
-- **UI 框架**: TailwindCSS
-- **HTTP 客戶端**: Axios
-- **地圖**: Google Maps JavaScript API
-- **狀態管理**: React Context
+### 後端
+- **Node.js** + **Express**
+- **TypeScript** 開發
+- **SQLite** 資料庫
+- **JWT** 認證
+- **bcrypt** 密碼加密
+- **Google Maps APIs** (Geocoding/Places/Directions)
 
-### 後端（Backend）
-- **框架**: Node.js + Express + TypeScript
-- **資料庫**: SQLite
-- **認證**: JWT Token
-- **密碼加密**: bcrypt
-- **Google Maps 整合**: Geocoding / Places / Directions API
-- **CORS**: 支援跨域請求
+## 📋 環境需求
 
-## 📂 專案結構
+- Node.js 18+
+- npm 或 yarn
+- Google Cloud Platform 帳號
 
-```
-hw4/
-├── frontend/              # React 前端
-│   ├── src/
-│   │   ├── pages/        # 頁面組件
-│   │   ├── components/   # 共用組件
-│   │   ├── context/      # React Context
-│   │   ├── services/     # API 服務
-│   │   ├── types.ts      # 型別定義
-│   │   └── utils/        # 工具函數
-│   ├── .env.example      # 環境變數範例
-│   └── package.json
-├── backend/              # Express 後端
-│   ├── src/
-│   │   ├── routes/       # API 路由
-│   │   ├── services/     # 業務邏輯
-│   │   ├── middleware/   # 中介軟體
-│   │   ├── database.ts   # 資料庫設定
-│   │   └── app.ts        # 應用程式入口
-│   ├── .env.example
-│   └── package.json
-├── GOOGLE_MAPS_SETUP.md  # Google Maps API 設定指南
-├── VERIFY_API_KEY.md     # API Key 驗證指南
-└── README.md             # 本檔案
-```
+## 🔑 Google Maps API 設定
 
-## 🚀 快速開始
+### 必要 API 服務
+請在 Google Cloud Console 中啟用以下 API：
 
-### 1. 安裝依賴
+1. **Maps JavaScript API** → 建立 Browser Key
+2. **Geocoding API** → 使用 Server Key
+3. **Places API** → 使用 Server Key  
+4. **Directions API** → 使用 Server Key
 
+### API Key 限制設定
+
+**Browser Key (前端)**
+- 限制類型：HTTP 網域
+- 允許清單：`http://localhost:5173/*`, `http://127.0.0.1:5173/*`
+
+**Server Key (後端)**
+- 限制類型：IP 位址 (開發階段可設為無限制)
+- 啟用服務：Geocoding API, Places API, Directions API
+
+## ⚙️ 安裝與設定
+
+### 1. 複製專案
 ```bash
-# 安裝前端依賴
-cd frontend
-npm install
-
-# 安裝後端依賴
-cd ../backend
-npm install
+git clone <repository-url>
+cd hw4
 ```
 
 ### 2. 設定環境變數
 
-**後端**：
+**⚠️ 重要：請替換為您自己的 API Key**
+
+#### 前端設定 (`frontend/.env`)
 ```bash
+# 複製範例檔案
+cp frontend/.env.example frontend/.env
+
+# 編輯 .env 檔案，替換 YOUR_BROWSER_KEY
+VITE_GOOGLE_MAPS_JS_KEY=YOUR_BROWSER_KEY
+VITE_API_BASE_URL=http://localhost:3000
+```
+
+#### 後端設定 (`backend/.env`)
+```bash
+# 複製範例檔案
+cp backend/.env.example backend/.env
+
+# 編輯 .env 檔案，替換 YOUR_SERVER_KEY
+GOOGLE_MAPS_SERVER_KEY=YOUR_SERVER_KEY
+PORT=3000
+CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+DATABASE_URL=file:./dev.db
+```
+
+### 3. 安裝依賴
+```bash
+# 安裝後端依賴
 cd backend
-cp .env.example .env
-# 編輯 .env 檔案，設定必要的環境變數
+npm install
+
+# 安裝前端依賴
+cd ../frontend
+npm install
 ```
-
-**前端**：
-```bash
-cd frontend
-cp .env.example .env
-# 編輯 .env 檔案，設定 Google Maps API Key
-```
-
-> **重要**: `.env` 檔案包含敏感資訊，不得上傳到版本控制系統。專案已提供 `.env.example` 範例檔案供參考。
-
-### 3. 設定 Google Maps API
-
-請參考 [GOOGLE_MAPS_SETUP.md](./GOOGLE_MAPS_SETUP.md) 詳細設定指南。
-
-**必要設定**：
-- 建立 Google Cloud 專案
-- 啟用 Maps JavaScript API、Geocoding API、Places API
-- 建立 Browser Key（前端）和 Server Key（後端）
-- 設定適當的 API 限制
 
 ### 4. 啟動應用
 
-**終端機 1 - 啟動後端**：
+**終端機 1 - 後端服務**
 ```bash
 cd backend
 npm run dev
-# 後端運行在 http://localhost:3000
 ```
 
-**終端機 2 - 啟動前端**：
+**終端機 2 - 前端服務**
 ```bash
 cd frontend
 npm run dev
-# 前端運行在 http://localhost:5173
 ```
 
-### 5. 開始使用
+### 5. 訪問應用
+- 前端：http://localhost:5173
+- 後端 API：http://localhost:3000
 
-1. 開啟瀏覽器訪問 http://localhost:5173
-2. 註冊新帳號或使用測試帳號：
-   - Email: `test@example.com`
-   - 密碼: `password123`
-3. 開始使用辦公咖啡廳清單！
+## 📖 API 文件
 
-## 🔐 認證與安全性
+### 認證端點
+- `POST /auth/register` - 用戶註冊
+- `POST /auth/login` - 用戶登入
+- `GET /auth/me` - 獲取當前用戶資訊
 
-### 認證機制
-本專案使用 **JWT (JSON Web Token)** 進行使用者認證。
+### 咖啡廳端點
+- `GET /api/cafes` - 獲取咖啡廳列表
+- `GET /api/cafes/:id` - 獲取單一咖啡廳
+- `POST /api/cafes` - 新增咖啡廳 (公開)
+- `PUT /api/cafes/:id` - 更新咖啡廳 (公開)
+- `DELETE /api/cafes/:id` - 刪除咖啡廳 (公開)
 
-**JWT 認證流程**：
-1. 使用者登入時，後端驗證 email/password
-2. 驗證成功後，後端產生 JWT Token（包含 userId、email 等資訊）
-3. 前端將 Token 儲存在 localStorage 中
-4. 每次 API 請求時，在 Authorization header 中攜帶 `Bearer <token>`
-5. 後端驗證 Token 有效性和過期時間
-6. Token 預設有效期為 7 天
+### 個人記錄端點 (需認證)
+- `GET /api/visits` - 獲取到訪記錄
+- `POST /api/visits` - 新增到訪記錄
+- `PUT /api/visits/:id` - 更新到訪記錄
+- `DELETE /api/visits/:id` - 刪除到訪記錄
 
-**安全性特點**：
-- ✅ **帳號欄位**: email + password
-- ✅ **密碼雜湊**: bcrypt（10 rounds）
-- ✅ **認證機制**: JWT Token（7天有效期）
-- ✅ **CORS 設定**: 允許 localhost:5173 和 127.0.0.1:5173
-- ✅ **輸入驗證**: 所有欄位（前端+後端雙重驗證）
-- ✅ **權限控管**: 使用者只能修改/刪除自己的資料
-- ✅ **Token 管理**: localStorage + Axios 攔截器
-- ✅ **自動登出**: 401 錯誤時自動清除認證狀態
+### 願望清單端點 (需認證)
+- `GET /api/wishlist` - 獲取願望清單
+- `POST /api/wishlist` - 新增到願望清單
+- `DELETE /api/wishlist/:id` - 從願望清單移除
 
-## 🗺️ Google Maps 功能
+### Google Maps 端點
+- `GET /api/maps/geocode` - 地址轉座標
+- `GET /api/maps/reverse-geocode` - 座標轉地址
+- `GET /api/maps/nearby` - 附近地點搜尋
+- `GET /api/maps/search` - 地點搜尋
+- `GET /api/maps/place/:placeId` - 地點詳細資訊
+- `GET /api/maps/directions` - 路線規劃
 
-### 已實作功能
-- ✅ **地圖顯示**: Google Maps JavaScript API
-- ✅ **咖啡廳標記**: 根據地址自動定位
-- ✅ **雙向互動**: 列表與地圖同步
-- ✅ **搜尋功能**: Places API 自動完成
-- ✅ **地圖點擊**: 新增咖啡廳
-- ✅ **視覺效果**: 自定義圖標（愛心/星星）
-- ✅ **懸停效果**: 地圖標記動畫
+## 🔐 認證機制
 
-### 地圖標記說明
-- ❤️ **紅色愛心**: 願望清單中的咖啡廳
-- ⭐ **橘色星星**: 一般咖啡廳
+本專案使用 **JWT (JSON Web Token)** 進行用戶認證：
 
-## 📝 功能特色
+1. **註冊/登入**：用戶提供 email 和密碼
+2. **密碼加密**：使用 bcrypt 雜湊儲存
+3. **Token 生成**：登入成功後生成 JWT token
+4. **自動附加**：前端自動在請求標頭附加 token
+5. **權限驗證**：後端驗證 token 有效性
 
-### 核心功能
-- ✅ **咖啡廳管理**: 完整的 CRUD 操作
-- ✅ **到訪記錄**: 記錄造訪時間和評分
-- ✅ **願望清單**: 收藏想去的咖啡廳
-- ✅ **搜尋篩選**: 依名稱、地址、設施篩選
-- ✅ **地圖整合**: 視覺化位置和互動
-- ✅ **響應式設計**: 支援各種螢幕尺寸
+### 權限設計
+- **公開功能**：咖啡廳的 CRUD 操作
+- **個人功能**：到訪記錄、願望清單 (需登入)
 
-### 設施與環境標記
-- 📶 WiFi
-- 🔌 電源插座
-- ⏰ 無限時
-- 🔇 安靜
-- 💡 光線佳
-- 💺 有座位
+## 🗄 資料庫結構
 
-## 🧪 測試
+### 用戶表 (users)
+- id, username, email, password_hash, created_at
 
-### API 測試
-使用測試帳號登入後，可以測試以下功能：
+### 咖啡廳表 (cafes)
+- id, name, description, address, rating, price_level
+- has_wifi, has_power_outlets, has_time_limit, is_noisy
+- has_good_lighting, has_available_seats
+- created_by, created_at, updated_at
 
-1. **咖啡廳管理**
-   - 新增咖啡廳
-   - 編輯咖啡廳資訊
-   - 刪除咖啡廳
-   - 瀏覽咖啡廳列表
+### 到訪記錄表 (visits)
+- id, cafe_id, user_id, visit_date, notes, rating, created_at
 
-2. **地圖功能**
-   - 地圖載入和顯示
-   - 咖啡廳標記定位
-   - 搜尋地點
-   - 點擊地圖新增咖啡廳
+### 願望清單表 (wishlist)
+- id, cafe_id, user_id, notes, created_at
 
-3. **使用者功能**
-   - 記錄到訪
-   - 管理願望清單
-   - 搜尋和篩選
+## 🎯 使用說明
 
-### 測試帳號
-- **Email**: `test@example.com`
-- **密碼**: `password123`
+### 基本操作
+1. **註冊/登入**：建立帳號或使用測試帳號 (`test@example.com` / `password123`)
+2. **瀏覽咖啡廳**：在地圖上查看所有咖啡廳位置
+3. **新增咖啡廳**：點擊地圖或使用搜尋功能新增
+4. **記錄到訪**：標記已去過的咖啡廳
+5. **管理願望清單**：收藏想去的咖啡廳
 
-## 🔧 開發說明
+### 地圖功能
+- **雙向互動**：點擊列表項目聚焦地圖，點擊地圖標記查看詳情
+- **智能搜尋**：輸入地點名稱自動完成搜尋
+- **視覺標記**：愛心圖標表示願望清單，星星圖標表示一般咖啡廳
+- **懸停效果**：滑鼠懸停時標記會放大
 
-### 資料庫 Schema
-- **users**: 使用者資訊
-- **cafes**: 咖啡廳資料
-- **visits**: 到訪記錄
-- **wishlist**: 願望清單
+## 🧪 測試帳號
 
-### API 端點
-- **認證**: `/auth/register`, `/auth/login`, `/auth/me`
-- **咖啡廳**: `/api/cafes/*` (公開操作)
-- **到訪記錄**: `/api/visits/*` (需認證)
-- **願望清單**: `/api/wishlist/*` (需認證)
-- **地圖服務**: `/api/maps/*` (Google Maps API 代理)
-
-### 環境變數
-**後端 (.env.example)**:
-```bash
-# 伺服器設定
-PORT=3000
-
-# CORS 設定
-CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
-
-# 資料庫設定
-DATABASE_URL=file:./dev.db
-
-# JWT 認證設定
-JWT_SECRET=your_super_secret_jwt_key_here
-JWT_EXPIRES_IN=7d
-
-# Google Maps API 設定
-GOOGLE_MAPS_SERVER_KEY=your_google_maps_server_key_here
+```
+Email: test@example.com
+Password: password123
 ```
 
-**前端 (.env.example)**:
-```bash
-# 後端 API 位址
-VITE_API_BASE_URL=http://localhost:3000
+## 📝 開發注意事項
 
-# Google Maps JavaScript API Key (Browser Key)
-VITE_GOOGLE_MAPS_JS_KEY=your_google_maps_browser_key_here
-```
+### 環境變數安全
+- `.env` 檔案包含敏感資訊，請勿提交到版本控制
+- 使用 `.env.example` 作為範本
+- 生產環境請設定適當的 API Key 限制
 
-> **注意**: 請複製 `.env.example` 為 `.env` 並填入實際值。`.env` 檔案不得上傳到版本控制系統。
+### API Key 管理
+- Browser Key 用於前端地圖顯示
+- Server Key 用於後端地理編碼和地點搜尋
+- 開發階段可設定較寬鬆的限制，生產環境請嚴格限制
+
+### 資料庫
+- 使用 SQLite 檔案資料庫 (`dev.db`)
+- 每次重啟後端會自動重置測試資料
+- 生產環境建議使用 PostgreSQL 或 MySQL
+
+## 🚨 故障排除
+
+### 常見問題
+
+**1. 地圖無法載入**
+- 檢查 `VITE_GOOGLE_MAPS_JS_KEY` 是否正確設定
+- 確認 Browser Key 的限制設定包含 `http://localhost:5173/*`
+
+**2. 搜尋功能失效**
+- 檢查 `GOOGLE_MAPS_SERVER_KEY` 是否正確設定
+- 確認 Server Key 已啟用 Places API
+
+**3. 認證失敗**
+- 檢查 JWT token 是否過期
+- 確認後端認證中間件正常運作
+
+**4. 資料庫錯誤**
+- 刪除 `backend/dev.db` 重新建立
+- 檢查 SQLite 檔案權限
 
 ## 📄 授權
 
-本專案為 Web Programming 課程作業。
+本專案僅供學習用途，請勿用於商業用途。
+
+## 🤝 貢獻
+
+歡迎提交 Issue 和 Pull Request 來改善這個專案。
+
+---
+
+**⚠️ 評分者注意**：請將 `YOUR_BROWSER_KEY` 和 `YOUR_SERVER_KEY` 替換為您自己的 Google Maps API Key 後再啟動應用，否則地圖功能將無法正常運作。
