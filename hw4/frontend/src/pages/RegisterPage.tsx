@@ -14,30 +14,53 @@ const RegisterPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
 
+    // 前端驗證 - 先不清除錯誤
     if (!username || !email || !password || !confirmPassword) {
       setError('請填寫所有欄位');
+      setIsLoading(false);
       return;
     }
 
     if (password !== confirmPassword) {
       setError('密碼不一致');
+      setIsLoading(false);
       return;
     }
 
     if (password.length < 6) {
       setError('密碼長度至少需要 6 個字元');
+      setIsLoading(false);
       return;
     }
 
+    // 清除舊錯誤並開始載入
+    setError('');
+    setIsLoading(true);
+
     try {
-      setIsLoading(true);
       await register(username, email, password);
+      // 只有註冊成功才導航
       navigate('/');
     } catch (err: any) {
-      setError(err.message || '註冊失敗，請稍後再試');
-    } finally {
+      console.log('註冊錯誤捕獲:', err);
+      
+      // 根據不同的錯誤類型顯示不同的提示
+      let errorMessage = '註冊失敗';
+      
+      if (err.response?.status === 400) {
+        // 處理帳號重複或格式錯誤
+        errorMessage = err.response?.data?.error || '此 Email 已被註冊';
+      } else if (err.response?.status >= 500) {
+        errorMessage = '伺服器錯誤，請稍後再試';
+      } else if (err.message) {
+        errorMessage = err.message;
+      } else {
+        errorMessage = '網路連線錯誤，請檢查網路連線';
+      }
+      
+      console.log('設置錯誤訊息:', errorMessage);
+      setError(errorMessage);
       setIsLoading(false);
     }
   };
@@ -52,8 +75,27 @@ const RegisterPage: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">
-              {error}
+            <div className={`border p-4 rounded-lg text-sm font-medium ${
+              error.includes('Email 已被註冊') || error.includes('此 Email 已被註冊')
+                ? 'bg-orange-50 border-orange-200 text-orange-700' 
+                : error.includes('密碼不一致') || error.includes('密碼長度')
+                ? 'bg-yellow-50 border-yellow-200 text-yellow-700'
+                : error.includes('請填寫所有欄位')
+                ? 'bg-blue-50 border-blue-200 text-blue-700'
+                : 'bg-red-50 border-red-200 text-red-700'
+            }`}>
+              <div className="flex items-center">
+                <span className="mr-2 text-lg">
+                  {error.includes('Email 已被註冊') || error.includes('此 Email 已被註冊')
+                    ? '⚠️' 
+                    : error.includes('密碼不一致') || error.includes('密碼長度')
+                    ? '🔑'
+                    : error.includes('請填寫所有欄位')
+                    ? 'ℹ️'
+                    : '❌'}
+                </span>
+                {error}
+              </div>
             </div>
           )}
 

@@ -64,14 +64,27 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // 初始化：檢查是否已登入
   useEffect(() => {
-    const { token, user } = authService.getStoredAuth();
-    if (token && user) {
-      setAuth({ isAuthenticated: true, user });
-      // 載入資料
-      loadCafes();
-      loadVisits();
-      loadWishlist();
-    }
+    const initAuth = async () => {
+      const { token, user } = authService.getStoredAuth();
+      if (token && user) {
+        setAuth({ isAuthenticated: true, user });
+        // 載入資料
+        try {
+          const cafesData = await cafeService.getAllCafes();
+          setCafes(cafesData);
+          
+          const visitsData = await visitService.getMyVisits();
+          setVisits(visitsData);
+          
+          const wishlistData = await wishlistService.getMyWishlist();
+          setWishlist(wishlistData);
+        } catch (err) {
+          console.error('初始化載入資料失敗:', err);
+        }
+      }
+    };
+    
+    initAuth();
   }, []);
 
   // Auth methods
@@ -111,9 +124,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       // 註冊後載入資料
       await Promise.all([loadCafes(), loadVisits(), loadWishlist()]);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.error || '註冊失敗';
-      setError(errorMessage);
-      throw new Error(errorMessage);
+      // 保持原始錯誤物件，讓 RegisterPage 可以根據狀態碼處理
+      setError(err.response?.data?.error || err.message || '註冊失敗');
+      throw err; // 重新拋出原始錯誤物件
     } finally {
       setLoading(false);
     }

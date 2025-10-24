@@ -131,7 +131,7 @@ npm run dev
 ## 🔐 認證與安全性
 
 ### 認證機制
-本專案使用 **JWT (JSON Web Token)** 進行使用者認證，而非 Session + Cookie 機制。
+本專案使用 **JWT (JSON Web Token)** 進行使用者認證。
 
 **JWT 認證流程**：
 1. 使用者登入時，後端驗證 email/password

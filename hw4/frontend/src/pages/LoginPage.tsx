@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 
@@ -10,27 +10,26 @@ const LoginPage: React.FC = () => {
   const { login } = useAppContext();
   const navigate = useNavigate();
 
-  // 調試：監控錯誤狀態變化
-  useEffect(() => {
-    console.log('錯誤狀態變化:', error);
-  }, [error]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-
+    
+    // 前端驗證
     if (!email || !password) {
       setError('請填寫所有欄位');
+      setIsLoading(false);
       return;
     }
 
+    // 清除舊錯誤並開始載入
+    setError('');
+    setIsLoading(true);
+
     try {
-      setIsLoading(true);
       await login(email, password);
-      // 登入成功才導航
+      // 只有登入成功才導航
       navigate('/');
     } catch (err: any) {
-      console.log('登入錯誤:', err); // 調試信息
+      console.log('登入錯誤捕獲:', err);
       
       // 根據不同的錯誤類型顯示不同的提示
       let errorMessage = '登入失敗';
@@ -48,14 +47,8 @@ const LoginPage: React.FC = () => {
         errorMessage = '網路連線錯誤，請檢查網路連線';
       }
       
-      console.log('設置錯誤訊息:', errorMessage); // 調試信息
-      
-      // 使用 setTimeout 確保錯誤訊息能正確設置
-      setTimeout(() => {
-        setError(errorMessage);
-        console.log('錯誤訊息已設置:', errorMessage);
-      }, 100);
-    } finally {
+      console.log('設置錯誤訊息:', errorMessage);
+      setError(errorMessage);
       setIsLoading(false);
     }
   };
@@ -75,11 +68,23 @@ const LoginPage: React.FC = () => {
                 ? 'bg-orange-50 border-orange-200 text-orange-700' 
                 : error.includes('密碼錯誤')
                 ? 'bg-red-50 border-red-200 text-red-700'
+                : error.includes('請填寫所有欄位')
+                ? 'bg-blue-50 border-blue-200 text-blue-700'
+                : error.includes('伺服器錯誤')
+                ? 'bg-purple-50 border-purple-200 text-purple-700'
                 : 'bg-red-50 border-red-200 text-red-700'
             }`}>
               <div className="flex items-center">
-                <span className="mr-2">
-                  {error.includes('查無此帳號') ? '❓' : '🔒'}
+                <span className="mr-2 text-lg">
+                  {error.includes('查無此帳號') 
+                    ? '❓' 
+                    : error.includes('密碼錯誤')
+                    ? '🔒'
+                    : error.includes('請填寫所有欄位')
+                    ? 'ℹ️'
+                    : error.includes('伺服器錯誤')
+                    ? '⚙️'
+                    : '❌'}
                 </span>
                 {error}
               </div>

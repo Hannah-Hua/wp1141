@@ -1,4 +1,4 @@
-import api from './api';
+import api, { publicApi } from './api';
 import { User } from '../types';
 
 interface AuthResponse {
@@ -7,9 +7,9 @@ interface AuthResponse {
   user: User;
 }
 
-// 註冊
+// 註冊 - 使用 publicApi 避免 401 自動重定向
 export async function register(username: string, email: string, password: string): Promise<AuthResponse> {
-  const response = await api.post<AuthResponse>('/auth/register', {
+  const response = await publicApi.post<AuthResponse>('/auth/register', {
     username,
     email,
     password,
@@ -17,9 +17,9 @@ export async function register(username: string, email: string, password: string
   return response.data;
 }
 
-// 登入
+// 登入 - 使用 publicApi 避免 401 自動重定向
 export async function login(email: string, password: string): Promise<AuthResponse> {
-  const response = await api.post<AuthResponse>('/auth/login', {
+  const response = await publicApi.post<AuthResponse>('/auth/login', {
     email,
     password,
   });
