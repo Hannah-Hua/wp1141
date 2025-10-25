@@ -35,11 +35,9 @@ _從完整聊天記錄中提取的所有用戶指令_
     * 至少儲存「使用者登入資訊」或「主要資源資料」其中之一（建議兩者皆存）
 
 還有登入與安全性要求：
-帳號欄位需包含 email/username + password（其一或兩者皆可）
 密碼必須以雜湊方式儲存（例：bcrypt 或 argon2）
-使用 JWT 或 Session + Cookie 任一機制（請於 README 說明）
 .env 檔不得上傳，並需提供 .env.example
-後端 CORS 設定需允許：<http://localhost:5173> <http://127.0.0.1:5173>
+後端 CORS 設定需允許：<http://localhost:PORT> <http://127.0.0.1:PORT>
 所有輸入需驗證（email 格式、密碼長度、必填欄位、數值/日期型態等）
 錯誤回傳需包含正確狀態碼與訊息（如 400/401/403/404/422/500）
 權限控管：
@@ -52,16 +50,15 @@ Google Maps API 設定
 啟用必要 API（依前後端分工）
 * Geocoding API / Places API / Directions API → 建立「Server Key」
 * Maps JavaScript API（地圖顯示與互動） → 建立「Browser Key」
-建立與設定 API Key
 
 前端 Key（Browser Key）
 限制類型：HTTP 網域
-允許清單：<http://localhost:5173/*> <http://127.0.0.1:5173/*>
+允許清單：<http://localhost:PORT/*> <http://127.0.0.1:PORT/*>
 請留意，這是你前端 Vite App 的 URL. 如果你因為任何因素導致你的前端的 port 不是 5173 (可能會是 5174, 517*, 3000, etc), 請重新確保你的前端是開在 5173, 或者是修改這個設定。
 
 啟用 API：Maps JavaScript API
 .env 範例：
-# frontend/.env.example VITE_GOOGLE_MAPS_JS_KEY=YOUR_BROWSER_KEY # Maps JavaScript API（Browser Key） VITE_API_BASE_URL=http://localhost:3000 # 後端 API 位址
+# frontend/.env.example VITE_GOOGLE_MAPS_JS_key=YOUR_KEY # Maps JavaScript API（Browser Key） VITE_API_BASE_URL=http://localhost:PORT # 後端 API 位址
 
 後端 Key（Server Key）
 
@@ -74,7 +71,7 @@ Places API
 Directions API
 
 .env 範例：
-# backend/.env.example PORT=3000 CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173 DATABASE_URL=file:./dev.db GOOGLE_MAPS_SERVER_KEY=YOUR_SERVER_KEY # 已啟用 Geocoding/Places/Directions
+# backend/.env.example PORT=3000 CORS_ORIGINS=http://localhost:PORT,http://127.0.0.1:PORT DATABASE_URL=file:./dev.db GOOGLE_MAPS_SERVER_key=YOUR_KEY # 已啟用 Geocoding/Places/Directions
 
 API 與資料欄位建議（通用、非強制）
 * 路由設計：/auth/*、/api/<your-resource>/*（依主題命名，如 /api/events、/api/locations）
@@ -88,12 +85,12 @@ API 與資料欄位建議（通用、非強制）
 ## User Prompt #2
 
 [plugin:vite:css] [postcss] It looks like you're trying to use `tailwindcss` directly as a PostCSS plugin. The PostCSS plugin has moved to a separate package, so to continue using Tailwind CSS with PostCSS you'll need to install `@tailwindcss/postcss` and update your PostCSS configuration.
-/Users/hannah/wp1141/hw4/frontend/src/index.css:undefined:null
-    at nt (/Users/hannah/wp1141/hw4/frontend/node_modules/tailwindcss/dist/lib.js:38:1629)
-    at LazyResult.runOnRoot (/Users/hannah/wp1141/hw4/frontend/node_modules/postcss/lib/lazy-result.js:361:16)
-    at LazyResult.runAsync (/Users/hannah/wp1141/hw4/frontend/node_modules/postcss/lib/lazy-result.js:290:26)
-    at LazyResult.async (/Users/hannah/wp1141/hw4/frontend/node_modules/postcss/lib/lazy-result.js:192:30)
-    at LazyResult.then (/Users/hannah/wp1141/hw4/frontend/node_modules/postcss/lib/lazy-result.js:436:17)
+/Users/USERNAME/wp1141/hw4/frontend/src/index.css:undefined:null
+    at nt (/Users/USERNAME/wp1141/hw4/frontend/node_modules/tailwindcss/dist/lib.js:38:1629)
+    at LazyResult.runOnRoot (/Users/USERNAME/wp1141/hw4/frontend/node_modules/postcss/lib/lazy-result.js:361:16)
+    at LazyResult.runAsync (/Users/USERNAME/wp1141/hw4/frontend/node_modules/postcss/lib/lazy-result.js:290:26)
+    at LazyResult.async (/Users/USERNAME/wp1141/hw4/frontend/node_modules/postcss/lib/lazy-result.js:192:30)
+    at LazyResult.then (/Users/USERNAME/wp1141/hw4/frontend/node_modules/postcss/lib/lazy-result.js:436:17)
 Click outside, press Esc key, or fix the code to dismiss.
 You can also disable this overlay by setting server.hmr.overlay to false in vite.config.ts.
 
@@ -298,24 +295,24 @@ Last login: Wed Oct 22 21:42:34 on ttys012
 
 ## User Prompt #19
 
-js?key=AIzaSyAtw3HZu…llback=initMap:1350 Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
+js?key=YOUR_KEY…llback=initMap:1350 Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
 
-js?key=AIzaSyAtw3HZu…llback=initMap:1449 As of February 21st, 2024, google.maps.Marker is deprecated. Please use google.maps.marker.AdvancedMarkerElement instead. At this time, google.maps.Marker is not scheduled to be discontinued, but google.maps.marker.AdvancedMarkerElement is recommended over google.maps.Marker. While google.maps.Marker will continue to receive bug fixes for any major regressions, existing bugs in google.maps.Marker will not be addressed. At least 12 months notice will be given before support is discontinued. Please see https://developers.google.com/maps/deprecations for additional details and https://developers.google.com/maps/documentation/javascript/advanced-markers/migration for the migration guide.
-js?key=AIzaSyAtw3HZu…llback=initMap:1222 Google Maps JavaScript API error: RefererNotAllowedMapError
+js?key=YOUR_KEY…llback=initMap:1449 As of February 21st, 2024, google.maps.Marker is deprecated. Please use google.maps.marker.AdvancedMarkerElement instead. At this time, google.maps.Marker is not scheduled to be discontinued, but google.maps.marker.AdvancedMarkerElement is recommended over google.maps.Marker. While google.maps.Marker will continue to receive bug fixes for any major regressions, existing bugs in google.maps.Marker will not be addressed. At least 12 months notice will be given before support is discontinued. Please see https://developers.google.com/maps/deprecations for additional details and https://developers.google.com/maps/documentation/javascript/advanced-markers/migration for the migration guide.
+js?key=YOUR_KEY…llback=initMap:1222 Google Maps JavaScript API error: RefererNotAllowedMapError
 https://developers.google.com/maps/documentation/javascript/error-messages#referer-not-allowed-map-error
-Your site URL to be authorized: http://__file_url__//Users/hannah/wp1141/hw4/google-maps-test.html
+Your site URL to be authorized: http://__file_url__//Users/USERNAME/wp1141/hw4/google-maps-test.html
 ﻿
 
 ---
 
 ## User Prompt #20
 
-js?key=AIzaSyAtw3HZu…llback=initMap:1350 Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
+js?key=YOUR_KEY…llback=initMap:1350 Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
 
-js?key=AIzaSyAtw3HZu…llback=initMap:1449 As of February 21st, 2024, google.maps.Marker is deprecated. Please use google.maps.marker.AdvancedMarkerElement instead. At this time, google.maps.Marker is not scheduled to be discontinued, but google.maps.marker.AdvancedMarkerElement is recommended over google.maps.Marker. While google.maps.Marker will continue to receive bug fixes for any major regressions, existing bugs in google.maps.Marker will not be addressed. At least 12 months notice will be given before support is discontinued. Please see https://developers.google.com/maps/deprecations for additional details and https://developers.google.com/maps/documentation/javascript/advanced-markers/migration for the migration guide.
-js?key=AIzaSyAtw3HZu…llback=initMap:1222 Google Maps JavaScript API error: RefererNotAllowedMapError
+js?key=YOUR_KEY…llback=initMap:1449 As of February 21st, 2024, google.maps.Marker is deprecated. Please use google.maps.marker.AdvancedMarkerElement instead. At this time, google.maps.Marker is not scheduled to be discontinued, but google.maps.marker.AdvancedMarkerElement is recommended over google.maps.Marker. While google.maps.Marker will continue to receive bug fixes for any major regressions, existing bugs in google.maps.Marker will not be addressed. At least 12 months notice will be given before support is discontinued. Please see https://developers.google.com/maps/deprecations for additional details and https://developers.google.com/maps/documentation/javascript/advanced-markers/migration for the migration guide.
+js?key=YOUR_KEY…llback=initMap:1222 Google Maps JavaScript API error: RefererNotAllowedMapError
 https://developers.google.com/maps/documentation/javascript/error-messages#referer-not-allowed-map-error
-Your site URL to be authorized: http://__file_url__//Users/hannah/wp1141/hw4/google-maps-test.html
+Your site URL to be authorized: http://__file_url__//Users/USERNAME/wp1141/hw4/google-maps-test.html
 ﻿
 
 ---
@@ -328,7 +325,6 @@ Your site URL to be authorized: http://__file_url__//Users/hannah/wp1141/hw4/goo
 
 ## User Prompt #22
 
-API Key: AIzaSyAtw3...
 
 載入狀態: 認證失敗
 
@@ -402,7 +398,6 @@ MapView.tsx:46 MapView: mapRef.current 不存在
 
 無法找到地圖容器元素
 
-請參考 GOOGLE_MAPS_SETUP.md 設定 API Key
 
 ---
 
@@ -471,19 +466,19 @@ loadWishlist @ AppContext.tsx:227Understand this error
 ✅ 現有資料已清空
 📝 插入測試資料...
 
-/Users/hannah/wp1141/hw4/backend/src/database.ts:122
+/Users/USERNAME/wp1141/hw4/backend/src/database.ts:122
       insertVisit.run(...visit);
                   ^
 
 SqliteError: FOREIGN KEY constraint failed
-    at <anonymous> (/Users/hannah/wp1141/hw4/backend/src/database.ts:122:19)
+    at <anonymous> (/Users/USERNAME/wp1141/hw4/backend/src/database.ts:122:19)
     at Array.forEach (<anonymous>)
-    at insertTestData (/Users/hannah/wp1141/hw4/backend/src/database.ts:121:16)
-    at resetTestData (/Users/hannah/wp1141/hw4/backend/src/database.ts:158:3)
-    at mapsRoutes (/Users/hannah/wp1141/hw4/backend/src/app.ts:37:1)
-    at Object.<anonymous> (/Users/hannah/wp1141/hw4/backend/src/app.ts:116:16)
+    at insertTestData (/Users/USERNAME/wp1141/hw4/backend/src/database.ts:121:16)
+    at resetTestData (/Users/USERNAME/wp1141/hw4/backend/src/database.ts:158:3)
+    at mapsRoutes (/Users/USERNAME/wp1141/hw4/backend/src/app.ts:37:1)
+    at Object.<anonymous> (/Users/USERNAME/wp1141/hw4/backend/src/app.ts:116:16)
     at Module._compile (node:internal/modules/cjs/loader:1734:14)
-    at Object.transformer (/Users/hannah/wp1141/hw4/backend/node_modules/tsx/dist/register-D46fvsV_.cjs:3:1104)
+    at Object.transformer (/Users/USERNAME/wp1141/hw4/backend/node_modules/tsx/dist/register-D46fvsV_.cjs:3:1104)
     at Module.load (node:internal/modules/cjs/loader:1469:32)
     at Function._load (node:internal/modules/cjs/loader:1286:12) {
   code: 'SQLITE_CONSTRAINT_FOREIGNKEY'
@@ -493,19 +488,19 @@ SqliteError: FOREIGN KEY constraint failed
 
 ## User Prompt #37
 
-/Users/hannah/wp1141/hw4/backend/src/database.ts:122
+/Users/USERNAME/wp1141/hw4/backend/src/database.ts:122
       insertVisit.run(...visit);
                   ^
 
 SqliteError: FOREIGN KEY constraint failed
-    at <anonymous> (/Users/hannah/wp1141/hw4/backend/src/database.ts:122:19)
+    at <anonymous> (/Users/USERNAME/wp1141/hw4/backend/src/database.ts:122:19)
     at Array.forEach (<anonymous>)
-    at insertTestData (/Users/hannah/wp1141/hw4/backend/src/database.ts:121:16)
-    at resetTestData (/Users/hannah/wp1141/hw4/backend/src/database.ts:169:3)
-    at mapsRoutes (/Users/hannah/wp1141/hw4/backend/src/app.ts:37:1)
-    at Object.<anonymous> (/Users/hannah/wp1141/hw4/backend/src/app.ts:116:16)
+    at insertTestData (/Users/USERNAME/wp1141/hw4/backend/src/database.ts:121:16)
+    at resetTestData (/Users/USERNAME/wp1141/hw4/backend/src/database.ts:169:3)
+    at mapsRoutes (/Users/USERNAME/wp1141/hw4/backend/src/app.ts:37:1)
+    at Object.<anonymous> (/Users/USERNAME/wp1141/hw4/backend/src/app.ts:116:16)
     at Module._compile (node:internal/modules/cjs/loader:1734:14)
-    at Object.transformer (/Users/hannah/wp1141/hw4/backend/node_modules/tsx/dist/register-D46fvsV_.cjs:3:1104)
+    at Object.transformer (/Users/USERNAME/wp1141/hw4/backend/node_modules/tsx/dist/register-D46fvsV_.cjs:3:1104)
     at Module.load (node:internal/modules/cjs/loader:1469:32)
     at Function._load (node:internal/modules/cjs/loader:1286:12) {
   code: 'SQLITE_CONSTRAINT_FOREIGNKEY'
@@ -609,20 +604,20 @@ git commit 這個版本，接下來的修改先不要commit
 ✅ 現有資料已清空
 ✅ 測試用戶已插入
 📝 插入測試資料...
-/Users/hannah/wp1141/hw4/backend/src/database.ts:108
+/Users/USERNAME/wp1141/hw4/backend/src/database.ts:108
       const result = insertCafe.run(...cafe);
                                 ^
 
 
 RangeError: Too few parameter values were provided
-    at <anonymous> (/Users/hannah/wp1141/hw4/backend/src/database.ts:108:33)
+    at <anonymous> (/Users/USERNAME/wp1141/hw4/backend/src/database.ts:108:33)
     at Array.forEach (<anonymous>)
-    at insertTestData (/Users/hannah/wp1141/hw4/backend/src/database.ts:107:15)
-    at resetTestData (/Users/hannah/wp1141/hw4/backend/src/database.ts:174:3)
-    at mapsRoutes (/Users/hannah/wp1141/hw4/backend/src/app.ts:37:1)
-    at Object.<anonymous> (/Users/hannah/wp1141/hw4/backend/src/app.ts:116:16)
+    at insertTestData (/Users/USERNAME/wp1141/hw4/backend/src/database.ts:107:15)
+    at resetTestData (/Users/USERNAME/wp1141/hw4/backend/src/database.ts:174:3)
+    at mapsRoutes (/Users/USERNAME/wp1141/hw4/backend/src/app.ts:37:1)
+    at Object.<anonymous> (/Users/USERNAME/wp1141/hw4/backend/src/app.ts:116:16)
     at Module._compile (node:internal/modules/cjs/loader:1734:14)
-    at Object.transformer (/Users/hannah/wp1141/hw4/backend/node_modules/tsx/dist/register-D46fvsV_.cjs:3:1104)
+    at Object.transformer (/Users/USERNAME/wp1141/hw4/backend/node_modules/tsx/dist/register-D46fvsV_.cjs:3:1104)
     at Module.load (node:internal/modules/cjs/loader:1469:32)
     at Function._load (node:internal/modules/cjs/loader:1286:12)
 
@@ -820,7 +815,6 @@ git commit push
 
 ## User Prompt #81
 
-此專案是使用使用 JWT 或 Session + Cookie ？（請於 README 說明）
 .env 檔不得上傳，但需提供 .env.example
 
 ---
@@ -864,8 +858,8 @@ git commit
 ## User Prompt #88
 
 [plugin:vite:esbuild] Transform failed with 1 error:
-/Users/hannah/wp1141/hw4/frontend/src/components/MapView.tsx:706:7: ERROR: Multiple exports with the same name "default"
-/Users/hannah/wp1141/hw4/frontend/src/components/MapView.tsx:706:0
+/Users/USERNAME/wp1141/hw4/frontend/src/components/MapView.tsx:706:7: ERROR: Multiple exports with the same name "default"
+/Users/USERNAME/wp1141/hw4/frontend/src/components/MapView.tsx:706:0
 Multiple exports with the same name "default"
 704 |  
 705 |  export default MapView;
@@ -873,11 +867,11 @@ Multiple exports with the same name "default"
     |         ^
 707 |  
 708 |  import * as RefreshRuntime from "/@react-refresh";
-    at failureErrorWithLog (/Users/hannah/wp1141/hw4/frontend/node_modules/esbuild/lib/main.js:1467:15)
-    at /Users/hannah/wp1141/hw4/frontend/node_modules/esbuild/lib/main.js:736:50
-    at responseCallbacks.<computed> (/Users/hannah/wp1141/hw4/frontend/node_modules/esbuild/lib/main.js:603:9)
-    at handleIncomingPacket (/Users/hannah/wp1141/hw4/frontend/node_modules/esbuild/lib/main.js:658:12)
-    at Socket.readFromStdout (/Users/hannah/wp1141/hw4/frontend/node_modules/esbuild/lib/main.js:581:7)
+    at failureErrorWithLog (/Users/USERNAME/wp1141/hw4/frontend/node_modules/esbuild/lib/main.js:1467:15)
+    at /Users/USERNAME/wp1141/hw4/frontend/node_modules/esbuild/lib/main.js:736:50
+    at responseCallbacks.<computed> (/Users/USERNAME/wp1141/hw4/frontend/node_modules/esbuild/lib/main.js:603:9)
+    at handleIncomingPacket (/Users/USERNAME/wp1141/hw4/frontend/node_modules/esbuild/lib/main.js:658:12)
+    at Socket.readFromStdout (/Users/USERNAME/wp1141/hw4/frontend/node_modules/esbuild/lib/main.js:581:7)
     at Socket.emit (node:events:507:28)
     at addChunk (node:internal/streams/readable:559:12)
     at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
@@ -939,10 +933,10 @@ git commit push
     ```bash
     # 於專案根目錄建立/編輯 .env（請評分者自行貼上金鑰）
     # frontend/.env
-    VITE_GOOGLE_MAPS_JS_KEY=YOUR_BROWSER_KEY
+    VITE_GOOGLE_MAPS_JS_key=YOUR_KEY
     
     # backend/.env
-    GOOGLE_MAPS_SERVER_KEY=YOUR_SERVER_KEY   # 啟用 Geocoding/Places/Directions
+    GOOGLE_MAPS_SERVER_key=YOUR_KEY   # 啟用 Geocoding/Places/Directions
     
     ```
     
@@ -967,8 +961,6 @@ git commit push
 
 請將cursor._.md的內容留下 user prompt 就好。
 請 **移除/遮罩所有敏感資訊**，包含：
-    - API Key / Secret / Token
-    - 內網位址、Cookie、Session、資料庫連線字串
     - 個資（email、電話、學號…）
 
 ---
