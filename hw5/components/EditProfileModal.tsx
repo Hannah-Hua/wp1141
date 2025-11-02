@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Image from 'next/image';
 
 interface EditProfileModalProps {
@@ -13,12 +13,72 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
   const [name, setName] = useState(user.name || '');
   const [bio, setBio] = useState(user.bio || '');
   const [loading, setLoading] = useState(false);
+  const [coverImagePreview, setCoverImagePreview] = useState<string | null>(user.coverImage || null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(user.image || null);
+  const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  
+  const coverInputRef = useRef<HTMLInputElement>(null);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  const handleCoverImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        alert('背景圖大小不能超過 5MB');
+        return;
+      }
+      setCoverImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setCoverImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) { // 2MB limit
+        alert('大頭貼大小不能超過 2MB');
+        return;
+      }
+      setAvatarFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      let coverImageData = coverImagePreview;
+      let avatarData = avatarPreview;
+
+      // 如果有新上傳的圖片，轉換為 base64
+      if (coverImageFile) {
+        coverImageData = await convertFileToBase64(coverImageFile);
+      }
+      
+      if (avatarFile) {
+        avatarData = await convertFileToBase64(avatarFile);
+      }
+
       const res = await fetch(`/api/users/${user.userId}`, {
         method: 'PATCH',
         headers: {
@@ -26,7 +86,9 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
         },
         body: JSON.stringify({
           name,
-          bio,
+          bio: bio || '',
+          image: avatarData,
+          coverImage: coverImageData,
         }),
       });
 
@@ -34,7 +96,8 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
         onUpdate();
         onClose();
       } else {
-        alert('更新失敗');
+        const data = await res.json();
+        alert(data.error || '更新失敗');
       }
     } catch (error) {
       console.error('Failed to update profile:', error);
@@ -46,8 +109,9 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl max-w-xl w-full max-h-[80vh] overflow-y-auto">
-        <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+      <div className="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="p-4 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
           <div className="flex items-center gap-8">
             <button
               onClick={onClose}
@@ -70,26 +134,38 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
 
         <div className="p-4">
           {/* Cover Image */}
-          <div className="h-48 bg-gray-300 relative mb-16 rounded-lg overflow-hidden z-0">
-            {user.coverImage && (
+          <div className="h-48 bg-gray-300 relative mb-16 rounded-lg overflow-hidden z-0 group">
+            {coverImagePreview && (
               <Image
-                src={user.coverImage}
+                src={coverImagePreview}
                 alt="Cover"
                 fill
                 className="object-cover"
               />
             )}
-            <button className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 bg-black bg-opacity-50 rounded-full hover:bg-opacity-70 z-10">
+            
+            {/* 上傳背景圖按鈕 */}
+            <input
+              ref={coverInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleCoverImageChange}
+              className="hidden"
+            />
+            <button
+              onClick={() => coverInputRef.current?.click()}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 bg-black bg-opacity-50 rounded-full hover:bg-opacity-70 z-10 transition-opacity opacity-0 group-hover:opacity-100"
+            >
               <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
               </svg>
             </button>
 
             {/* Avatar - 確保在背景圖上方 */}
-            <div className="absolute -bottom-16 left-4 w-32 h-32 rounded-full border-4 border-white bg-gray-300 overflow-hidden z-20">
-              {user.image ? (
+            <div className="absolute -bottom-16 left-4 w-32 h-32 rounded-full border-4 border-white bg-gray-300 overflow-hidden z-20 group/avatar">
+              {avatarPreview ? (
                 <Image
-                  src={user.image}
+                  src={avatarPreview}
                   alt={user.name}
                   width={128}
                   height={128}
@@ -100,7 +176,19 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
                   {user.name[0]?.toUpperCase()}
                 </div>
               )}
-              <button className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 hover:bg-opacity-70">
+              
+              {/* 上傳大頭貼按鈕 */}
+              <input
+                ref={avatarInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarChange}
+                className="hidden"
+              />
+              <button
+                onClick={() => avatarInputRef.current?.click()}
+                className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 hover:bg-opacity-70 opacity-0 group-hover/avatar:opacity-100 transition-opacity"
+              >
                 <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
                 </svg>
@@ -108,7 +196,7 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4 mt-16">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
                 姓名
@@ -134,6 +222,7 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                 rows={4}
                 maxLength={160}
+                placeholder="介紹一下自己吧..."
               />
               <p className="text-sm text-gray-500 mt-1">
                 {bio.length} / 160
@@ -145,4 +234,3 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
     </div>
   );
 }
-
