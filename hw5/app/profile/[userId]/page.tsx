@@ -127,7 +127,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Cover Image */}
-        <div className="h-48 bg-gray-300 relative">
+        <div className="h-48 bg-gray-300 relative z-0">
           {user.coverImage && (
             <Image
               src={user.coverImage}
@@ -136,12 +136,23 @@ export default function ProfilePage() {
               className="object-cover"
             />
           )}
+          
+          {/* Edit Profile 按鈕在背景圖右下方 */}
+          {isOwnProfile && (
+            <button
+              onClick={() => setShowEditModal(true)}
+              className="absolute bottom-4 right-4 px-4 py-1.5 bg-white bg-opacity-90 backdrop-blur-sm border border-gray-300 rounded-full font-bold text-sm hover:bg-opacity-100 transition-all z-10"
+            >
+              Edit profile
+            </button>
+          )}
         </div>
 
         {/* Profile Info */}
-        <div className="px-4 pb-4">
+        <div className="px-4 pb-4 relative z-10">
           <div className="flex justify-between items-start -mt-16 mb-4">
-            <div className="w-32 h-32 rounded-full border-4 border-white bg-gray-300 overflow-hidden">
+            {/* 大頭貼 - 中間對齊背景圖底部，確保在背景圖上方 */}
+            <div className="w-32 h-32 rounded-full border-4 border-white bg-gray-300 overflow-hidden relative z-20">
               {user.image ? (
                 <Image
                   src={user.image}
@@ -157,14 +168,8 @@ export default function ProfilePage() {
               )}
             </div>
 
-            {isOwnProfile ? (
-              <button
-                onClick={() => setShowEditModal(true)}
-                className="mt-3 px-6 py-2 border border-gray-300 rounded-full font-bold hover:bg-gray-50"
-              >
-                Edit profile
-              </button>
-            ) : (
+            {/* Follow 按鈕（別人的頁面才顯示） */}
+            {!isOwnProfile && (
               <button
                 onClick={handleFollow}
                 onMouseEnter={() => setIsHoveringFollow(true)}

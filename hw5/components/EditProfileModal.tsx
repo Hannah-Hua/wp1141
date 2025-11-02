@@ -70,7 +70,7 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
 
         <div className="p-4">
           {/* Cover Image */}
-          <div className="h-48 bg-gray-300 relative mb-16 rounded-lg overflow-hidden">
+          <div className="h-48 bg-gray-300 relative mb-16 rounded-lg overflow-hidden z-0">
             {user.coverImage && (
               <Image
                 src={user.coverImage}
@@ -79,14 +79,14 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
                 className="object-cover"
               />
             )}
-            <button className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 bg-black bg-opacity-50 rounded-full hover:bg-opacity-70">
+            <button className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 bg-black bg-opacity-50 rounded-full hover:bg-opacity-70 z-10">
               <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
               </svg>
             </button>
 
-            {/* Avatar */}
-            <div className="absolute -bottom-16 left-4 w-32 h-32 rounded-full border-4 border-white bg-gray-300 overflow-hidden">
+            {/* Avatar - 確保在背景圖上方 */}
+            <div className="absolute -bottom-16 left-4 w-32 h-32 rounded-full border-4 border-white bg-gray-300 overflow-hidden z-20">
               {user.image ? (
                 <Image
                   src={user.image}
