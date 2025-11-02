@@ -127,7 +127,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Cover Image */}
-        <div className="h-48 bg-gray-300 relative z-0">
+        <div className="h-48 bg-gray-300 relative">
           {user.coverImage && (
             <Image
               src={user.coverImage}
@@ -142,12 +142,11 @@ export default function ProfilePage() {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                e.preventDefault();
                 setShowEditModal(true);
               }}
               type="button"
-              className="absolute bottom-4 right-4 px-4 py-1.5 bg-white bg-opacity-90 backdrop-blur-sm border border-gray-300 rounded-full font-bold text-sm hover:bg-opacity-100 transition-all z-50 cursor-pointer pointer-events-auto"
-              style={{ zIndex: 50 }}
+              className="absolute bottom-4 right-4 px-4 py-1.5 bg-white bg-opacity-90 backdrop-blur-sm border border-gray-300 rounded-full font-bold text-sm hover:bg-opacity-100 transition-all cursor-pointer z-50"
+              style={{ zIndex: 9999 }}
             >
               Edit profile
             </button>
@@ -155,8 +154,8 @@ export default function ProfilePage() {
         </div>
 
         {/* Profile Info */}
-        <div className="px-4 pb-4 relative z-10" style={{ pointerEvents: 'auto' }}>
-          <div className="flex justify-between items-start -mt-16 mb-4" style={{ pointerEvents: 'none' }}>
+        <div className="px-4 pb-4 relative" style={{ pointerEvents: 'none' }}>
+          <div className="flex justify-between items-start -mt-16 mb-4">
             {/* 大頭貼 - 中間對齊背景圖底部，確保在背景圖上方 */}
             <div 
               className="w-32 h-32 rounded-full border-4 border-white bg-gray-300 overflow-hidden relative z-20 cursor-pointer"
