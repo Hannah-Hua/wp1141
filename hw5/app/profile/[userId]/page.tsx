@@ -140,8 +140,14 @@ export default function ProfilePage() {
           {/* Edit Profile 按鈕在背景圖右下方 */}
           {isOwnProfile && (
             <button
-              onClick={() => setShowEditModal(true)}
-              className="absolute bottom-4 right-4 px-4 py-1.5 bg-white bg-opacity-90 backdrop-blur-sm border border-gray-300 rounded-full font-bold text-sm hover:bg-opacity-100 transition-all z-10"
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                setShowEditModal(true);
+              }}
+              type="button"
+              className="absolute bottom-4 right-4 px-4 py-1.5 bg-white bg-opacity-90 backdrop-blur-sm border border-gray-300 rounded-full font-bold text-sm hover:bg-opacity-100 transition-all z-50 cursor-pointer pointer-events-auto"
+              style={{ zIndex: 50 }}
             >
               Edit profile
             </button>
@@ -149,10 +155,17 @@ export default function ProfilePage() {
         </div>
 
         {/* Profile Info */}
-        <div className="px-4 pb-4 relative z-10">
-          <div className="flex justify-between items-start -mt-16 mb-4">
+        <div className="px-4 pb-4 relative z-10" style={{ pointerEvents: 'auto' }}>
+          <div className="flex justify-between items-start -mt-16 mb-4" style={{ pointerEvents: 'none' }}>
             {/* 大頭貼 - 中間對齊背景圖底部，確保在背景圖上方 */}
-            <div className="w-32 h-32 rounded-full border-4 border-white bg-gray-300 overflow-hidden relative z-20">
+            <div 
+              className="w-32 h-32 rounded-full border-4 border-white bg-gray-300 overflow-hidden relative z-20 cursor-pointer"
+              style={{ pointerEvents: 'auto' }}
+              onClick={(e) => {
+                e.stopPropagation();
+                // 可以點擊進入個人頁面
+              }}
+            >
               {user.image ? (
                 <Image
                   src={user.image}
@@ -174,6 +187,8 @@ export default function ProfilePage() {
                 onClick={handleFollow}
                 onMouseEnter={() => setIsHoveringFollow(true)}
                 onMouseLeave={() => setIsHoveringFollow(false)}
+                type="button"
+                style={{ pointerEvents: 'auto' }}
                 className={`mt-3 px-6 py-2 rounded-full font-bold transition-all ${
                   isFollowing
                     ? isHoveringFollow
@@ -190,7 +205,7 @@ export default function ProfilePage() {
             )}
           </div>
 
-          <div>
+          <div style={{ pointerEvents: 'auto' }}>
             <h2 className="text-xl font-bold">{user.name}</h2>
             <p className="text-gray-500">@{user.userId}</p>
             

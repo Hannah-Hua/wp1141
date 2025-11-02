@@ -70,6 +70,7 @@ export default function Sidebar() {
                   alt={session.user.name || ''}
                   width={40}
                   height={40}
+                  loading="eager"
                   className="w-full h-full object-cover"
                 />
               ) : (
