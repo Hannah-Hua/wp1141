@@ -21,6 +21,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [isHoveringFollow, setIsHoveringFollow] = useState(false);
 
   const isOwnProfile = session?.user?.userId === userId;
 
@@ -166,13 +167,20 @@ export default function ProfilePage() {
             ) : (
               <button
                 onClick={handleFollow}
-                className={`mt-3 px-6 py-2 rounded-full font-bold ${
+                onMouseEnter={() => setIsHoveringFollow(true)}
+                onMouseLeave={() => setIsHoveringFollow(false)}
+                className={`mt-3 px-6 py-2 rounded-full font-bold transition-all ${
                   isFollowing
-                    ? 'border border-gray-300 hover:bg-red-50 hover:text-red-500 hover:border-red-500'
+                    ? isHoveringFollow
+                      ? 'bg-red-50 bg-opacity-80 text-red-600 border border-red-600'
+                      : 'bg-white text-black border border-gray-300'
                     : 'bg-black text-white hover:bg-gray-800'
                 }`}
               >
-                {isFollowing ? 'Following' : 'Follow'}
+                {isFollowing 
+                  ? (isHoveringFollow ? 'Unfollow' : 'Following')
+                  : 'Follow'
+                }
               </button>
             )}
           </div>

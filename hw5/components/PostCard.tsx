@@ -182,12 +182,12 @@ export default function PostCard({ post, onUpdate }: PostCardProps) {
         className="border-b border-gray-200 p-4 hover:bg-gray-50 transition-colors cursor-pointer"
         onClick={handleCardClick}
       >
-        {post.repostBy && (
+        {post.repostBy && post.reposterDetails && (
           <div className="flex items-center gap-2 text-gray-500 text-sm mb-2 ml-8">
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
               <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>
             </svg>
-            <span>{post.authorDetails?.name} 轉發了</span>
+            <span>{post.reposterDetails.name} 轉發了</span>
           </div>
         )}
 
@@ -294,7 +294,7 @@ export default function PostCard({ post, onUpdate }: PostCardProps) {
                     <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>
                   </svg>
                 </div>
-                <span className="text-sm">0</span>
+                <span className="text-sm">{post.repostCount || 0}</span>
               </button>
 
               <button
