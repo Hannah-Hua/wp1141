@@ -15,8 +15,13 @@ export default function Feed() {
   }, [activeTab]);
 
   useEffect(() => {
-    // 訂閱 Pusher 頻道以接收即時更新
+    // 訂閱 Pusher 頻道以接收即時更新（只有在 Pusher 已設定時）
     const pusher = getPusher();
+    if (!pusher) {
+      // Pusher 未設定，跳過即時更新功能
+      return;
+    }
+
     const channel = pusher.subscribe('posts');
 
     channel.bind('post-updated', (data: any) => {

@@ -2,16 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import connectDB from '@/lib/mongodb';
 import Post from '@/models/Post';
-import Pusher from 'pusher';
-
-// 初始化 Pusher
-const pusher = new Pusher({
-  appId: process.env.PUSHER_APP_ID!,
-  key: process.env.PUSHER_KEY!,
-  secret: process.env.PUSHER_SECRET!,
-  cluster: process.env.PUSHER_CLUSTER!,
-  useTLS: true,
-});
+import { triggerPusherEvent } from '@/lib/pusherServer';
 
 export async function POST(
   request: NextRequest,
@@ -52,7 +43,7 @@ export async function POST(
 
     // 觸發 Pusher 事件
     const updatedPost = await Post.findById(params.id);
-    await pusher.trigger('posts', 'post-updated', {
+    await triggerPusherEvent('posts', 'post-updated', {
       postId: params.id,
       likesCount: updatedPost.likes.length,
     });
