@@ -66,12 +66,28 @@ GITHUB_CLIENT_SECRET=你的-github-client-secret
 7. 在「有效的 OAuth 重新導向 URI」加入：
    - `http://localhost:3000/api/auth/callback/facebook`
    - `https://your-app.vercel.app/api/auth/callback/facebook`
+8. **完成使用案例設定**（在主控板顯示為必要動作）：
+   - 點擊「自訂使用 Facebook 登入以驗證用戶並索取資料的使用案例」
+   - 設定使用案例名稱（例如：`User Login`）
+   - 選擇所需權限：
+     - `email`（必填）
+     - `public_profile`（必填，包含姓名和頭像）
+   - 儲存設定
+9. **設定測試用戶**（開發階段）：
+   - 左側「角色」→「測試用戶」
+   - 建立測試用戶（或將自己的 Facebook 帳號加入為測試用戶）
+   - **注意：** 開發階段只能讓測試用戶登入，需要完成應用程式審查後才能讓一般用戶使用
 
 **填入 .env.local：**
 ```
 FACEBOOK_CLIENT_ID=你的-facebook-app-id
 FACEBOOK_CLIENT_SECRET=你的-facebook-app-secret
 ```
+
+**⚠️ 重要提醒：**
+- Facebook 登入在開發階段只能讓**測試用戶**使用
+- 如果要讓所有用戶使用，需要完成「應用程式審查」（App Review）
+- 對於本機測試和初期開發，建議先使用 GitHub 或 Google OAuth（設定更簡單）
 
 ---
 

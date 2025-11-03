@@ -89,14 +89,14 @@ export default function PostCard({ post, onUpdate, disableClick = false }: PostC
     });
 
     // Process mentions
-    parts = parts.flatMap(part => {
+    parts = parts.flatMap((part, partIndex) => {
       if (typeof part !== 'string') return part;
       const segments = part.split(mentionRegex);
       return segments.map((segment, i) => {
         if (i > 0 && i % 2 === 1) {
           return (
             <span
-              key={`mention-${i}`}
+              key={`mention-${partIndex}-${i}-${segment}`}
               className="text-blue-500 hover:underline cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
