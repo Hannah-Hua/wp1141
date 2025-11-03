@@ -133,18 +133,19 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
         </div>
 
         <div className="p-4">
-          {/* Cover Image */}
-          <div className="h-48 bg-gray-300 relative mb-16 rounded-lg overflow-hidden z-0 group">
+          {/* Cover Image - 最底層 */}
+          <div className="h-48 bg-gray-300 relative mb-16 rounded-lg overflow-hidden group">
             {coverImagePreview && (
               <Image
                 src={coverImagePreview}
                 alt="Cover"
                 fill
                 className="object-cover"
+                priority
               />
             )}
             
-            {/* 上傳背景圖按鈕 */}
+            {/* 上傳背景圖按鈕 - 在 banner 中間 */}
             <input
               ref={coverInputRef}
               type="file"
@@ -153,15 +154,16 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
               className="hidden"
             />
             <button
+              type="button"
               onClick={() => coverInputRef.current?.click()}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 bg-black bg-opacity-50 rounded-full hover:bg-opacity-70 z-10 transition-opacity opacity-0 group-hover:opacity-100"
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 bg-black bg-opacity-50 rounded-full hover:bg-opacity-70 transition-opacity opacity-0 group-hover:opacity-100 z-10"
             >
               <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
               </svg>
             </button>
 
-            {/* Avatar - 確保在背景圖上方 */}
+            {/* Avatar - 覆蓋在 banner 左下角，在背景圖上方 */}
             <div className="absolute -bottom-16 left-4 w-32 h-32 rounded-full border-4 border-white bg-gray-300 overflow-hidden z-20 group/avatar">
               {avatarPreview ? (
                 <Image
@@ -177,7 +179,7 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
                 </div>
               )}
               
-              {/* 上傳大頭貼按鈕 */}
+              {/* 上傳大頭貼按鈕 - 覆蓋在大頭貼上 */}
               <input
                 ref={avatarInputRef}
                 type="file"
@@ -186,8 +188,9 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
                 className="hidden"
               />
               <button
+                type="button"
                 onClick={() => avatarInputRef.current?.click()}
-                className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 hover:bg-opacity-70 opacity-0 group-hover/avatar:opacity-100 transition-opacity"
+                className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 hover:bg-opacity-70 opacity-0 group-hover/avatar:opacity-100 transition-opacity z-30"
               >
                 <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
