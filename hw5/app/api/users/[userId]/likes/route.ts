@@ -27,26 +27,63 @@ export async function GET(
       );
     }
 
-    // 查找用戶按讚過的貼文
-    const posts = await Post.find({ likes: user._id.toString() }).sort({ createdAt: -1 });
+    // 查找用戶按讚過的貼文（只查詢原始貼文，排除 repost）
+    // 因為 repost 會繼承原始貼文的 likes，所以會重複顯示
+    const posts = await Post.find({ 
+      likes: user._id.toString(),
+      repostBy: { $exists: false } // 排除 repost，只顯示原始貼文
+    }).sort({ createdAt: -1 });
 
-    // 為每個貼文添加作者資訊
-    const postsWithAuthors = await Promise.all(
-      posts.map(async (post) => {
-        const author = await User.findById(post.author);
-        const postObj = post.toObject();
-        
-        if (author) {
-          postObj.authorDetails = {
-            userId: author.userId,
-            name: author.name,
-            image: author.image,
-          };
+    // 為每個貼文添加作者資訊（批量查詢優化）
+    const userIds = new Set<string>();
+    posts.forEach(post => {
+      userIds.add(post.author);
+    });
+
+    const users = await User.find({ _id: { $in: Array.from(userIds) } });
+    const userMap = new Map();
+    users.forEach(u => {
+      userMap.set(u._id.toString(), {
+        userId: u.userId,
+        name: u.name,
+        image: u.image,
+      });
+    });
+
+    // 批量計算轉發次數
+    const postIds = posts.map(p => p._id.toString());
+    const repostCounts = await Post.aggregate([
+      {
+        $match: {
+          originalPost: { $in: postIds },
         }
+      },
+      {
+        $group: {
+          _id: '$originalPost',
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+    
+    const repostCountMap = new Map();
+    repostCounts.forEach(item => {
+      repostCountMap.set(item._id.toString(), item.count);
+    });
 
-        return postObj;
-      })
-    );
+    const postsWithAuthors = posts.map(post => {
+      const postObj = post.toObject();
+      const authorData = userMap.get(post.author);
+      
+      if (authorData) {
+        postObj.authorDetails = authorData;
+      }
+
+      // 添加轉發次數
+      postObj.repostCount = repostCountMap.get(post._id.toString()) || 0;
+
+      return postObj;
+    });
 
     return NextResponse.json({ posts: postsWithAuthors });
   } catch (error) {

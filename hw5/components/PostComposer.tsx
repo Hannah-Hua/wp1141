@@ -145,7 +145,7 @@ export default function PostComposer({ onPostCreated, parentPostId, placeholder 
                   disabled={!content.trim() || isOverLimit || loading}
                   className="bg-blue-500 text-white font-bold py-2 px-6 rounded-full hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {loading ? '發文中...' : 'Reply'}
+                  {loading ? '發文中...' : (parentPostId ? 'Reply' : 'Post')}
                 </button>
               </div>
             </div>

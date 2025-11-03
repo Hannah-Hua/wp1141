@@ -2,7 +2,7 @@
 
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import PostModal from './PostModal';
 
@@ -11,10 +11,28 @@ export default function Sidebar() {
   const router = useRouter();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = () => {
     signOut({ callbackUrl: '/auth/signin' });
   };
+
+  // 點擊外部時收起選單
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    if (showUserMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showUserMenu]);
 
   return (
     <>
@@ -58,7 +76,7 @@ export default function Sidebar() {
         </button>
 
         {/* 用戶資訊 */}
-        <div className="relative">
+        <div className="relative" ref={menuRef}>
           <button
             onClick={() => setShowUserMenu(!showUserMenu)}
             className="w-full flex items-center gap-3 p-3 hover:bg-gray-100 rounded-full transition-colors"
