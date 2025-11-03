@@ -18,9 +18,16 @@ export default function PostPage() {
   useEffect(() => {
     if (postId) {
       fetchPost();
-      fetchReplies();
     }
   }, [postId]);
+
+  useEffect(() => {
+    // 當 post 載入後再取得回覆（因為需要知道是否是 repost）
+    if (post) {
+      fetchReplies();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [post]);
 
   const fetchPost = async () => {
     try {
@@ -38,7 +45,9 @@ export default function PostPage() {
 
   const fetchReplies = async () => {
     try {
-      const res = await fetch(`/api/posts?parentPost=${postId}`);
+      // 如果是 repost，查詢原始貼文的回覆；否則查詢當前貼文的回覆
+      const targetPostId = post?.originalPost || postId;
+      const res = await fetch(`/api/posts?parentPost=${targetPostId}`);
       if (res.ok) {
         const data = await res.json();
         setReplies(data.posts || []);
@@ -88,11 +97,18 @@ export default function PostPage() {
         </div>
 
         {/* Main Post */}
-        <PostCard post={post} onUpdate={handleUpdate} />
+        <div className="border-b border-gray-200">
+          <PostCard post={post} onUpdate={handleUpdate} disableClick={true} />
+        </div>
 
         {/* Reply Composer */}
-        <div className="border-b-8 border-gray-200">
-          <PostComposer onPostCreated={handleUpdate} parentPostId={postId} />
+        <div className="border-b border-gray-200">
+          <PostComposer 
+            onPostCreated={handleUpdate} 
+            parentPostId={post.originalPost || postId}
+            placeholder="Post your reply"
+            defaultExpanded={true}
+          />
         </div>
 
         {/* Replies */}
@@ -103,7 +119,9 @@ export default function PostPage() {
             </div>
           ) : (
             replies.map((reply) => (
-              <PostCard key={reply._id} post={reply} onUpdate={handleUpdate} />
+              <div key={reply._id} className="border-b border-gray-200">
+                <PostCard post={reply} onUpdate={handleUpdate} />
+              </div>
             ))
           )}
         </div>

@@ -9,9 +9,10 @@ import PostModal from './PostModal';
 interface PostCardProps {
   post: any;
   onUpdate: () => void;
+  disableClick?: boolean; // 是否禁用點擊跳轉（用於單個貼文頁面的主貼文）
 }
 
-export default function PostCard({ post, onUpdate }: PostCardProps) {
+export default function PostCard({ post, onUpdate, disableClick = false }: PostCardProps) {
   const { data: session } = useSession();
   const router = useRouter();
   const [showMenu, setShowMenu] = useState(false);
@@ -119,7 +120,10 @@ export default function PostCard({ post, onUpdate }: PostCardProps) {
 
     setIsLiking(true);
     try {
-      const res = await fetch(`/api/posts/${post._id}/like`, {
+      // 如果是 repost，應該對原始貼文進行 like 操作
+      const targetPostId = post.originalPost || post._id;
+      
+      const res = await fetch(`/api/posts/${targetPostId}/like`, {
         method: 'POST',
       });
 
@@ -139,7 +143,10 @@ export default function PostCard({ post, onUpdate }: PostCardProps) {
 
     setIsReposting(true);
     try {
-      const res = await fetch(`/api/posts/${post._id}/repost`, {
+      // 如果是 repost，應該對原始貼文進行 repost 操作
+      const targetPostId = post.originalPost || post._id;
+      
+      const res = await fetch(`/api/posts/${targetPostId}/repost`, {
         method: 'POST',
       });
 
@@ -173,13 +180,17 @@ export default function PostCard({ post, onUpdate }: PostCardProps) {
   };
 
   const handleCardClick = () => {
-    router.push(`/post/${post._id}`);
+    if (!disableClick) {
+      router.push(`/post/${post._id}`);
+    }
   };
 
   return (
     <>
       <article
-        className="border-b border-gray-200 p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+        className={`border-b border-gray-200 p-4 transition-colors ${
+          disableClick ? '' : 'hover:bg-gray-50 cursor-pointer'
+        }`}
         onClick={handleCardClick}
       >
         {post.repostBy && post.reposterDetails && (
@@ -319,7 +330,7 @@ export default function PostCard({ post, onUpdate }: PostCardProps) {
       {showReplyModal && (
         <PostModal
           onClose={() => setShowReplyModal(false)}
-          parentPostId={post._id}
+          parentPostId={post.originalPost || post._id}
           isReply={true}
         />
       )}

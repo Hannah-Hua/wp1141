@@ -71,6 +71,9 @@ const PostSchema = new Schema<IPost>(
 PostSchema.index({ author: 1, createdAt: -1 });
 PostSchema.index({ createdAt: -1 });
 PostSchema.index({ parentPost: 1 });
+PostSchema.index({ repostBy: 1, createdAt: -1 });
+PostSchema.index({ originalPost: 1 });
+PostSchema.index({ author: 1, parentPost: 1, repostBy: 1 }); // 複合索引優化 Following 查詢
 
 const Post = models.Post || mongoose.model<IPost>('Post', PostSchema);
 

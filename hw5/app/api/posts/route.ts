@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
         { repostBy: targetUser._id.toString() }
       ];
     } else if (following === 'true') {
-      // 獲取追蹤用戶的貼文
+      // 獲取追蹤用戶的貼文和轉發（不包括當前用戶自己的轉發）
       const session = await auth();
       if (!session?.user?.id) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -43,9 +43,29 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'User not found' }, { status: 404 });
       }
 
+      // 確保 following 列表不是空的
+      if (!currentUser.following || currentUser.following.length === 0) {
+        // 如果沒有追蹤任何人，返回空列表
+        return NextResponse.json({ posts: [] });
+      }
+
+      // 只顯示追蹤用戶的原創貼文和追蹤用戶的 repost
+      // 明確排除：1) 當前用戶自己的 repost 2) 回覆（parentPost 存在的貼文）
       query.$or = [
-        { author: { $in: currentUser.following }, parentPost: { $exists: false } },
-        { repostBy: { $in: currentUser.following } }
+        // 追蹤用戶的原創貼文（不是 repost，不是回覆）
+        { 
+          author: { $in: currentUser.following }, 
+          parentPost: { $exists: false },
+          repostBy: { $exists: false }
+        },
+        // 追蹤用戶的 repost（明確排除當前用戶自己的 repost）
+        { 
+          repostBy: { 
+            $in: currentUser.following,
+            $ne: currentUser._id.toString()
+          },
+          parentPost: { $exists: false } // repost 也不應該是回覆
+        }
       ];
     } else {
       // 獲取所有貼文（首頁 feed）
@@ -54,61 +74,108 @@ export async function GET(request: NextRequest) {
 
     const posts = await Post.find(query).sort({ createdAt: -1 }).limit(50);
 
-    // 為每個貼文添加作者資訊
-    const postsWithAuthors = await Promise.all(
-      posts.map(async (post) => {
-        const postObj = post.toObject();
+    // 批量查詢優化：收集所有需要的用戶 ID 和原始貼文 ID
+    const userIds = new Set<string>();
+    const postIds = new Set<string>();
+    const originalPostIds = new Set<string>();
+    
+    posts.forEach(post => {
+      userIds.add(post.author);
+      if (post.repostBy) {
+        userIds.add(post.repostBy);
+        // 如果是 repost，需要取得原始貼文的統計數據
+        if (post.originalPost) {
+          originalPostIds.add(post.originalPost.toString());
+        }
+      }
+      postIds.add(post._id.toString());
+      if (post.originalPost) {
+        originalPostIds.add(post.originalPost.toString());
+      }
+    });
+
+    // 批量查詢所有用戶
+    const users = await User.find({ _id: { $in: Array.from(userIds) } });
+    const userMap = new Map();
+    users.forEach(user => {
+      userMap.set(user._id.toString(), {
+        userId: user.userId,
+        name: user.name,
+        image: user.image,
+      });
+    });
+
+    // 批量查詢原始貼文以獲取統計數據（replies, likes）
+    const originalPosts = await Post.find({ 
+      _id: { $in: Array.from(originalPostIds) } 
+    }).select('replies likes');
+    
+    const originalPostStatsMap = new Map();
+    originalPosts.forEach(originalPost => {
+      originalPostStatsMap.set(originalPost._id.toString(), {
+        replies: originalPost.replies || [],
+        likes: originalPost.likes || [],
+      });
+    });
+
+    // 批量計算轉發次數（使用聚合查詢）
+    const repostCounts = await Post.aggregate([
+      {
+        $match: {
+          originalPost: { $in: Array.from(originalPostIds) },
+        }
+      },
+      {
+        $group: {
+          _id: '$originalPost',
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+    
+    const repostCountMap = new Map();
+    repostCounts.forEach(item => {
+      repostCountMap.set(item._id.toString(), item.count);
+    });
+
+    // 為每個貼文添加作者資訊（使用緩存的用戶資料）
+    const postsWithAuthors = posts.map(post => {
+      const postObj = post.toObject();
+      
+      // 如果是轉發
+      if (post.repostBy && post.originalPost) {
+        // 轉發者資訊
+        const reposterData = userMap.get(post.repostBy);
+        if (reposterData) {
+          postObj.reposterDetails = reposterData;
+        }
+
+        // 原作者資訊
+        const originalAuthorData = userMap.get(post.author);
+        if (originalAuthorData) {
+          postObj.authorDetails = originalAuthorData;
+        }
         
-        // 如果是轉發
-        if (post.repostBy) {
-          // 轉發者資訊
-          const reposter = await User.findById(post.repostBy);
-          if (reposter) {
-            postObj.reposterDetails = {
-              userId: reposter.userId,
-              name: reposter.name,
-              image: reposter.image,
-            };
-          }
-
-          // 原作者資訊
-          const originalAuthor = await User.findById(post.author);
-          if (originalAuthor) {
-            postObj.authorDetails = {
-              userId: originalAuthor.userId,
-              name: originalAuthor.name,
-              image: originalAuthor.image,
-            };
-          }
-        } else {
-          // 一般貼文或留言，取得作者資訊
-          const author = await User.findById(post.author);
-          if (author) {
-            postObj.authorDetails = {
-              userId: author.userId,
-              name: author.name,
-              image: author.image,
-            };
-          }
+        // 使用原始貼文的統計數據（留言數、轉發數、愛心數）
+        const originalStats = originalPostStatsMap.get(post.originalPost.toString());
+        if (originalStats) {
+          postObj.replies = originalStats.replies;  // 使用原始貼文的留言
+          postObj.likes = originalStats.likes;      // 使用原始貼文的愛心
+          postObj.repostCount = repostCountMap.get(post.originalPost.toString()) || 0;  // 使用原始貼文的轉發數
         }
-
-        // 計算轉發次數（只對原始貼文計算，不對轉發貼文計算）
-        if (!post.repostBy) {
-          const repostCount = await Post.countDocuments({
-            originalPost: post._id,
-          });
-          postObj.repostCount = repostCount;
-        } else {
-          // 如果是轉發，取得原始貼文的轉發次數
-          const repostCount = await Post.countDocuments({
-            originalPost: post.originalPost,
-          });
-          postObj.repostCount = repostCount;
+      } else {
+        // 一般貼文或留言，取得作者資訊
+        const authorData = userMap.get(post.author);
+        if (authorData) {
+          postObj.authorDetails = authorData;
         }
+        
+        // 轉發次數
+        postObj.repostCount = repostCountMap.get(post._id.toString()) || 0;
+      }
 
-        return postObj;
-      })
-    );
+      return postObj;
+    });
 
     return NextResponse.json({ posts: postsWithAuthors });
   } catch (error) {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import connectDB from '@/lib/mongodb';
 import Post from '@/models/Post';
+import User from '@/models/User';
 
 export async function GET(
   request: NextRequest,
@@ -19,7 +20,63 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({ post });
+    const postObj = post.toObject();
+
+    // 如果是 repost，使用原始貼文的統計數據
+    if (post.repostBy && post.originalPost) {
+      const originalPost = await Post.findById(post.originalPost);
+      if (originalPost) {
+        // 使用原始貼文的統計數據
+        postObj.replies = originalPost.replies || [];
+        postObj.likes = originalPost.likes || [];
+        
+        // 計算原始貼文的轉發次數
+        const repostCount = await Post.countDocuments({
+          originalPost: post.originalPost,
+        });
+        postObj.repostCount = repostCount;
+      }
+
+      // 取得轉發者和原作者資訊
+      const [reposter, originalAuthor] = await Promise.all([
+        User.findById(post.repostBy),
+        User.findById(post.author),
+      ]);
+
+      if (reposter) {
+        postObj.reposterDetails = {
+          userId: reposter.userId,
+          name: reposter.name,
+          image: reposter.image,
+        };
+      }
+
+      if (originalAuthor) {
+        postObj.authorDetails = {
+          userId: originalAuthor.userId,
+          name: originalAuthor.name,
+          image: originalAuthor.image,
+        };
+      }
+    } else {
+      // 一般貼文，取得作者資訊
+      const author = await User.findById(post.author);
+      if (author) {
+        postObj.authorDetails = {
+          userId: author.userId,
+          name: author.name,
+          image: author.image,
+        };
+      }
+
+      // 計算轉發次數
+      const repostCount = await Post.countDocuments({
+        originalPost: post._id,
+      });
+      postObj.repostCount = repostCount;
+    }
+
+    return NextResponse.json({ post: postObj });
   } catch (error) {
     console.error('Failed to fetch post:', error);
     return NextResponse.json(

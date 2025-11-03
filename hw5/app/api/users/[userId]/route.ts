@@ -19,7 +19,25 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({ user });
+    // 檢查當前用戶是否在追蹤目標用戶（如果已登入）
+    const session = await auth();
+    let isFollowing = false;
+    
+    if (session?.user?.id && session.user.id !== user._id.toString()) {
+      // 只查詢 following 欄位，減少資料傳輸
+      const currentUser = await User.findById(session.user.id).select('following');
+      if (currentUser && currentUser.following) {
+        // 檢查當前用戶的 following 列表是否包含目標用戶的 _id
+        // 這與 Follow API 的邏輯一致
+        isFollowing = currentUser.following.includes(user._id.toString());
+      }
+    }
+
+    const userObj = user.toObject();
+    return NextResponse.json({ 
+      user: userObj,
+      isFollowing // 添加追蹤狀態
+    });
   } catch (error) {
     console.error('Failed to fetch user:', error);
     return NextResponse.json(

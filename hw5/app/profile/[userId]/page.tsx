@@ -39,7 +39,12 @@ export default function ProfilePage() {
       if (res.ok) {
         const data = await res.json();
         setUser(data.user);
-        setIsFollowing(data.user.followers?.includes(session?.user?.id));
+        
+        // 使用 API 返回的 isFollowing 狀態
+        // 這個狀態是基於當前用戶的 following 列表，與 Follow API 邏輯一致
+        if (!isOwnProfile && data.isFollowing !== undefined) {
+          setIsFollowing(data.isFollowing);
+        }
       }
     } catch (error) {
       console.error('Failed to fetch user:', error);
@@ -74,18 +79,33 @@ export default function ProfilePage() {
     }
   };
 
-  const handleFollow = async () => {
+  const handleFollow = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    
+    if (!session?.user?.id) {
+      alert('請先登入');
+      return;
+    }
+    
     try {
       const res = await fetch(`/api/users/${userId}/follow`, {
         method: 'POST',
       });
 
       if (res.ok) {
-        setIsFollowing(!isFollowing);
-        fetchUserProfile();
+        const data = await res.json();
+        // 確保狀態正確更新
+        setIsFollowing(data.isFollowing);
+        // 重新獲取用戶資料以更新 followers 數量
+        await fetchUserProfile();
+      } else {
+        const errorData = await res.json();
+        alert(errorData.error || '操作失敗');
       }
     } catch (error) {
       console.error('Failed to follow/unfollow:', error);
+      alert('操作時發生錯誤');
     }
   };
 
@@ -138,15 +158,14 @@ export default function ProfilePage() {
           )}
           
           {/* Edit Profile 按鈕在背景圖右下方 */}
-          {isOwnProfile && (
+          {isOwnProfile && !showEditModal && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 setShowEditModal(true);
               }}
               type="button"
-              className="absolute bottom-4 right-4 px-4 py-1.5 bg-white bg-opacity-90 backdrop-blur-sm border border-gray-300 rounded-full font-bold text-sm hover:bg-opacity-100 transition-all cursor-pointer z-50"
-              style={{ zIndex: 9999 }}
+              className="absolute bottom-4 right-4 px-4 py-1.5 bg-white bg-opacity-90 backdrop-blur-sm border border-gray-300 rounded-full font-bold text-sm hover:bg-opacity-100 transition-all cursor-pointer z-10"
             >
               Edit profile
             </button>
@@ -191,7 +210,7 @@ export default function ProfilePage() {
                 className={`mt-3 px-6 py-2 rounded-full font-bold transition-all ${
                   isFollowing
                     ? isHoveringFollow
-                      ? 'bg-red-50 bg-opacity-80 text-red-600 border border-red-600'
+                      ? 'bg-red-100 bg-opacity-90 text-red-600 border border-red-500'
                       : 'bg-white text-black border border-gray-300'
                     : 'bg-black text-white hover:bg-gray-800'
                 }`}

@@ -239,8 +239,20 @@ export default function PostModal({ onClose, parentPostId, isReply = false }: Po
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl max-w-xl w-full max-h-[80vh] overflow-y-auto">
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000]"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          handleClose();
+        }
+      }}
+      style={{ zIndex: 10000 }}
+    >
+      <div 
+        className="bg-white rounded-2xl max-w-xl w-full max-h-[80vh] overflow-y-auto relative"
+        onClick={(e) => e.stopPropagation()}
+        style={{ zIndex: 10001 }}
+      >
         {/* Header */}
         <div className="p-4 border-b border-gray-200 flex items-center justify-between">
           <button
@@ -269,6 +281,7 @@ export default function PostModal({ onClose, parentPostId, isReply = false }: Po
                   alt={session.user.name || ''}
                   width={40}
                   height={40}
+                  loading="eager"
                   className="w-full h-full object-cover"
                 />
               ) : (
