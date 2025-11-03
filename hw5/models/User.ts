@@ -8,6 +8,8 @@ export interface IUser {
   image?: string; // 大頭貼
   coverImage?: string; // 背景圖
   bio?: string; // 個人簡介
+  website?: string; // 個人網站連結
+  birthday?: Date; // 生日
   provider: 'google' | 'github' | 'facebook';
   providerId: string; // OAuth provider 的 ID
   following: string[]; // 追蹤的用戶 ID 列表
@@ -40,6 +42,12 @@ const UserSchema = new Schema<IUser>(
     bio: {
       type: String,
       maxlength: 160,
+    },
+    website: {
+      type: String,
+    },
+    birthday: {
+      type: Date,
     },
     provider: {
       type: String,

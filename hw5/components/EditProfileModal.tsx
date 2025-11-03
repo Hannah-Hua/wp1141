@@ -12,6 +12,8 @@ interface EditProfileModalProps {
 export default function EditProfileModal({ user, onClose, onUpdate }: EditProfileModalProps) {
   const [name, setName] = useState(user.name || '');
   const [bio, setBio] = useState(user.bio || '');
+  const [website, setWebsite] = useState(user.website || '');
+  const [birthday, setBirthday] = useState(user.birthday ? new Date(user.birthday).toISOString().split('T')[0] : '');
   const [loading, setLoading] = useState(false);
   const [coverImagePreview, setCoverImagePreview] = useState<string | null>(user.coverImage || null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(user.image || null);
@@ -87,6 +89,8 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
         body: JSON.stringify({
           name,
           bio: bio || '',
+          website: website || '',
+          birthday: birthday || null,
           image: avatarData,
           coverImage: coverImageData,
         }),
@@ -108,13 +112,24 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto">
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div 
+        className="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] flex flex-col overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
-        <div className="p-4 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
+        <div className="p-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0 bg-white">
           <div className="flex items-center gap-8">
             <button
               onClick={onClose}
+              type="button"
               className="text-gray-500 hover:text-gray-700"
             >
               <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -126,112 +141,143 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
           <button
             onClick={handleSubmit}
             disabled={loading}
+            type="button"
             className="bg-black text-white font-bold py-2 px-6 rounded-full hover:bg-gray-800 disabled:opacity-50"
           >
             {loading ? '儲存中...' : '儲存'}
           </button>
         </div>
 
-        <div className="p-4">
-          {/* Cover Image - 最底層 */}
-          <div className="h-48 bg-gray-300 relative mb-16 rounded-lg overflow-hidden group">
-            {coverImagePreview && (
-              <Image
-                src={coverImagePreview}
-                alt="Cover"
-                fill
-                className="object-cover"
-                priority
-              />
-            )}
-            
-            {/* 上傳背景圖按鈕 - 在 banner 中間 */}
-            <input
-              ref={coverInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleCoverImageChange}
-              className="hidden"
-            />
-            <button
-              type="button"
-              onClick={() => coverInputRef.current?.click()}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 bg-black bg-opacity-50 rounded-full hover:bg-opacity-70 transition-opacity opacity-0 group-hover:opacity-100 z-10"
-            >
-              <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
-              </svg>
-            </button>
-
-            {/* Avatar - 覆蓋在 banner 左下角，在背景圖上方 */}
-            <div className="absolute -bottom-16 left-4 w-32 h-32 rounded-full border-4 border-white bg-gray-300 overflow-hidden z-20 group/avatar">
-              {avatarPreview ? (
+        {/* Scrollable Content */}
+        <div className="overflow-y-auto flex-1">
+          <div className="p-4">
+            {/* Cover Image - 最底層 */}
+            <div className="h-48 bg-gray-300 relative mb-20 rounded-lg group">
+              {coverImagePreview && (
                 <Image
-                  src={avatarPreview}
-                  alt={user.name}
-                  width={128}
-                  height={128}
-                  className="w-full h-full object-cover"
+                  src={coverImagePreview}
+                  alt="Cover"
+                  fill
+                  className="object-cover rounded-lg"
+                  priority
                 />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-blue-500 text-white text-4xl font-bold">
-                  {user.name[0]?.toUpperCase()}
-                </div>
               )}
               
-              {/* 上傳大頭貼按鈕 - 覆蓋在大頭貼上 */}
+              {/* 上傳背景圖按鈕 - 在 banner 右上角 */}
               <input
-                ref={avatarInputRef}
+                ref={coverInputRef}
                 type="file"
                 accept="image/*"
-                onChange={handleAvatarChange}
+                onChange={handleCoverImageChange}
                 className="hidden"
               />
               <button
                 type="button"
-                onClick={() => avatarInputRef.current?.click()}
-                className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 hover:bg-opacity-70 opacity-0 group-hover/avatar:opacity-100 transition-opacity z-30"
+                onClick={() => coverInputRef.current?.click()}
+                className="absolute top-3 right-3 p-2 bg-black bg-opacity-50 rounded-full hover:bg-opacity-70 transition-opacity z-10"
               >
-                <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
                 </svg>
               </button>
+
+              {/* Avatar - 覆蓋在 banner 左下角，確保完整顯示 */}
+              <div className="absolute -bottom-20 left-4 w-32 h-32 rounded-full border-4 border-white bg-gray-300 z-20 group/avatar" style={{ overflow: 'visible' }}>
+                {avatarPreview ? (
+                  <Image
+                    src={avatarPreview}
+                    alt={user.name}
+                    width={128}
+                    height={128}
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-blue-500 text-white text-4xl font-bold rounded-full">
+                    {user.name[0]?.toUpperCase()}
+                  </div>
+                )}
+                
+                {/* 上傳大頭貼按鈕 - 覆蓋在大頭貼上 */}
+                <input
+                  ref={avatarInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => avatarInputRef.current?.click()}
+                  className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 hover:bg-opacity-70 opacity-0 group-hover/avatar:opacity-100 transition-opacity rounded-full z-30"
+                >
+                  <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                  </svg>
+                </button>
+              </div>
             </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                  姓名
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label htmlFor="bio" className="block text-sm font-medium text-gray-700 mb-2">
+                  個人簡介
+                </label>
+                <textarea
+                  id="bio"
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  rows={4}
+                  maxLength={160}
+                  placeholder="介紹一下自己吧..."
+                />
+                <p className="text-sm text-gray-500 mt-1">
+                  {bio.length} / 160
+                </p>
+              </div>
+
+              <div>
+                <label htmlFor="website" className="block text-sm font-medium text-gray-700 mb-2">
+                  網站
+                </label>
+                <input
+                  id="website"
+                  type="url"
+                  value={website}
+                  onChange={(e) => setWebsite(e.target.value)}
+                  placeholder="https://example.com"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="birthday" className="block text-sm font-medium text-gray-700 mb-2">
+                  生日
+                </label>
+                <input
+                  id="birthday"
+                  type="date"
+                  value={birthday}
+                  onChange={(e) => setBirthday(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </form>
           </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4 mt-16">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                姓名
-              </label>
-              <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="bio" className="block text-sm font-medium text-gray-700 mb-2">
-                個人簡介
-              </label>
-              <textarea
-                id="bio"
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                rows={4}
-                maxLength={160}
-                placeholder="介紹一下自己吧..."
-              />
-              <p className="text-sm text-gray-500 mt-1">
-                {bio.length} / 160
-              </p>
-            </div>
-          </form>
         </div>
       </div>
     </div>

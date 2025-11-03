@@ -40,13 +40,19 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { name, bio, image, coverImage } = await request.json();
+    const { name, bio, website, birthday, image, coverImage } = await request.json();
 
     await connectDB();
 
     const updateData: any = {};
     if (name) updateData.name = name;
     if (bio !== undefined) updateData.bio = bio;
+    if (website !== undefined) updateData.website = website;
+    if (birthday) {
+      updateData.birthday = new Date(birthday);
+    } else if (birthday === null || birthday === '') {
+      updateData.birthday = null;
+    }
     if (image) updateData.image = image;
     if (coverImage !== undefined) updateData.coverImage = coverImage;
 
