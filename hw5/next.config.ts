@@ -1,11 +1,6 @@
 import type { NextConfig } from "next";
-import path from "path";
 
 const nextConfig: NextConfig = {
-  // Pin Turbopack's workspace root to this project to avoid scanning parent dirs
-  turbopack: {
-    root: path.join(__dirname),
-  },
   images: {
     remotePatterns: [
       {
