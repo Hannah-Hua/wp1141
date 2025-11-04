@@ -49,35 +49,133 @@
 
 ## 🔐 步驟 3: 新增 Facebook 登入產品
 
-### 3.1 新增產品
+### 3.1 方法一：從主控板新增產品
 
-1. 在左側選單中，點擊 **「新增產品」** 或 **「產品」** 標籤
-2. 找到 **「Facebook 登入」**，點擊右側的 **「設定」** 按鈕
-3. 系統會自動將 Facebook 登入產品新增到您的應用程式
+1. 在左側選單中，點擊 **「主控板」**（Dashboard）
+2. 在主控板頁面中，尋找：
+   - **「新增產品」** 按鈕（通常在頁面頂部或中間）
+   - 或 **「產品」** 區塊，點擊 **「瀏覽所有產品」**
+3. 在產品列表中，找到 **「Facebook 登入」**（Facebook Login）
+4. 點擊 **「設定」** 或 **「新增」** 按鈕
+5. 系統會自動將 Facebook 登入產品新增到您的應用程式
 
-### 3.2 設定有效的 OAuth 重新導向 URI
+### 3.2 方法二：從使用案例設定
 
-1. 在左側選單中，點擊 **「Facebook 登入」** → **「設定」**
-2. 找到 **「有效的 OAuth 重新導向 URI」** 區塊
-3. 點擊 **「新增 URI」** 或直接在欄位中輸入以下 URI（每行一個）：
+如果找不到「新增產品」選項，可以透過設定使用案例來啟用：
 
-```
-http://localhost:3000/api/auth/callback/facebook
-```
+1. 在左側選單中，點擊 **「使用案例」**（Use Cases）
+2. 如果看到 **「設定使用案例」** 或類似的提示，點擊進入
+3. 選擇 **「自訂使用 Facebook 登入以驗證用戶並索取資料的使用案例」**
+4. 完成使用案例設定後，Facebook 登入產品會自動啟用
 
-4. 如果您已經有 Vercel 部署網址，也一併加入：
+### 3.3 方法三：直接使用 URL
 
-```
-https://your-app.vercel.app/api/auth/callback/facebook
-```
+如果上述方法都不行，可以直接訪問 Facebook 登入設定頁面：
 
-5. 點擊 **「儲存變更」**
+1. 在瀏覽器網址列中，將您的應用程式 ID 替換到以下 URL：
+   ```
+   https://developers.facebook.com/apps/你的應用程式編號/fb-login/settings/
+   ```
+   
+   例如，如果您的應用程式編號是 `1764667804301657`，則訪問：
+   ```
+   https://developers.facebook.com/apps/1764667804301657/fb-login/settings/
+   ```
+
+2. 這會直接帶您到 Facebook 登入的設定頁面
+
+### 3.4 設定有效的 OAuth 重新導向 URI
+
+無論使用哪種方法進入設定頁面，接下來都需要設定重新導向 URI：
+
+#### 步驟 1: 找到設定區塊
+
+1. 在 Facebook 登入設定頁面中，向下滾動找到 **「有效的 OAuth 重新導向 URI」**（Valid OAuth Redirect URIs）區塊
+2. 這個區塊通常在頁面中間或下方
+
+#### 步驟 2: 新增 URI
+
+1. **找到 URI 輸入欄位**：
+   - 您會看到一個文字輸入框或文字區域
+   - 這個欄位可能是空的，或已經有一些 URI
+
+2. **輸入 URI**：
+   - 在欄位中輸入以下 URI（**每行一個**，不要用逗號分隔）：
+   
+   ```
+   http://localhost:3000/api/auth/callback/facebook
+   ```
+
+3. **如果有多個環境**，可以一次加入多個（每行一個）：
+   ```
+   http://localhost:3000/api/auth/callback/facebook
+   https://your-app.vercel.app/api/auth/callback/facebook
+   ```
+
+#### 步驟 3: 儲存變更
+
+1. **重要**：輸入 URI 後，**必須點擊頁面下方的「儲存變更」** 或 **「Save Changes」** 按鈕
+2. 等待儲存完成（通常會顯示成功訊息）
+3. **確認 URI 已儲存**：重新整理頁面，確認 URI 還在清單中
 
 ⚠️ **重要檢查點**：
 - ✅ 使用 `http://` 用於本機開發（localhost）
 - ✅ 使用 `https://` 用於正式環境（Vercel）
 - ✅ URL 必須完全正確，沒有 trailing slash `/`
 - ✅ 路徑必須是 `/api/auth/callback/facebook`
+- ✅ 每行一個 URI（不要用逗號分隔）
+- ✅ **必須點擊「儲存變更」按鈕**（這是關鍵！）
+
+#### ⚠️ 如果看到「此重新導向 URI 對此應用程式無效」錯誤
+
+**重要理解**：這個錯誤通常出現在「重新導向 URI 驗證程式」工具中。這個驗證工具**只是用來測試** URI 是否有效，但它**不是**實際設定的地方。
+
+**實際設定 URI 的位置**是在「有效的 OAuth 重新導向 URI」清單中（通常在頁面上方）。
+
+##### 解決步驟：
+
+1. **找到「有效的 OAuth 重新導向 URI」清單**（**不是驗證工具**）：
+   - 在 Facebook 登入設定頁面中，**向上滾動**或在頁面上方尋找
+   - 找到標題為 **「有效的 OAuth 重新導向 URI」** 或 **「Valid OAuth Redirect URIs」** 的區塊
+   - 這是一個**文字輸入框或文字區域**，用來設定實際的有效 URI 清單
+   - **注意**：這與下方的「重新導向 URI 驗證程式」是不同的區塊
+
+2. **在「有效的 OAuth 重新導向 URI」清單中輸入 URI**：
+   - 在這個欄位中輸入所有需要使用的 URI（**每行一個**）：
+     ```
+     http://localhost:3000/api/auth/callback/facebook
+     https://wp1141-1.vercel.app/api/auth/callback/facebook
+     ```
+   - **不要**在「重新導向 URI 驗證程式」工具中輸入（那只是用來測試的）
+   - **不要**在「客戶端 OAuth 設定」或其他測試欄位中輸入
+
+3. **儲存變更**（**這是最關鍵的步驟！**）：
+   - 輸入完成後，**向下滾動**到頁面底部
+   - **務必**點擊 **「儲存變更」** 或 **「Save Changes」** 按鈕
+   - 等待儲存成功訊息出現（通常會顯示綠色成功提示）
+   - **如果沒有點擊儲存，URI 不會生效！**
+
+4. **驗證 URI 已成功加入**：
+   - 重新整理頁面（F5 或 Cmd+R）
+   - 確認 URI 顯示在「有效的 OAuth 重新導向 URI」清單中
+   - 如果沒有顯示，可能是：
+     - 沒有點擊「儲存變更」按鈕
+     - URI 格式錯誤
+     - 需要重新輸入並再次儲存
+
+5. **使用驗證工具測試**（可選）：
+   - 儲存後，您可以**選擇性地**使用下方的「重新導向 URI 驗證程式」來測試 URI
+   - 如果驗證通過，應該會顯示綠色勾號或成功訊息
+   - 如果還是顯示錯誤，請確認：
+     - URI 已經正確儲存在上方的清單中
+     - 頁面已重新整理
+     - URI 格式完全正確
+
+6. **檢查 URI 格式**：
+   - ✅ 正確：`https://wp1141-1.vercel.app/api/auth/callback/facebook`
+   - ❌ 錯誤：`https://wp1141-1.vercel.app/api/auth/callback/facebook/`（多了斜線）
+   - ❌ 錯誤：`https://wp1141-1.vercel.app/api/auth/callback/facebook `（多了空格）
+   - ❌ 錯誤：`wp1141-1.vercel.app/api/auth/callback/facebook`（缺少協議）
 
 ---
 
@@ -87,17 +185,33 @@ https://your-app.vercel.app/api/auth/callback/facebook
 
 Facebook 會要求您完成使用案例設定（在儀表板中會顯示為「必要動作」）：
 
-1. 在應用程式儀表板中，找到 **「使用案例」** 或 **「設定使用案例」** 的提示
-2. 點擊 **「開始」** 或 **「設定」**
-3. 選擇使用案例類型：
+1. **從左側選單進入**：
+   - 點擊左側選單中的 **「使用案例」**（Use Cases）
+   - 或點擊 **「必要動作」**（Required Actions），查看需要完成的項目
+
+2. **如果尚未新增 Facebook 登入產品**：
+   - 在「使用案例」頁面中，點擊 **「新增使用案例」** 或 **「建立使用案例」**
    - 選擇 **「自訂使用 Facebook 登入以驗證用戶並索取資料的使用案例」**
-4. 填寫使用案例資訊：
+   - 這會自動啟用 Facebook 登入產品
+
+3. **如果已經有使用案例設定頁面**：
+   - 點擊 **「開始」** 或 **「設定」** 或 **「編輯」**
+   - 選擇使用案例類型：
+     - 選擇 **「自訂使用 Facebook 登入以驗證用戶並索取資料的使用案例」**
+
+4. **填寫使用案例資訊**：
    - **使用案例名稱**：例如 `User Login` 或 `User Authentication`
    - **說明**：簡單描述您的應用程式用途，例如 "允許用戶使用 Facebook 帳號登入應用程式"
-5. 選擇所需權限：
+
+5. **選擇所需權限**：
    - ✅ **email**（必填）- 用於取得用戶的電子郵件
    - ✅ **public_profile**（必填）- 包含用戶的姓名和頭像
-6. 點擊 **「儲存」** 或 **「完成」**
+   - 這些權限通常已經預設選取
+
+6. **儲存設定**：
+   - 點擊 **「儲存」** 或 **「完成」** 或 **「Submit」**
+
+⚠️ **注意**：完成使用案例設定後，Facebook 登入功能才能正常運作。如果跳過這一步，可能會在登入時遇到權限錯誤。
 
 ---
 
@@ -265,14 +379,43 @@ FACEBOOK_CLIENT_SECRET=你的-facebook-app-secret
 
 ## ⚠️ 常見問題與解決方案
 
-### 問題 1: "Invalid OAuth redirect_uri"
+### 問題 1: "Invalid OAuth redirect_uri" 或 "此重新導向 URI 對此應用程式無效"
 
-**原因**：Facebook 應用程式中的重新導向 URI 設定不正確
+**原因**：Facebook 應用程式中的重新導向 URI 設定不正確或尚未儲存
 
 **解決方案**：
-1. 確認 URI 完全正確（包括協議、網域、路徑）
-2. 確認沒有 trailing slash
-3. 確認 URI 已經儲存
+
+1. **確認您在正確的設定頁面**：
+   - 訪問：`https://developers.facebook.com/apps/你的應用程式編號/fb-login/settings/`
+   - 確認您在「Facebook 登入」→「設定」頁面
+
+2. **找到「有效的 OAuth 重新導向 URI」區塊**：
+   - 向下滾動頁面，找到這個區塊
+   - 確認不是在其他測試欄位中輸入
+
+3. **正確輸入 URI**：
+   - 在「有效的 OAuth 重新導向 URI」欄位中輸入：
+     ```
+     http://localhost:3000/api/auth/callback/facebook
+     ```
+   - **每行一個 URI**，不要用逗號分隔
+   - 確認格式完全正確（沒有空格、沒有 trailing slash）
+
+4. **儲存變更（最重要！）**：
+   - 輸入完成後，**必須點擊頁面底部的「儲存變更」或「Save Changes」按鈕**
+   - 等待儲存成功訊息出現
+   - 如果沒有儲存，URI 不會生效
+
+5. **驗證儲存成功**：
+   - 重新整理頁面
+   - 確認 URI 顯示在清單中
+   - 如果沒有顯示，重新輸入並再次儲存
+
+6. **檢查 URI 格式**：
+   - ✅ 正確：`http://localhost:3000/api/auth/callback/facebook`
+   - ❌ 錯誤：`http://localhost:3000/api/auth/callback/facebook/`（多了斜線）
+   - ❌ 錯誤：`http://localhost:3000/api/auth/callback/facebook `（多了空格）
+   - ❌ 錯誤：`localhost:3000/api/auth/callback/facebook`（缺少協議）
 
 ### 問題 2: "App Not Setup: This app is still in development mode"
 
@@ -291,7 +434,149 @@ FACEBOOK_CLIENT_SECRET=你的-facebook-app-secret
 2. 確認使用案例中已包含 `email` 權限
 3. 在 NextAuth 設定中，Facebook provider 會自動請求 `email` 和 `public_profile` 權限
 
-### 問題 4: 環境變數未生效
+### 問題 4: 400 錯誤（Failed to load resource: the server responded with a status of 400）
+
+**原因**：這通常表示 OAuth 請求格式錯誤或配置不正確
+
+**⚠️ 如果是在 Vercel 部署環境中遇到 400 錯誤，請優先檢查以下項目：**
+
+#### 🚀 部署環境專用排查（優先檢查）
+
+1. **確認 Vercel 環境變數已設定**：
+   - 前往 Vercel Dashboard > 您的專案 > Settings > Environment Variables
+   - 確認以下變數都已設定並適用於 **Production** 環境：
+     ```
+     FACEBOOK_CLIENT_ID=1764667804301657
+     FACEBOOK_CLIENT_SECRET=你的-facebook-app-secret
+     NEXTAUTH_URL=https://wp1141-1.vercel.app
+     NEXTAUTH_SECRET=你的-nextauth-secret
+     ```
+   - ⚠️ **重要**：`NEXTAUTH_URL` 必須完全匹配您的實際 Vercel 網址（沒有 trailing slash）
+
+2. **確認 Facebook 已加入 Vercel 網址**：
+   - 訪問：`https://developers.facebook.com/apps/1764667804301657/fb-login/settings/`
+   - 在「有效的 OAuth 重新導向 URI」清單中，確認已包含：
+     ```
+     https://wp1141-1.vercel.app/api/auth/callback/facebook
+     ```
+   - 確認已點擊「儲存變更」按鈕
+   - ⚠️ **注意**：必須使用 `https://`（不是 `http://`）
+
+3. **重新部署 Vercel**：
+   - 修改環境變數後，必須重新部署才會生效
+   - Vercel Dashboard > Deployments > 找到最新部署 > "..." > Redeploy
+   - 或推送新的 commit 觸發自動部署
+
+4. **檢查 Vercel Logs**：
+   - Vercel Dashboard > 您的專案 > Logs
+   - 查看是否有錯誤訊息
+   - 特別注意是否有 "FACEBOOK_CLIENT_ID is not defined" 之類的錯誤
+
+**常見原因和解決方案**（適用於本機和部署環境）：
+
+#### A. 環境變數未設定或錯誤
+
+1. **檢查 .env.local 檔案**：
+   ```bash
+   cd /Users/hannah/wp1141/hw5
+   cat .env.local
+   ```
+
+2. **確認以下變數已正確設定**：
+   ```bash
+   FACEBOOK_CLIENT_ID=你的-應用程式編號
+   FACEBOOK_CLIENT_SECRET=你的-應用程式密鑰
+   NEXTAUTH_URL=http://localhost:3000
+   NEXTAUTH_SECRET=你的-nextauth-secret
+   ```
+
+3. **如果環境變數未設定**：
+   - 建立 `.env.local` 檔案（如果不存在）
+   - 填入 Facebook 憑證
+   - 重新啟動開發伺服器
+
+#### B. Facebook 重新導向 URI 設定不正確
+
+1. **本機環境**：
+   - 訪問：`https://developers.facebook.com/apps/1764667804301657/fb-login/settings/`
+   - 確認 `http://localhost:3000/api/auth/callback/facebook` 已在「有效的 OAuth 重新導向 URI」清單中
+   - 確認已點擊「儲存變更」按鈕
+
+2. **部署環境（Vercel）**：
+   - 訪問：`https://developers.facebook.com/apps/1764667804301657/fb-login/settings/`
+   - 確認 `https://wp1141-1.vercel.app/api/auth/callback/facebook` 已在清單中
+   - ⚠️ **必須使用 `https://`**（不是 `http://`）
+   - 確認已點擊「儲存變更」按鈕
+
+3. **檢查 URI 格式**：
+   - ✅ 本機正確：`http://localhost:3000/api/auth/callback/facebook`
+   - ✅ 部署正確：`https://wp1141-1.vercel.app/api/auth/callback/facebook`
+   - ❌ 錯誤：`http://localhost:3000/api/auth/callback/facebook/`（多了斜線）
+   - ❌ 錯誤：`https://localhost:3000/api/auth/callback/facebook`（本機應使用 http）
+   - ❌ 錯誤：`http://wp1141-1.vercel.app/api/auth/callback/facebook`（部署應使用 https）
+
+#### C. 使用案例未設定
+
+1. **確認使用案例已設定**：
+   - 前往左側選單 → 「使用案例」
+   - 確認已設定「自訂使用 Facebook 登入以驗證用戶並索取資料的使用案例」
+   - 確認已包含 `email` 和 `public_profile` 權限
+
+#### D. 應用程式處於開發模式
+
+1. **確認您是應用程式開發者**：
+   - 前往左側選單 → 「角色」→ 「管理員」
+   - 確認您的 Facebook 帳號在列表中
+
+2. **或使用測試用戶**：
+   - 前往左側選單 → 「角色」→ 「測試用戶」
+   - 建立測試用戶並使用測試用戶登入
+
+#### E. 檢查瀏覽器主控台和網路請求
+
+1. **開啟開發者工具**（F12）
+2. **查看 Console 標籤頁**：
+   - 查看是否有更詳細的錯誤訊息
+   - 記錄任何錯誤訊息
+
+3. **查看 Network 標籤頁**：
+   - 找到返回 400 錯誤的請求
+   - 點擊該請求，查看「Response」標籤頁
+   - 查看錯誤詳情
+
+4. **查看伺服器日誌**：
+   - 查看終端機中的 Next.js 日誌
+   - 尋找任何錯誤訊息
+
+#### F. 重新啟動開發伺服器
+
+1. **停止開發伺服器**：
+   - 在終端機中按 `Ctrl+C`
+
+2. **重新啟動**：
+   ```bash
+   npm run dev
+   ```
+
+3. **清除瀏覽器快取**：
+   - 清除瀏覽器快取和 Cookie
+   - 或使用無痕模式測試
+
+#### G. 檢查 NextAuth 配置
+
+1. **確認 auth.ts 中的 Facebook provider 配置正確**：
+   ```typescript
+   Facebook({
+     clientId: process.env.FACEBOOK_CLIENT_ID!,
+     clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
+   })
+   ```
+
+2. **確認環境變數名稱正確**：
+   - `FACEBOOK_CLIENT_ID`（不是 `FACEBOOK_APP_ID`）
+   - `FACEBOOK_CLIENT_SECRET`（不是 `FACEBOOK_APP_SECRET`）
+
+### 問題 5: 環境變數未生效
 
 **原因**：修改環境變數後未重啟開發伺服器
 
