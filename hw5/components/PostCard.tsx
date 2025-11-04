@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import SafeImage from '@/components/SafeImage';
 import PostModal from './PostModal';
 
 interface PostCardProps {
@@ -211,7 +211,7 @@ export default function PostCard({ post, onUpdate, disableClick = false }: PostC
             }}
           >
             {post.authorDetails?.image ? (
-              <Image
+              <SafeImage
                 src={post.authorDetails.image}
                 alt={post.authorDetails.name}
                 width={40}

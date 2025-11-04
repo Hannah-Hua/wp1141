@@ -2,7 +2,7 @@
 
 import { signIn } from 'next-auth/react';
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
+import SafeImage from '@/components/SafeImage';
 
 interface User {
   userId: string;
@@ -119,7 +119,7 @@ export default function SignIn() {
                 className="w-full flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left"
               >
                 {user.image ? (
-                  <Image
+                  <SafeImage
                     src={user.image}
                     alt={user.name}
                     width={40}

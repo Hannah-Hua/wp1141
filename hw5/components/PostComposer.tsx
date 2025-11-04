@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { useSession } from 'next-auth/react';
-import Image from 'next/image';
+import SafeImage from '@/components/SafeImage';
 
 interface PostComposerProps {
   onPostCreated: () => void;
@@ -96,7 +96,7 @@ export default function PostComposer({ onPostCreated, parentPostId, placeholder 
       <div className="flex gap-3">
         <div className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden flex-shrink-0">
           {session?.user?.image ? (
-            <Image
+            <SafeImage
               src={session.user.image}
               alt={session.user.name || ''}
               width={40}

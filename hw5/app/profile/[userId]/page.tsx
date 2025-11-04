@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter, useParams } from 'next/navigation';
-import Image from 'next/image';
+import SafeImage from '@/components/SafeImage';
 import MainLayout from '@/components/MainLayout';
 import PostCard from '@/components/PostCard';
 import EditProfileModal from '@/components/EditProfileModal';
@@ -172,7 +172,7 @@ export default function ProfilePage() {
               }}
             >
               {user.image ? (
-                <Image
+                <SafeImage
                   src={user.image}
                   alt={user.name}
                   width={128}
