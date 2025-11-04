@@ -149,7 +149,7 @@ export default function ProfilePage() {
         {/* Cover Image */}
         <div className="h-48 bg-gray-300 relative">
           {user.coverImage && (
-            <Image
+            <SafeImage
               src={user.coverImage}
               alt="Cover"
               fill
