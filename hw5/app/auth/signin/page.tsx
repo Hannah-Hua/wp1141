@@ -3,6 +3,7 @@
 import { signIn } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import SafeImage from '@/components/SafeImage';
+import PulseLogo from '@/components/PulseLogo';
 
 interface User {
   userId: string;
@@ -81,9 +82,11 @@ export default function SignIn() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-lg">
         <div className="text-center">
-          <h1 className="text-4xl font-bold mb-2">𝕏</h1>
+          <div className="flex justify-center mb-4">
+            <PulseLogo size={60} showText={true} />
+          </div>
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            歡迎來到 X
+            歡迎來到 PULSE
           </h2>
           <p className="text-gray-600">輸入或選擇 UserID 進行登入</p>
         </div>

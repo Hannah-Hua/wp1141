@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import PostModal from './PostModal';
+import PulseLogo from './PulseLogo';
 
 export default function Sidebar() {
   const { data: session } = useSession();
@@ -40,7 +41,7 @@ export default function Sidebar() {
         {/* Logo */}
         <div className="mb-4">
           <button onClick={() => router.push('/')} className="p-3 hover:bg-gray-100 rounded-full transition-colors">
-            <span className="text-3xl font-bold">𝕏</span>
+            <PulseLogo size={32} showText={false} />
           </button>
         </div>
 
