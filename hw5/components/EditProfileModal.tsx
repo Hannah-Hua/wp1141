@@ -13,6 +13,7 @@ interface EditProfileModalProps {
 
 export default function EditProfileModal({ user, onClose, onUpdate }: EditProfileModalProps) {
   const router = useRouter();
+  const { update } = useSession();
   const [name, setName] = useState(user.name || '');
   const [bio, setBio] = useState(user.bio || '');
   const [website, setWebsite] = useState(user.website || '');
@@ -214,7 +215,6 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
 
       if (res.ok) {
         // 強制刷新 session 以更新頭貼和名稱
-        const { update } = await import('next-auth/react');
         await update();
         
         // 觸發頁面重新驗證，更新所有組件（包括 Sidebar 和 Feed）
