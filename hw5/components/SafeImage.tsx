@@ -15,16 +15,26 @@ interface SafeImageProps {
 }
 
 /**
- * SafeImage 組件：自動處理 Base64 圖片
+ * SafeImage 組件：自動處理 Base64 圖片和 Facebook CDN 圖片
  * - 如果是 Base64（data:image/...），使用普通的 <img> 標籤
- * - 如果是 URL，使用 Next.js Image 組件進行優化
+ * - 如果是 Facebook CDN URL（可能無法優化），使用普通的 <img> 標籤
+ * - 如果是其他 URL，使用 Next.js Image 組件進行優化
  */
 export default function SafeImage({ src, alt, width, height, fill, className, loading, sizes, ...props }: SafeImageProps) {
   // 檢查是否為 Base64 圖片
   const isBase64 = src && src.startsWith('data:image/');
+  
+  // 檢查是否為 Facebook CDN URL（這些 URL 可能無法被 Next.js 優化）
+  const isFacebookCDN = src && (
+    src.includes('platform-lookaside.fbsbx.com') ||
+    src.includes('fbcdn.net') ||
+    src.includes('graph.facebook.com')
+  );
+  
+  // 如果是不支援優化的圖片，使用普通的 <img> 標籤
+  if (isBase64 || isFacebookCDN) {
 
-  if (isBase64) {
-    // Base64 圖片使用普通的 <img> 標籤，因為 Next.js Image 無法優化 Base64
+    // 使用普通的 <img> 標籤，因為 Next.js Image 無法優化這些圖片
     if (fill) {
       // 如果使用 fill，使用絕對定位的 <img>
       return (
