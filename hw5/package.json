@@ -10,9 +10,11 @@
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
+    "cloudinary": "^2.8.0",
     "mongoose": "^8.19.2",
     "next": "16.0.1",
     "next-auth": "^5.0.0-beta.30",
+    "next-cloudinary": "^6.17.0",
     "pusher": "^5.2.0",
     "pusher-js": "^8.4.0",
     "react": "19.2.0",

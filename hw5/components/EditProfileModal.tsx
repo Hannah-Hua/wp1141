@@ -64,6 +64,39 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
     });
   };
 
+  /**
+   * 上傳圖片到 Cloudinary，如果失敗則回退到 Base64
+   */
+  const uploadImageToCloudinary = async (base64Image: string, folder: string): Promise<string> => {
+    try {
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          image: base64Image,
+          folder: folder,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.url) {
+        // Cloudinary 上傳成功，返回 URL
+        return data.url;
+      } else {
+        // Cloudinary 未設定或上傳失敗，回退到 Base64
+        console.warn('Cloudinary upload failed, using base64:', data.error);
+        return base64Image;
+      }
+    } catch (error) {
+      // 網路錯誤或其他問題，回退到 Base64
+      console.warn('Cloudinary upload error, using base64:', error);
+      return base64Image;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -72,13 +105,17 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
       let coverImageData = coverImagePreview;
       let avatarData = avatarPreview;
 
-      // 如果有新上傳的圖片，轉換為 base64
+      // 如果有新上傳的圖片，先嘗試上傳到 Cloudinary
       if (coverImageFile) {
-        coverImageData = await convertFileToBase64(coverImageFile);
+        const base64 = await convertFileToBase64(coverImageFile);
+        // 嘗試上傳到 Cloudinary，失敗則使用 Base64
+        coverImageData = await uploadImageToCloudinary(base64, 'x-clone/cover-images');
       }
       
       if (avatarFile) {
-        avatarData = await convertFileToBase64(avatarFile);
+        const base64 = await convertFileToBase64(avatarFile);
+        // 嘗試上傳到 Cloudinary，失敗則使用 Base64
+        avatarData = await uploadImageToCloudinary(base64, 'x-clone/avatars');
       }
 
       const res = await fetch(`/api/users/${user.userId}`, {
@@ -160,8 +197,8 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
                   src={coverImagePreview}
                   alt="Cover"
                   fill
+                  sizes="(max-width: 768px) 100vw, 672px"
                   className="object-cover rounded-lg"
-                  priority
                 />
               )}
               

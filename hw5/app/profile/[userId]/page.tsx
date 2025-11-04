@@ -129,7 +129,7 @@ export default function ProfilePage() {
     <MainLayout>
       <div>
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 z-10 px-4 py-3">
+        <div className="sticky top-0 bg-white border-b border-gray-200 z-50 px-4 py-3">
           <div className="flex items-center gap-8">
             <button
               onClick={() => router.back()}
@@ -154,30 +154,17 @@ export default function ProfilePage() {
               alt="Cover"
               fill
               className="object-cover"
+              sizes="100vw"
             />
-          )}
-          
-          {/* Edit Profile 按鈕在背景圖右下方 */}
-          {isOwnProfile && !showEditModal && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowEditModal(true);
-              }}
-              type="button"
-              className="absolute bottom-4 right-4 px-4 py-1.5 bg-white bg-opacity-90 backdrop-blur-sm border border-gray-300 rounded-full font-bold text-sm hover:bg-opacity-100 transition-all cursor-pointer z-10"
-            >
-              Edit profile
-            </button>
           )}
         </div>
 
         {/* Profile Info */}
         <div className="px-4 pb-4 relative" style={{ pointerEvents: 'none' }}>
           <div className="flex justify-between items-start -mt-16 mb-4">
-            {/* 大頭貼 - 中間對齊背景圖底部，確保在背景圖上方 */}
+            {/* 大頭貼 - 中間對齊背景圖底部，確保在背景圖上方，但低於 Header */}
             <div 
-              className="w-32 h-32 rounded-full border-4 border-white bg-gray-300 overflow-hidden relative z-20 cursor-pointer"
+              className="w-32 h-32 rounded-full border-4 border-white bg-gray-300 overflow-hidden relative z-10 cursor-pointer"
               style={{ pointerEvents: 'auto' }}
               onClick={(e) => {
                 e.stopPropagation();
@@ -199,28 +186,44 @@ export default function ProfilePage() {
               )}
             </div>
 
-            {/* Follow 按鈕（別人的頁面才顯示） */}
-            {!isOwnProfile && (
-              <button
-                onClick={handleFollow}
-                onMouseEnter={() => setIsHoveringFollow(true)}
-                onMouseLeave={() => setIsHoveringFollow(false)}
-                type="button"
-                style={{ pointerEvents: 'auto' }}
-                className={`mt-3 px-6 py-2 rounded-full font-bold transition-all ${
-                  isFollowing
-                    ? isHoveringFollow
-                      ? 'bg-red-100 bg-opacity-90 text-red-600 border border-red-500'
-                      : 'bg-white text-black border border-gray-300'
-                    : 'bg-black text-white hover:bg-gray-800'
-                }`}
-              >
-                {isFollowing 
-                  ? (isHoveringFollow ? 'Unfollow' : 'Following')
-                  : 'Follow'
-                }
-              </button>
-            )}
+            {/* 按鈕區域 - 放在大頭貼同一行，右側對齊，與大頭貼底部對齊 */}
+            <div className="flex items-end pt-20" style={{ pointerEvents: 'auto' }}>
+              {/* Edit Profile 按鈕（自己的頁面才顯示） */}
+              {isOwnProfile && !showEditModal && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowEditModal(true);
+                  }}
+                  type="button"
+                  className="px-4 py-1.5 bg-white border border-gray-300 rounded-full font-bold text-sm hover:bg-gray-50 transition-all cursor-pointer"
+                >
+                  Edit profile
+                </button>
+              )}
+
+              {/* Follow 按鈕（別人的頁面才顯示） */}
+              {!isOwnProfile && (
+                <button
+                  onClick={handleFollow}
+                  onMouseEnter={() => setIsHoveringFollow(true)}
+                  onMouseLeave={() => setIsHoveringFollow(false)}
+                  type="button"
+                  className={`px-6 py-2 rounded-full font-bold transition-all ${
+                    isFollowing
+                      ? isHoveringFollow
+                        ? 'bg-red-100 bg-opacity-90 text-red-600 border border-red-500'
+                        : 'bg-white text-black border border-gray-300'
+                      : 'bg-black text-white hover:bg-gray-800'
+                  }`}
+                >
+                  {isFollowing 
+                    ? (isHoveringFollow ? 'Unfollow' : 'Following')
+                    : 'Follow'
+                  }
+                </button>
+              )}
+            </div>
           </div>
 
           <div style={{ pointerEvents: 'auto' }}>
