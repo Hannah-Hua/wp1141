@@ -48,13 +48,37 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
     },
     async session({ session, token }) {
-      // 從 JWT token 中取得用戶資訊，避免每次查資料庫
+      // 從 JWT token 中取得用戶資訊，並從資料庫查詢最新的用戶資料（包括頭貼和名稱）
       if (session.user && token.userId && token.userMongoId) {
-        session.user = {
-          ...session.user,
-          id: token.userMongoId as string,
-          userId: token.userId as string,
-        } as any;
+        try {
+          await connectDB();
+          const dbUser = await User.findById(token.userMongoId).select('userId name image');
+          
+          if (dbUser) {
+            session.user = {
+              ...session.user,
+              id: token.userMongoId as string,
+              userId: dbUser.userId,
+              name: dbUser.name || session.user.name,
+              image: dbUser.image || session.user.image,
+            } as any;
+          } else {
+            // 如果找不到用戶，至少設定基本資訊
+            session.user = {
+              ...session.user,
+              id: token.userMongoId as string,
+              userId: token.userId as string,
+            } as any;
+          }
+        } catch (error) {
+          console.error('Session error:', error);
+          // 發生錯誤時，至少設定基本資訊
+          session.user = {
+            ...session.user,
+            id: token.userMongoId as string,
+            userId: token.userId as string,
+          } as any;
+        }
       }
       return session;
     },

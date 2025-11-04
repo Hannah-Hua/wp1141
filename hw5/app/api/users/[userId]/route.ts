@@ -141,6 +141,10 @@ export async function PATCH(
       );
     }
 
+    // 清除相關快取，確保貼文中的作者資訊會更新
+    const cache = (await import('@/lib/cache')).default;
+    cache.deleteByPrefix('posts:');
+
     return NextResponse.json({ user });
   } catch (error) {
     console.error('Failed to update user:', error);
