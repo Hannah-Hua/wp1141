@@ -58,7 +58,61 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { name, bio, website, birthday, image, coverImage } = await request.json();
+    // 檢查請求大小（Vercel 限制為 4.5MB）
+    const contentLength = request.headers.get('content-length');
+    if (contentLength && parseInt(contentLength) > 4 * 1024 * 1024) {
+      return NextResponse.json(
+        { 
+          error: '圖片太大。請使用較小的圖片（建議小於 2MB），或設定 Cloudinary 以使用雲端儲存。',
+          code: 'PAYLOAD_TOO_LARGE'
+        },
+        { status: 413 }
+      );
+    }
+
+    let body;
+    try {
+      body = await request.json();
+    } catch (parseError) {
+      return NextResponse.json(
+        { 
+          error: '請求格式錯誤。圖片可能太大，請使用較小的圖片或設定 Cloudinary。',
+          code: 'INVALID_JSON'
+        },
+        { status: 400 }
+      );
+    }
+
+    const { name, bio, website, birthday, image, coverImage } = body;
+
+    // 檢查 Base64 圖片大小
+    if (image && image.startsWith('data:image/')) {
+      const base64Size = Math.ceil(image.length * 0.75); // Base64 約為原始大小的 1.33 倍
+      if (base64Size > 3 * 1024 * 1024) { // 3MB 限制
+        return NextResponse.json(
+          { 
+            error: '頭貼圖片太大（超過 3MB）。請使用較小的圖片或設定 Cloudinary。',
+            code: 'IMAGE_TOO_LARGE',
+            field: 'image'
+          },
+          { status: 413 }
+        );
+      }
+    }
+
+    if (coverImage && coverImage.startsWith('data:image/')) {
+      const base64Size = Math.ceil(coverImage.length * 0.75);
+      if (base64Size > 3 * 1024 * 1024) { // 3MB 限制
+        return NextResponse.json(
+          { 
+            error: '背景圖片太大（超過 3MB）。請使用較小的圖片或設定 Cloudinary。',
+            code: 'IMAGE_TOO_LARGE',
+            field: 'coverImage'
+          },
+          { status: 413 }
+        );
+      }
+    }
 
     await connectDB();
 
@@ -90,6 +144,20 @@ export async function PATCH(
     return NextResponse.json({ user });
   } catch (error) {
     console.error('Failed to update user:', error);
+    
+    // 確保總是返回有效的 JSON
+    if (error instanceof Error) {
+      if (error.message.includes('PayloadTooLargeError') || error.message.includes('413')) {
+        return NextResponse.json(
+          { 
+            error: '圖片太大。請使用較小的圖片（建議小於 2MB），或設定 Cloudinary 以使用雲端儲存。',
+            code: 'PAYLOAD_TOO_LARGE'
+          },
+          { status: 413 }
+        );
+      }
+    }
+    
     return NextResponse.json(
       { error: 'Failed to update user' },
       { status: 500 }

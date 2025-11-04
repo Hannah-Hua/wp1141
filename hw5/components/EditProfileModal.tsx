@@ -65,7 +65,57 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
   };
 
   /**
-   * 上傳圖片到 Cloudinary，如果失敗則回退到 Base64
+   * 壓縮 Base64 圖片
+   */
+  const compressImage = (base64Image: string, maxSizeMB: number = 2): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        
+        // 計算目標尺寸（最大寬度或高度為 1200px）
+        const maxDimension = 1200;
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = (height * maxDimension) / width;
+            width = maxDimension;
+          } else {
+            width = (width * maxDimension) / height;
+            height = maxDimension;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // 嘗試不同的品質直到大小符合要求
+          let quality = 0.9;
+          let compressed = canvas.toDataURL('image/jpeg', quality);
+          
+          // 如果還是太大，降低品質
+          while (compressed.length > maxSizeMB * 1024 * 1024 && quality > 0.1) {
+            quality -= 0.1;
+            compressed = canvas.toDataURL('image/jpeg', quality);
+          }
+          
+          resolve(compressed);
+        } else {
+          resolve(base64Image);
+        }
+      };
+      img.onerror = () => resolve(base64Image);
+      img.src = base64Image;
+    });
+  };
+
+  /**
+   * 上傳圖片到 Cloudinary，如果失敗則回退到 Base64（並壓縮）
    */
   const uploadImageToCloudinary = async (base64Image: string, folder: string): Promise<string> => {
     try {
@@ -80,20 +130,46 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
         }),
       });
 
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch (parseError) {
+        // 如果無法解析 JSON，可能是 413 錯誤
+        console.error('❌ Cloudinary upload failed: 無法解析回應 (可能是 413 錯誤)', {
+          status: res.status,
+          statusText: res.statusText,
+        });
+        return await compressImage(base64Image, 2);
+      }
 
       if (res.ok && data.url) {
         // Cloudinary 上傳成功，返回 URL
+        console.log('✅ Cloudinary 上傳成功:', data.url.substring(0, 50) + '...');
         return data.url;
       } else {
-        // Cloudinary 未設定或上傳失敗，回退到 Base64
-        console.warn('Cloudinary upload failed, using base64:', data.error);
-        return base64Image;
+        // Cloudinary 上傳失敗，記錄詳細錯誤
+        console.error('❌ Cloudinary upload failed:', {
+          status: res.status,
+          statusText: res.statusText,
+          error: data.error,
+          fallback: data.fallback,
+        });
+
+        // 如果是環境變數未設定（503），提示用戶
+        if (res.status === 503 && data.fallback) {
+          console.warn('⚠️ Cloudinary 環境變數未設定，使用 Base64 儲存');
+        } else if (res.status === 500) {
+          console.error('❌ Cloudinary 上傳發生伺服器錯誤，請檢查環境變數和憑證');
+        }
+
+        // 壓縮後回退到 Base64
+        return await compressImage(base64Image, 2);
       }
     } catch (error) {
-      // 網路錯誤或其他問題，回退到 Base64
-      console.warn('Cloudinary upload error, using base64:', error);
-      return base64Image;
+      // 網路錯誤或其他問題
+      console.error('❌ Cloudinary upload 網路錯誤:', error);
+      console.warn('⚠️ 使用壓縮的 Base64 作為回退方案');
+      return await compressImage(base64Image, 2);
     }
   };
 
@@ -137,12 +213,33 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
         onUpdate();
         onClose();
       } else {
-        const data = await res.json();
-        alert(data.error || '更新失敗');
+        // 嘗試解析錯誤訊息
+        let errorMessage = '更新失敗';
+        try {
+          const data = await res.json();
+          errorMessage = data.error || errorMessage;
+          
+          // 如果是圖片太大錯誤，提供更清楚的訊息
+          if (res.status === 413 || data.code === 'PAYLOAD_TOO_LARGE' || data.code === 'IMAGE_TOO_LARGE') {
+            errorMessage = '圖片太大。請使用較小的圖片（建議小於 2MB），或設定 Cloudinary 以使用雲端儲存。';
+          }
+        } catch (parseError) {
+          // 如果無法解析 JSON（可能是 413 錯誤），顯示預設訊息
+          if (res.status === 413) {
+            errorMessage = '圖片太大。請使用較小的圖片（建議小於 2MB），或設定 Cloudinary 以使用雲端儲存。';
+          } else {
+            errorMessage = `更新失敗 (狀態碼: ${res.status})`;
+          }
+        }
+        alert(errorMessage);
       }
     } catch (error) {
       console.error('Failed to update profile:', error);
-      alert('更新時發生錯誤');
+      if (error instanceof Error && error.message.includes('413')) {
+        alert('圖片太大。請使用較小的圖片（建議小於 2MB），或設定 Cloudinary 以使用雲端儲存。');
+      } else {
+        alert('更新時發生錯誤');
+      }
     } finally {
       setLoading(false);
     }

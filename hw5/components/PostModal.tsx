@@ -162,8 +162,20 @@ export default function PostModal({ onClose, parentPostId, isReply = false }: Po
 
   if (showDrafts) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-2xl max-w-xl w-full max-h-[80vh] overflow-y-auto">
+      <div 
+        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+        style={{ zIndex: 10002 }}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            setShowDrafts(false);
+          }
+        }}
+      >
+        <div 
+          className="bg-white rounded-2xl max-w-xl w-full max-h-[80vh] overflow-y-auto"
+          onClick={(e) => e.stopPropagation()}
+          style={{ zIndex: 10003 }}
+        >
           <div className="p-4 border-b border-gray-200 flex items-center justify-between">
             <h2 className="text-xl font-bold">草稿</h2>
             <button
@@ -209,8 +221,20 @@ export default function PostModal({ onClose, parentPostId, isReply = false }: Po
 
   if (showDiscardConfirm) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-2xl max-w-sm w-full p-6">
+      <div 
+        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+        style={{ zIndex: 10001 }}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            setShowDiscardConfirm(false);
+          }
+        }}
+      >
+        <div 
+          className="bg-white rounded-2xl max-w-sm w-full p-6"
+          onClick={(e) => e.stopPropagation()}
+          style={{ zIndex: 10002 }}
+        >
           <h3 className="text-xl font-bold mb-4">要放棄貼文嗎？</h3>
           <p className="text-gray-600 mb-6">你可以儲存此貼文為草稿。</p>
           <div className="space-y-3">
