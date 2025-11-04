@@ -69,7 +69,7 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
    */
   const compressImage = (base64Image: string, maxSizeMB: number = 2): Promise<string> => {
     return new Promise((resolve) => {
-      const img = new Image();
+      const img = document.createElement('img');
       img.onload = () => {
         const canvas = document.createElement('canvas');
         let width = img.width;
