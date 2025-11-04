@@ -7,7 +7,7 @@
 ### 認證系統
 - ✅ OAuth 登入支援 (Google/GitHub/Facebook)
 - ✅ 自訂 UserID 註冊系統
-- ✅ Session 管理 (30天有效期)
+- ✅ Session 管理 (JWT-based, 10分鐘有效期)
 
 ### 貼文功能
 - ✅ 發表貼文 (280字元限制)
@@ -54,35 +54,51 @@
 
 ### 安裝步驟
 
-1. 複製環境變數範例檔案：
-\`\`\`bash
-cp .env.example .env.local
-\`\`\`
+1. 建立 `.env.local` 檔案並填入所有必要的環境變數（見下方環境變數設定章節）
 
-2. 填寫 `.env.local` 中的所有必要環境變數
-
-3. 安裝相依套件：
+2. 安裝相依套件：
 \`\`\`bash
 npm install
 \`\`\`
 
-4. 啟動開發伺服器：
+3. 啟動開發伺服器：
 \`\`\`bash
 npm run dev
 \`\`\`
 
-5. 在瀏覽器開啟 http://localhost:3000
+4. 在瀏覽器開啟 http://localhost:3000
 
 ### 環境變數設定
 
-請參考 `.env.example` 檔案，需要設定以下環境變數：
+請在 `.env.local` 檔案中設定以下環境變數：
 
-- MongoDB 連線字串
-- NextAuth URL 和 Secret
-- Google OAuth 憑證
-- GitHub OAuth 憑證
-- Facebook OAuth 憑證
-- Pusher 憑證
+#### 資料庫
+- `MONGODB_URI` - MongoDB 連線字串
+
+#### NextAuth 認證
+- `NEXTAUTH_URL` - 應用程式 URL (開發環境: `http://localhost:3000`, 生產環境: 您的 Vercel URL)
+- `NEXTAUTH_SECRET` - NextAuth 密鑰 (可使用 `openssl rand -base64 32` 生成)
+
+#### OAuth 提供者
+- `GOOGLE_CLIENT_ID` - Google OAuth Client ID
+- `GOOGLE_CLIENT_SECRET` - Google OAuth Client Secret
+- `GITHUB_CLIENT_ID` - GitHub OAuth Client ID
+- `GITHUB_CLIENT_SECRET` - GitHub OAuth Client Secret
+- `FACEBOOK_CLIENT_ID` - Facebook OAuth App ID
+- `FACEBOOK_CLIENT_SECRET` - Facebook OAuth App Secret
+
+#### Pusher 即時通訊
+- `PUSHER_APP_ID` - Pusher App ID
+- `PUSHER_KEY` - Pusher Key
+- `PUSHER_SECRET` - Pusher Secret
+- `PUSHER_CLUSTER` - Pusher Cluster (例如: `ap1`)
+- `NEXT_PUBLIC_PUSHER_KEY` - Pusher Public Key (與 PUSHER_KEY 相同)
+- `NEXT_PUBLIC_PUSHER_CLUSTER` - Pusher Public Cluster (與 PUSHER_CLUSTER 相同)
+
+#### Cloudinary 圖片上傳
+- `CLOUDINARY_CLOUD_NAME` - Cloudinary Cloud Name
+- `CLOUDINARY_API_KEY` - Cloudinary API Key
+- `CLOUDINARY_API_SECRET` - Cloudinary API Secret
 
 ## 部署到 Vercel
 
@@ -101,13 +117,14 @@ hw5/
 │   │   ├── auth/         # NextAuth 認證
 │   │   ├── posts/        # 貼文相關 API
 │   │   ├── drafts/       # 草稿相關 API
-│   │   └── users/        # 用戶相關 API
+│   │   ├── users/        # 用戶相關 API
+│   │   └── upload/       # 圖片上傳 API
 │   ├── auth/             # 認證頁面
 │   ├── profile/          # 個人頁面
 │   ├── post/             # 單篇貼文頁面
 │   └── page.tsx          # 首頁
 ├── components/            # React 組件
-├── lib/                   # 工具函式
+├── lib/                   # 工具函式 (MongoDB, Pusher, Cloudinary)
 ├── models/               # MongoDB Models
 ├── types/                # TypeScript 型別定義
 └── public/               # 靜態資源
@@ -127,11 +144,3 @@ hw5/
 - #HashTag：不計入字數
 - @mention：不計入字數
 - 上限：280 字元
-
-## 開發者
-
-Hannah - NTU MIS
-
-## 授權
-
-MIT
