@@ -26,9 +26,15 @@ export default function SignIn() {
       if (res.ok) {
         const data = await res.json();
         setUsers(data.users || []);
+      } else {
+        // 如果 API 返回錯誤，記錄詳細資訊
+        const errorData = await res.json().catch(() => ({}));
+        console.error('Failed to fetch users:', res.status, errorData);
+        setError('無法載入用戶列表，請稍後再試');
       }
     } catch (err) {
       console.error('Failed to fetch users:', err);
+      setError('無法連接到伺服器，請檢查網路連線');
     } finally {
       setLoading(false);
     }

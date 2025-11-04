@@ -37,6 +37,7 @@ export async function GET(request: NextRequest) {
       .sort({ createdAt: -1 })
       .limit(100); // 限制返回數量
 
+    // 如果沒有用戶，返回空陣列而不是錯誤
     return NextResponse.json({
       users: users.map(user => ({
         userId: user.userId,
@@ -46,8 +47,12 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Failed to fetch users:', error);
+    // 即使出錯也返回空陣列，避免前端顯示錯誤
     return NextResponse.json(
-      { error: 'Failed to fetch users' },
+      { 
+        users: [],
+        error: error instanceof Error ? error.message : 'Failed to fetch users' 
+      },
       { status: 500 }
     );
   }
