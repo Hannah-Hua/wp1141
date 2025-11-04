@@ -37,9 +37,19 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'User not found' }, { status: 404 });
       }
 
+      // 只顯示：
+      // 1. 該用戶自己發表的原創貼文（不是 repost，不是回覆）
+      // 2. 該用戶 repost 的貼文
+      // 不顯示：別人 repost 該用戶的貼文（即 author === userId && repostBy 存在且不是該用戶）
       query.$or = [
-        { author: targetUser._id.toString(), parentPost: { $exists: false } },
-        { repostBy: targetUser._id.toString() }
+        { 
+          author: targetUser._id.toString(), 
+          parentPost: { $exists: false },
+          repostBy: { $exists: false } // 只顯示原創貼文，不顯示被 repost 的貼文
+        },
+        { 
+          repostBy: targetUser._id.toString() // 顯示該用戶 repost 的貼文
+        }
       ];
     } else if (following === 'true') {
       // 獲取追蹤用戶的貼文和轉發（不包括當前用戶自己的轉發）
