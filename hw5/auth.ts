@@ -33,10 +33,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           providerId: account.providerAccountId,
         });
 
+        // 如果用戶已存在，直接登入
         if (existingUser) {
           return true;
         }
 
+        // 如果用戶不存在，檢查是否從註冊流程來的（callbackUrl 包含 /auth/register）
+        // 如果是，導向註冊頁面輸入 userID
+        // 否則，導向註冊頁面（但這應該不會發生，因為新用戶應該先選擇 Provider 註冊）
         return `/auth/register?provider=${account.provider}&providerId=${account.providerAccountId}&name=${encodeURIComponent(user.name || '')}&email=${encodeURIComponent(user.email || '')}&image=${encodeURIComponent(user.image || '')}`;
       } catch (error) {
         console.error('Sign in error:', error);
@@ -44,32 +48,40 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
     },
     async session({ session, token }) {
-      if (session.user) {
-        try {
-          await connectDB();
-          const user = await User.findOne({
-            provider: token.provider as string,
-            providerId: token.providerId as string,
-          });
-
-          if (user) {
-            session.user = {
-              ...session.user,
-              id: user._id.toString(),
-              userId: user.userId,
-            } as any;
-          }
-        } catch (error) {
-          console.error('Session error:', error);
-        }
+      // 從 JWT token 中取得用戶資訊，避免每次查資料庫
+      if (session.user && token.userId && token.userMongoId) {
+        session.user = {
+          ...session.user,
+          id: token.userMongoId as string,
+          userId: token.userId as string,
+        } as any;
       }
       return session;
     },
-    async jwt({ token, account }) {
+    async jwt({ token, account, user }) {
       if (account) {
         token.provider = account.provider;
         token.providerId = account.providerAccountId;
       }
+      
+      // 只有在首次登入或 token 中沒有用戶資訊時才查資料庫
+      if ((account || !token.userId) && token.provider && token.providerId) {
+        try {
+          await connectDB();
+          const dbUser = await User.findOne({
+            provider: token.provider as string,
+            providerId: token.providerId as string,
+          }).select('_id userId');
+
+          if (dbUser) {
+            token.userId = dbUser.userId;
+            token.userMongoId = dbUser._id.toString();
+          }
+        } catch (error) {
+          console.error('JWT error:', error);
+        }
+      }
+      
       return token;
     },
   },
@@ -78,7 +90,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60,
+    maxAge: 10 * 60, // 10 分鐘過期
+    updateAge: 60, // 每 60 秒檢查一次 session 狀態
   },
   cookies: {
     sessionToken: {

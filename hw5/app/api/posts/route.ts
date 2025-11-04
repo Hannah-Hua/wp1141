@@ -4,6 +4,7 @@ import connectDB from '@/lib/mongodb';
 import Post from '@/models/Post';
 import User from '@/models/User';
 import { triggerPusherEvent } from '@/lib/pusherServer';
+import cache from '@/lib/cache';
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,6 +12,15 @@ export async function GET(request: NextRequest) {
     const userId = searchParams.get('userId');
     const parentPost = searchParams.get('parentPost');
     const following = searchParams.get('following');
+
+    // 建立快取 key
+    const cacheKey = `posts:${userId || ''}:${parentPost || ''}:${following || ''}`;
+    
+    // 檢查快取
+    const cachedData = cache.get<any>(cacheKey);
+    if (cachedData) {
+      return NextResponse.json(cachedData);
+    }
 
     await connectDB();
 
@@ -38,7 +48,8 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
-      const currentUser = await User.findById(session.user.id);
+      // 優化：只查詢 following 欄位，減少資料傳輸
+      const currentUser = await User.findById(session.user.id).select('following');
       if (!currentUser) {
         return NextResponse.json({ error: 'User not found' }, { status: 404 });
       }
@@ -177,7 +188,12 @@ export async function GET(request: NextRequest) {
       return postObj;
     });
 
-    return NextResponse.json({ posts: postsWithAuthors });
+    const result = { posts: postsWithAuthors };
+    
+    // 將結果存入快取（TTL: 30 秒，因為有 Pusher 即時更新）
+    cache.set(cacheKey, result, 30 * 1000);
+
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Failed to fetch posts:', error);
     return NextResponse.json(
@@ -223,14 +239,40 @@ export async function POST(request: NextRequest) {
         $push: { replies: post._id },
       });
       
-      // 觸發 Pusher 事件 - 新留言
+      // 清除相關快取
+      cache.deleteByPrefix('posts:');
+      
+      // 觸發 Pusher 事件 - 新留言（包含完整貼文資訊）
+      const parentPostDoc = await Post.findById(parentPost);
       await triggerPusherEvent('posts', 'post-updated', {
         postId: parentPost,
+        updatedPost: parentPostDoc ? {
+          _id: parentPostDoc._id.toString(),
+          replies: parentPostDoc.replies,
+          likes: parentPostDoc.likes,
+        } : null,
       });
     } else {
-      // 觸發 Pusher 事件 - 新貼文
+      // 清除相關快取
+      cache.deleteByPrefix('posts:');
+      
+      // 取得完整貼文資訊（包含作者資訊）
+      const author = await User.findById(session.user.id).select('userId name image');
+      const newPostWithAuthor = {
+        ...post.toObject(),
+        authorDetails: author ? {
+          userId: author.userId,
+          name: author.name,
+          image: author.image,
+        } : null,
+        likes: [],
+        replies: [],
+        repostCount: 0,
+      };
+      
+      // 觸發 Pusher 事件 - 新貼文（包含完整貼文資訊）
       await triggerPusherEvent('posts', 'post-created', {
-        postId: post._id,
+        post: newPostWithAuthor,
       });
     }
 

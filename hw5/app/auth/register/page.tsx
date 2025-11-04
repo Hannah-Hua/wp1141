@@ -2,6 +2,7 @@
 
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useState, Suspense } from 'react';
+import { signIn } from 'next-auth/react';
 
 function RegisterForm() {
   const searchParams = useSearchParams();
@@ -61,8 +62,16 @@ function RegisterForm() {
         return;
       }
 
-      // 註冊成功，導向首頁
-      router.push('/');
+      // 註冊成功後，使用相同的 Provider 自動登入以建立 session
+      if (provider) {
+        await signIn(provider, { 
+          callbackUrl: '/',
+          redirect: true 
+        });
+      } else {
+        // 如果沒有 provider（不應該發生），直接導向首頁
+        router.push('/');
+      }
     } catch (err) {
       setError('註冊時發生錯誤，請稍後再試');
     } finally {

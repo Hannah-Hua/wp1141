@@ -25,13 +25,55 @@ export default function Feed() {
     const channel = pusher.subscribe('posts');
 
     channel.bind('post-updated', (data: any) => {
-      // 當有貼文更新時，重新取得貼文列表
-      fetchPosts();
+      // 增量更新：只更新變動的貼文，而不是重新載入整個列表
+      if (data.postId) {
+        setPosts(prevPosts => {
+          const postIndex = prevPosts.findIndex(p => p._id === data.postId);
+          if (postIndex !== -1) {
+            // 更新現有貼文
+            const updatedPosts = [...prevPosts];
+            updatedPosts[postIndex] = {
+              ...updatedPosts[postIndex],
+              likes: data.likes || updatedPosts[postIndex].likes,
+              likesCount: data.likesCount || updatedPosts[postIndex].likes?.length || 0,
+            };
+            return updatedPosts;
+          }
+          // 如果找不到，可能是新貼文，重新載入
+          return prevPosts;
+        });
+      } else {
+        // 如果沒有提供 postId，回退到完整重新載入
+        fetchPosts();
+      }
     });
 
-    channel.bind('post-created', () => {
-      // 當有新貼文時，重新取得貼文列表
-      fetchPosts();
+    channel.bind('post-created', (data: any) => {
+      // 增量更新：將新貼文加入列表開頭
+      if (data.post && data.post._id) {
+        setPosts(prevPosts => {
+          // 檢查是否已存在（避免重複）
+          const exists = prevPosts.some(p => p._id === data.post._id);
+          if (exists) {
+            return prevPosts;
+          }
+          // 將新貼文加入開頭
+          return [data.post, ...prevPosts];
+        });
+      } else {
+        // 如果沒有提供完整貼文資訊，回退到完整重新載入
+        fetchPosts();
+      }
+    });
+
+    channel.bind('post-deleted', (data: any) => {
+      // 增量更新：從列表中移除被刪除的貼文
+      if (data.postId) {
+        setPosts(prevPosts => prevPosts.filter(p => p._id !== data.postId));
+      } else {
+        // 如果沒有提供 postId，回退到完整重新載入
+        fetchPosts();
+      }
     });
 
     return () => {

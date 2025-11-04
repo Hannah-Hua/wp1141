@@ -3,6 +3,7 @@ import { auth } from '@/auth';
 import connectDB from '@/lib/mongodb';
 import Post from '@/models/Post';
 import { triggerPusherEvent } from '@/lib/pusherServer';
+import cache from '@/lib/cache';
 
 export async function POST(
   request: NextRequest,
@@ -41,11 +42,17 @@ export async function POST(
       });
     }
 
-    // 觸發 Pusher 事件
+    // 清除相關快取
+    cache.deleteByPrefix('posts:');
+    
+    // 觸發 Pusher 事件（包含完整更新資訊）
     const updatedPost = await Post.findById(params.id);
     await triggerPusherEvent('posts', 'post-updated', {
       postId: params.id,
       likesCount: updatedPost.likes.length,
+      likes: updatedPost.likes,
+      isLiked: !isLiked,
+      userId: userId,
     });
 
     return NextResponse.json({ success: true, isLiked: !isLiked });

@@ -3,6 +3,8 @@ import { auth } from '@/auth';
 import connectDB from '@/lib/mongodb';
 import Post from '@/models/Post';
 import User from '@/models/User';
+import { triggerPusherEvent } from '@/lib/pusherServer';
+import cache from '@/lib/cache';
 
 export async function GET(
   request: NextRequest,
@@ -124,6 +126,15 @@ export async function DELETE(
         $pull: { replies: params.id },
       });
     }
+
+    // 清除相關快取
+    cache.deleteByPrefix('posts:');
+    
+    // 觸發 Pusher 事件
+    await triggerPusherEvent('posts', 'post-deleted', {
+      postId: params.id,
+      parentPostId: post.parentPost,
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {
