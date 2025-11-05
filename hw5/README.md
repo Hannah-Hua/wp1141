@@ -57,9 +57,9 @@
 
 ### 🚀 快速開始
 
-**方式一：線上體驗（推薦）**
+**方式一：線上體驗**
 
-直接訪問 [https://wp1141-1.vercel.app](https://wp1141-1.vercel.app) 即可使用，無需任何設定！
+直接訪問 [https://wp1141-1.vercel.app](https://wp1141-1.vercel.app) 。
 
 **方式二：本地開發**
 
@@ -121,14 +121,6 @@ npm run dev
 - `CLOUDINARY_CLOUD_NAME` - Cloudinary Cloud Name
 - `CLOUDINARY_API_KEY` - Cloudinary API Key
 - `CLOUDINARY_API_SECRET` - Cloudinary API Secret
-
-## 部署到 Vercel
-
-1. 在 Vercel 建立新專案並連結 GitHub repository
-
-2. 在 Vercel 專案設定中加入所有環境變數
-
-3. 部署！Vercel 會自動偵測 Next.js 並進行建置
 
 ## 專案結構
 
