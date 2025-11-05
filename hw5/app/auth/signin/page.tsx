@@ -1,45 +1,12 @@
 'use client';
 
 import { signIn } from 'next-auth/react';
-import { useState, useEffect } from 'react';
-import SafeImage from '@/components/SafeImage';
+import { useState } from 'react';
 import PulseLogo from '@/components/PulseLogo';
 
-interface User {
-  userId: string;
-  name: string;
-  image?: string;
-}
-
 export default function SignIn() {
-  const [users, setUsers] = useState<User[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const fetchUsers = async () => {
-    try {
-      const res = await fetch('/api/users');
-      if (res.ok) {
-        const data = await res.json();
-        setUsers(data.users || []);
-      } else {
-        // 如果 API 返回錯誤，記錄詳細資訊
-        const errorData = await res.json().catch(() => ({}));
-        console.error('Failed to fetch users:', res.status, errorData);
-        setError('無法載入用戶列表，請稍後再試');
-      }
-    } catch (err) {
-      console.error('Failed to fetch users:', err);
-      setError('無法連接到伺服器，請檢查網路連線');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleUserLogin = async (userId: string) => {
     try {
@@ -70,13 +37,9 @@ export default function SignIn() {
     e.preventDefault();
     if (!searchQuery.trim()) return;
 
+    setError('');
     await handleUserLogin(searchQuery.trim());
   };
-
-  const filteredUsers = users.filter(user =>
-    user.userId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -88,7 +51,7 @@ export default function SignIn() {
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
             歡迎來到 PULSE
           </h2>
-          <p className="text-gray-600">輸入或選擇 UserID 進行登入</p>
+          <p className="text-gray-600">輸入 UserID 進行登入</p>
         </div>
 
         {/* 搜尋輸入框 */}
@@ -97,8 +60,11 @@ export default function SignIn() {
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="輸入 UserID 或名稱..."
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setError('');
+              }}
+              placeholder="輸入 UserID..."
               className="w-full px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
@@ -107,47 +73,13 @@ export default function SignIn() {
               <p className="text-sm text-red-800">{error}</p>
             </div>
           )}
+          <button
+            type="submit"
+            className="w-full bg-black text-white font-bold py-3 px-6 rounded-full hover:bg-gray-800 transition-colors"
+          >
+            登入
+          </button>
         </form>
-
-        {/* 用戶列表 */}
-        {loading ? (
-          <div className="text-center text-gray-500">載入中...</div>
-        ) : filteredUsers.length > 0 ? (
-          <div className="space-y-2 max-h-96 overflow-y-auto">
-            <p className="text-sm text-gray-600 font-medium">已註冊用戶：</p>
-            {filteredUsers.map((user) => (
-              <button
-                key={user.userId}
-                onClick={() => handleUserLogin(user.userId)}
-                className="w-full flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left"
-              >
-                {user.image ? (
-                  <SafeImage
-                    src={user.image}
-                    alt={user.name}
-                    width={40}
-                    height={40}
-                    className="rounded-full"
-                  />
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
-                    <span className="text-gray-600 font-medium">
-                      {user.name.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                )}
-                <div className="flex-1">
-                  <p className="font-medium text-gray-900">{user.userId}</p>
-                  <p className="text-sm text-gray-500">{user.name}</p>
-                </div>
-              </button>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center text-gray-500">
-            {searchQuery ? '找不到符合的用戶' : '尚無註冊用戶'}
-          </div>
-        )}
 
         {/* 分隔線 */}
         <div className="relative">
