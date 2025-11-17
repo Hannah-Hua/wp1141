@@ -116,7 +116,7 @@ export async function getRecentMessages(
 
   return conversation.messages
     .slice(-limit)
-    .map((msg) => ({
+    .map((msg: { role: string; content: string }) => ({
       role: msg.role,
       content: msg.content,
     }));
