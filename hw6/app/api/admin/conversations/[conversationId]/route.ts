@@ -2,14 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Conversation from '@/models/Conversation';
 
+type RouteContext = {
+  params: Promise<{ conversationId: string }>;
+};
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: { conversationId: string } }
+  { params }: RouteContext
 ) {
   try {
     await connectDB();
 
-    const conversation = await Conversation.findById(params.conversationId).lean();
+    const { conversationId } = await params;
+    const conversation = await Conversation.findById(conversationId).lean();
 
     if (!conversation) {
       return NextResponse.json(
