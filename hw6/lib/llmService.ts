@@ -230,7 +230,7 @@ export async function generateGameTurn(
       },
       ...conversationHistory
         .slice(-5) // 只取最近 5 條訊息作為上下文
-        .map((msg) => ({
+        .map((msg: { role: string; content: string }) => ({
           role: msg.role === 'user' ? 'user' : 'assistant',
           content: msg.content,
         })) as OpenAI.Chat.Completions.ChatCompletionMessageParam[],

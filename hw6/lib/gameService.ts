@@ -175,7 +175,7 @@ export async function applyGameEffects(
   }
   if (effects.items_lost) {
     character.items = (character.items || []).filter(
-      (item) => !effects.items_lost!.includes(item)
+      (item: string) => !effects.items_lost!.includes(item)
     );
   }
 

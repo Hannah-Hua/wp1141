@@ -191,7 +191,7 @@ export async function generateGameTurn(
     // 建立對話歷史（簡化版，Gemini 的對話格式不同）
     const historyText = conversationHistory
       .slice(-5)
-      .map((msg) => `${msg.role === 'user' ? '使用者' : '助手'}: ${msg.content}`)
+      .map((msg: { role: string; content: string }) => `${msg.role === 'user' ? '使用者' : '助手'}: ${msg.content}`)
       .join('\n');
     
     const promptWithHistory = historyText 

@@ -43,7 +43,7 @@ export async function replyButtonsMessage(
     template: {
       type: 'buttons',
       text,
-      actions: actions.map((action) => ({
+      actions: actions.map((action: { label: string; text: string }) => ({
         type: 'message',
         label: action.label,
         text: action.text,

@@ -16,7 +16,14 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
 
     // 建立查詢條件
-    const query: any = {};
+    const query: {
+      lineUserId?: string;
+      'gameState.phase'?: string;
+      createdAt?: {
+        $gte?: Date;
+        $lte?: Date;
+      };
+    } = {};
     
     if (lineUserId) {
       query.lineUserId = lineUserId;
@@ -47,17 +54,20 @@ export async function GET(request: NextRequest) {
     const total = await Conversation.countDocuments(query);
 
     // 取得使用者資訊
-    const userIds = [...new Set(conversations.map((c) => c.lineUserId))];
+    const userIds = [...new Set(conversations.map((c) => (c as unknown as { lineUserId: string }).lineUserId))];
     const users = await User.find({ lineUserId: { $in: userIds } }).lean();
-    const userMap = new Map(users.map((u) => [u.lineUserId, u]));
+    const userMap = new Map(users.map((u) => [(u as unknown as { lineUserId: string }).lineUserId, u]));
 
     // 組合資料
-    const result = conversations.map((conv) => ({
-      ...conv,
-      user: userMap.get(conv.lineUserId) || null,
-      messageCount: conv.messages.length,
-      lastMessage: conv.messages[conv.messages.length - 1] || null,
-    }));
+    const result = conversations.map((conv) => {
+      const convTyped = conv as unknown as { lineUserId: string; messages: unknown[] };
+      return {
+        ...conv,
+        user: userMap.get(convTyped.lineUserId) || null,
+        messageCount: convTyped.messages.length,
+        lastMessage: convTyped.messages[convTyped.messages.length - 1] || null,
+      };
+    });
 
     return NextResponse.json({
       conversations: result,
