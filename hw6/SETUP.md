@@ -16,19 +16,12 @@ MONGODB_URI=mongodb+srv://ziyenhua_db_user:AgSMi49CxhCDQDE9@hw6.wkp7fji.mongodb.
 LINE_CHANNEL_ACCESS_TOKEN=your_channel_access_token
 LINE_CHANNEL_SECRET=your_channel_secret
 
-# LLM 設定（系統會優先使用 OpenAI）
-LLM_PROVIDER=openai
+# LLM 設定（使用 OpenAI）
 OPENAI_API_KEY=sk-your_openai_api_key
-
-# （可選）Google Gemini API：只有在沒有 OpenAI Key 時才會使用
-# ENABLE_GEMINI=true
-# GOOGLE_GEMINI_API_KEY=your_gemini_api_key
 
 # Next.js
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
-
-> 💡 **免費替代方案**：如果不想付費，可以使用 Google Gemini API（完全免費，有配額限制）。詳細說明請參考 **[FREE_LLM_ALTERNATIVES.md](./FREE_LLM_ALTERNATIVES.md)**。
 
 ⚠️ **重要**：第一行的 `MONGODB_URI=` 是必需的，不要遺漏變數名稱！
 
@@ -46,9 +39,8 @@ npm install
 # 測試 MongoDB 連線
 node scripts/test-mongodb.js
 
-# 測試 LLM API（根據你使用的提供者）
-node scripts/test-openai.js    # 如果使用 OpenAI
-node scripts/test-gemini.js    # 如果使用 Gemini
+# 測試 LLM API
+node scripts/test-openai.js
 ```
 
 ### 4. 啟動開發伺服器

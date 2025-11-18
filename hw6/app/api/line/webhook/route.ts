@@ -210,34 +210,27 @@ export async function POST(request: NextRequest) {
           });
 
           // 根據錯誤類型提供更詳細的錯誤訊息（使用 replyGameOptionsMessage 確保有選項）
-          if (error.message === 'LLM_QUOTA_EXCEEDED' || error.message === 'GEMINI_QUOTA_EXCEEDED') {
+          if (error.message === 'LLM_QUOTA_EXCEEDED') {
             await replyGameOptionsMessage(
               replyToken, 
               '⚠️ 劇情之神暫時無法回應（API 配額已用完），請稍後再試。\n\n你的冒險仍在繼續。',
               ['稍後再試', '查看當前狀態']
             );
-          } else if (error.message === 'LLM_TIMEOUT' || error.message === 'GEMINI_TIMEOUT') {
+          } else if (error.message === 'LLM_TIMEOUT') {
             await replyGameOptionsMessage(
               replyToken,
               '⏱️ 劇情之神回應超時，請稍後再試。\n\n你的冒險仍在繼續。',
               ['稍後再試', '查看當前狀態']
             );
-          } else if (error.message === 'GEMINI_SERVICE_UNAVAILABLE') {
-            console.error('Gemini service unavailable (503)');
-            await replyGameOptionsMessage(
-              replyToken,
-              '🚧 劇情之神的伺服器太忙，暫時無法回應。請稍後再試，冒險會在這裡等你！',
-              ['稍後再試', '查看當前狀態']
-            );
-          } else if (error.message === 'GEMINI_JSON_PARSE_ERROR' || error.message === 'OPENAI_JSON_PARSE_ERROR') {
-            console.error('LLM 回應格式錯誤，無法解析 JSON');
+          } else if (error.message === 'OPENAI_JSON_PARSE_ERROR') {
+            console.error('OpenAI 回應格式錯誤，無法解析 JSON');
             await replyGameOptionsMessage(
               replyToken,
               '⚠️ 劇情之神的回應格式有誤，請稍後再試。\n\n你的冒險仍在繼續。',
               ['稍後再試', '查看當前狀態', '繼續探索']
             );
-          } else if (error.message === 'GEMINI_INVALID_FORMAT' || error.message === 'OPENAI_INVALID_FORMAT') {
-            console.error('LLM 回應格式不符合預期');
+          } else if (error.message === 'OPENAI_INVALID_FORMAT') {
+            console.error('OpenAI 回應格式不符合預期');
             await replyGameOptionsMessage(
               replyToken,
               '⚠️ 劇情之神的回應格式不符合預期，請稍後再試。\n\n你的冒險仍在繼續。',

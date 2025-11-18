@@ -1,17 +1,13 @@
 import OpenAI from 'openai';
 import { GameState, GameTurnResult, CharacterClass } from '@/types/game';
 
-// 支援多種 LLM 提供者（但預設優先使用 OpenAI）
-const LLM_PROVIDER = (process.env.LLM_PROVIDER || 'openai').toLowerCase() as 'openai' | 'gemini';
-const GEMINI_ENABLED = process.env.ENABLE_GEMINI === 'true';
-
 // 延遲初始化 OpenAI 客戶端（只在需要時才建立）
 let openai: OpenAI | null = null;
 
 function getOpenAIClient(): OpenAI {
   if (!openai) {
     if (!process.env.OPENAI_API_KEY) {
-      throw new Error('OPENAI_API_KEY is not set. Please set it in .env.local or switch to Gemini by setting LLM_PROVIDER=gemini');
+      throw new Error('OPENAI_API_KEY is not set. Please set it in .env.local');
     }
     openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
@@ -188,34 +184,13 @@ function getSystemPrompt(gameState: GameState): string {
 }
 
 /**
- * 呼叫 LLM 生成遊戲回合（支援多種提供者）
+ * 呼叫 OpenAI 生成遊戲回合
  */
 export async function generateGameTurn(
   userMessage: string,
   gameState: GameState,
   conversationHistory: Array<{ role: string; content: string }>
 ): Promise<GameTurnResult> {
-  // 如果使用 Gemini（且明確啟用），使用 Gemini 服務
-  if (LLM_PROVIDER === 'gemini') {
-    if (!GEMINI_ENABLED) {
-      console.warn('LLM provider is set to gemini, but ENABLE_GEMINI != true. Skipping Gemini and using OpenAI.');
-    } else {
-    const { generateGameTurn: generateWithGemini } = await import('./geminiService');
-    try {
-      return await generateWithGemini(userMessage, gameState, conversationHistory);
-    } catch (error: any) {
-      // 如果 Gemini 失敗，嘗試降級到 OpenAI（如果有的話）
-      if (process.env.OPENAI_API_KEY && error.message !== 'GEMINI_QUOTA_EXCEEDED') {
-        console.warn('Gemini failed, falling back to OpenAI');
-        // 繼續使用 OpenAI
-      } else {
-        throw error;
-      }
-    }
-    }
-  }
-
-  // 使用 OpenAI（預設）
   try {
     // 只在需要時才初始化 OpenAI 客戶端
     const openaiClient = getOpenAIClient();
@@ -240,13 +215,36 @@ export async function generateGameTurn(
       },
     ];
 
-    const completion = await openaiClient.chat.completions.create({
-      model: 'gpt-4o-mini', // 使用較便宜的模型
-      messages,
-      temperature: 0.8,
-      response_format: { type: 'json_object' },
-      max_tokens: 1000,
-    });
+    // 設定 timeout：8 秒（Vercel 免費方案限制 10 秒，留 2 秒緩衝）
+    const timeoutMs = 8000;
+    const abortController = new AbortController();
+    const timeoutId = setTimeout(() => {
+      abortController.abort();
+    }, timeoutMs);
+
+    let completion;
+    try {
+      completion = await openaiClient.chat.completions.create(
+        {
+          model: 'gpt-4o-mini', // 使用較便宜的模型
+          messages,
+          temperature: 0.8,
+          response_format: { type: 'json_object' },
+          max_tokens: 1000,
+        },
+        {
+          signal: abortController.signal,
+        }
+      );
+    } catch (error: any) {
+      clearTimeout(timeoutId);
+      if (error.name === 'AbortError' || abortController.signal.aborted) {
+        throw new Error('LLM_TIMEOUT');
+      }
+      throw error;
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     const content = completion.choices[0]?.message?.content;
     if (!content) {
@@ -321,8 +319,8 @@ export async function generateGameTurn(
       }
     }
     
-    // 如果所有提供者都失敗，使用降級回應
-    console.error('All LLM providers failed, using fallback');
+    // 如果 OpenAI 失敗，使用降級回應
+    console.error('OpenAI failed, using fallback');
     return getFallbackResponse(gameState);
   }
 }
