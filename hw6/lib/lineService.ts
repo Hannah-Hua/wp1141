@@ -149,17 +149,23 @@ export async function replyGameOptionsMessage(
   options: string[],
   gameState?: { progress?: number }
 ) {
+  const isDeityAwayMessage = narration.includes('劇情之神');
+
   // 確保至少有選項
   if (!options || options.length === 0) {
-    console.warn('No options provided, using default options');
-    options = ['繼續探索', '查看當前狀態', '稍後再試'];
+    if (isDeityAwayMessage) {
+      options = [];
+    } else {
+      console.warn('No options provided, using default options');
+      options = ['繼續探索', '查看當前狀態', '稍後再試'];
+    }
   }
   
   // 如果選項超過 4 個，只取前 4 個
   const displayOptions = options.slice(0, 4);
   
   // 確保至少有 2 個選項（LINE 要求）
-  if (displayOptions.length < 2) {
+  if (!isDeityAwayMessage && displayOptions.length < 2) {
     displayOptions.push('繼續探索', '查看當前狀態');
     displayOptions.splice(4); // 限制在 4 個以內
   }
@@ -199,8 +205,12 @@ export async function replyGameOptionsMessage(
     },
   };
 
-  const messages: Message[] = [...textMessages, templateMessage];
+  if (isDeityAwayMessage && displayOptions.length === 0) {
+    await client.replyMessage(replyToken, textMessages);
+    return;
+  }
 
+  const messages: Message[] = [...textMessages, templateMessage];
   await client.replyMessage(replyToken, messages);
 }
 
@@ -249,13 +259,11 @@ export async function replyClassConfirmationMessage(
   };
 
   const info = classInfo[className];
-  const text = `你選擇了 **${info.name}**。
+  const text = `你選擇了 ${info.name}。
 
 ${info.description}
 
-你正站在一個類似台大校園的大門前，
-但天空中漂浮著看起來像巨大程式碼的符文，
-這裡並不是現實世界的校園。
+你正站在一個類似台大校園的大門前，但天空中漂浮著看起來像巨大程式碼的符文，這裡並不是現實世界的校園。
 
 你的冒險從平行台大大門開始。
 
