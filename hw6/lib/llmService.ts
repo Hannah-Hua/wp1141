@@ -217,7 +217,7 @@ export async function generateGameTurn(
 
     // 設定 timeout：5 秒（LINE 需要在 30 秒內回應，保留充足時間給資料庫與 LINE API）
     // 如果超時，會使用 fallback 回應，確保 LINE 能收到回覆
-    const timeoutMs = 10000;
+    const timeoutMs = 15000;
     const abortController = new AbortController();
     const timeoutId = setTimeout(() => {
       abortController.abort();
@@ -332,10 +332,7 @@ export async function generateGameTurn(
 export function getFallbackResponse(gameState: GameState): GameTurnResult {
   return {
     narration: '劇情之神似乎暫時離開了，請稍後再試。\n\n你的冒險仍在繼續，但現在無法推進劇情。',
-    options: [
-      '稍後再試',
-      '查看當前狀態',
-    ],
+    options: [],
     effects: {
       game_over: false,
     },
