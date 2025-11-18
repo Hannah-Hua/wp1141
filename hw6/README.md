@@ -1,200 +1,114 @@
-# 遺失在台大地下室的秘寶 - LINE Bot 遊戲
+# 遺失在台大地下室的秘寶 · LINE Bot RPG
 
-一個整合 LINE Messaging API 的智慧聊天機器人系統，實作文字冒險 RPG 遊戲。
+一個以 Next.js + MongoDB + OpenAI 打造的 LINE 文字冒險遊戲。玩家扮演台大資管學生，在平行台大的地底城尋找「星光之心」，整個流程（角色建立、職業選擇、劇情推進、結局）都透過 LINE 對話完成，並提供管理後台供助教檢視對話紀錄。
 
-## 🎮 遊戲簡介
+---
 
-《遺失在台大地下室的秘寶》是一個在 LINE 上進行的文字冒險 RPG 遊戲。玩家扮演台大資管系學生，在平行台大世界中探索地底城，尋找「星光之心」秘寶。
+## 👾 立即體驗：加入官方帳號
+1. 開啟 LINE → 點擊「加入好友」  
+2. 搜尋官方帳號 ID：`@624uzxgu`  
+3. 加入後，在聊天室輸入 **「開始冒險」**  
+4. 依照指示輸入名字、選擇職業，即可展開冒險
 
-## ✨ 功能特色
+> TIP：如果想重玩，直接輸入「重新開始」即可重設角色。
 
-### LINE Bot 功能
-- ✅ 完整的對話流程設計（文字、按鈕模板）
-- ✅ 固定起始流程（角色建立、職業選擇）
-- ✅ LLM 驅動的動態劇情生成
-- ✅ 遊戲狀態管理（HP、金錢、道具、進度）
-- ✅ 上下文對話維持
+---
 
-### 技術實作
-- ✅ LINE Messaging API Webhook 整合
-- ✅ MongoDB 對話紀錄持久化
-- ✅ OpenAI GPT-4o-mini 整合
-- ✅ 錯誤處理與降級機制
-- ✅ 管理後台（對話紀錄檢視、篩選、統計）
+## 🛠️ 管理後台怎麼看？
+| 環境 | 路徑 | 說明 |
+|------|------|------|
+| 本機 | `http://localhost:3000/admin` | 啟動開發伺服器後即可瀏覽 |
+| 部署 | `https://wp1141-6.vercel.app/admin` | Vercel 自動部署的網址 |
 
-## 🛠️ 技術棧
+後台功能：
+- 對話列表（可依 LINE userId、日期、遊戲階段篩選）
+- 對話內容檢視（含 LLM 敘事、玩家選項、遊戲狀態）
+- 基礎統計（使用者數、會話數、訊息數等）
 
-- **前端框架**: Next.js 16 (App Router)
-- **語言**: TypeScript
-- **樣式**: Tailwind CSS
-- **資料庫**: MongoDB Atlas + Mongoose
-- **LINE SDK**: @line/bot-sdk
-- **LLM**: OpenAI GPT-4o-mini
-- **部署**: Vercel
+---
 
-## 📋 環境需求
+## ⚙️ 快速開發指南
+1. 安裝套件  
+   ```bash
+   npm install
+   ```
+2. 建立 `.env.local`（內容如下）
+   ```env
+   MONGODB_URI=your_mongodb_uri
+   LINE_CHANNEL_ACCESS_TOKEN=your_line_channel_access_token
+   LINE_CHANNEL_SECRET=your_line_channel_secret
+   OPENAI_API_KEY=your_openai_api_key
+   NEXT_PUBLIC_APP_URL=http://localhost:3000
+   ```
+3. 本機啟動與測試  
+   ```bash
+   npm run dev           # 啟動 Next.js
+   node scripts/test-mongodb.js
+   node scripts/test-openai.js
+   ```
+4. 設定 LINE Webhook  
+   - 開發：使用 ngrok/expose 將 `http://localhost:3000/api/line/webhook` 暴露到公網  
+   - 部署：`https://your-vercel-app.vercel.app/api/line/webhook`
 
-- Node.js 18+
-- MongoDB Atlas 帳號（詳細設定請參考 [MONGODB_SETUP.md](./MONGODB_SETUP.md)）
-- LINE Developers 帳號（建立 Messaging API Channel）
-- LLM API Key（可選）：
-  - OpenAI API Key（詳細設定請參考 [OPENAI_SETUP.md](./OPENAI_SETUP.md)）
-  - 或 Google Gemini API Key（免費，推薦，詳細說明請參考 [FREE_LLM_ALTERNATIVES.md](./FREE_LLM_ALTERNATIVES.md)）
+更多細節：
+- [SETUP.md](./SETUP.md) – 一次看懂環境設定流程  
+- [ENV_SETUP.md](./ENV_SETUP.md) – `.env.local` 詳細說明  
+- [MONGODB_SETUP.md](./MONGODB_SETUP.md) / [OPENAI_SETUP.md](./OPENAI_SETUP.md) – 雲端服務設定教學
 
-## 🚀 安裝步驟
+---
 
-### 1. 安裝相依套件
-
-```bash
-npm install
-```
-
-### 2. 設定環境變數
-
-建立 `.env.local` 檔案並填入以下變數：
-
-```env
-# MongoDB
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/dbname
-
-# LINE Bot
-LINE_CHANNEL_ACCESS_TOKEN=your_line_channel_access_token
-LINE_CHANNEL_SECRET=your_line_channel_secret
-
-# OpenAI (LLM)
-OPENAI_API_KEY=your_openai_api_key
-
-# Next.js
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-```
-
-### 3. 啟動開發伺服器
-
-```bash
-npm run dev
-```
-
-### 4. 設定 LINE Webhook
-
-1. 前往 [LINE Developers Console](https://developers.line.biz/console/)
-2. 選擇你的 Channel
-3. 在 Webhook settings 中設定 Webhook URL：
-   - 開發環境：使用 ngrok 等工具將 `http://localhost:3000/api/line/webhook` 暴露到公網
-   - 生產環境：`https://your-domain.vercel.app/api/line/webhook`
-4. 啟用 Webhook
-
-## 📁 專案結構
-
+## 🧱 專案結構
 ```
 hw6/
 ├── app/
 │   ├── api/
-│   │   ├── line/
-│   │   │   └── webhook/
-│   │   │       └── route.ts          # LINE Webhook endpoint
-│   │   └── admin/
-│   │       ├── conversations/       # 對話紀錄 API
-│   │       └── stats/                # 統計資料 API
-│   ├── admin/
-│   │   └── page.tsx                  # 管理後台頁面
-│   ├── layout.tsx
-│   ├── page.tsx
-│   └── globals.css
-├── lib/
-│   ├── mongodb.ts                    # MongoDB 連線
-│   ├── gameService.ts                # 遊戲狀態管理
-│   ├── llmService.ts                 # LLM 整合服務
-│   └── lineService.ts                # LINE Bot 服務
-├── models/
-│   ├── User.ts                       # 使用者 Model
-│   └── Conversation.ts               # 對話 Model
-├── types/
-│   └── game.ts                       # 遊戲相關型別定義
-└── package.json
+│   │   ├── line/webhook/route.ts     # LINE Webhook
+│   │   └── admin/...                 # 後台 API
+│   ├── admin/page.tsx                # 後台頁面
+│   └── page.tsx                      # Landing page
+├── lib/                              # MongoDB、LINE、LLM、遊戲邏輯
+├── models/                           # User、Conversation
+├── scripts/                          # 測試 MongoDB / OpenAI / Gemini
+└── README.md
 ```
 
-## 🎯 遊戲流程
+---
 
-### 固定起始流程
+## 🧠 重要元件
+| 檔案 | 職責 |
+|------|------|
+| `app/api/line/webhook/route.ts` | LINE 事件入口，負責流程控制、錯誤處理 |
+| `lib/lineService.ts` | 封裝 LINE 回覆（文字、按鈕、進度條等） |
+| `lib/gameService.ts` | 管理遊戲狀態、對話歷史、道具與進度 |
+| `lib/llmService.ts` | OpenAI GPT-4o-mini 呼叫與 JSON 解析 |
+| `app/admin/page.tsx` | 後台 UI，顯示對話與統計 |
 
-1. **觸發遊戲**：使用者輸入「開始冒險」
-2. **輸入名稱**：使用者輸入角色名稱
-3. **選擇職業**：
-   - 1️⃣ 程式法師（Coder Mage）
-   - 2️⃣ 資料騎士（Data Knight）
-   - 3️⃣ 簡報遊俠（Slide Ranger）
-4. **開始冒險**：進入 LLM 驅動的動態劇情
+---
 
-### 遊戲規則
+## 🔌 技術重點
+- Next.js 16 App Router + Server Actions
+- Tailwind CSS v4（`@import "tailwindcss"`）
+- MongoDB Atlas + Mongoose：持久化使用者、會話、遊戲狀態
+- LINE Messaging API：Webhook 驗證、回覆模板訊息
+- OpenAI GPT-4o-mini：生成劇情、選項與效果（timeout 與降級機制已實作）
+- Vercel 部署：Fluid Compute + Serverless Functions
 
-- 玩家在平行台大世界中探索
-- 透過選擇選項推進劇情
-- 收集道具、金錢，對抗 Bug 和錯誤訊息
-- 主線進度達到 100% 時完成遊戲
+---
 
-## 🔧 API 端點
+## 🧪 常用指令
+| 命令 | 說明 |
+|------|------|
+| `npm run dev` | 開發伺服器 |
+| `npm run build` / `npm run start` | 生產模式 |
+| `node scripts/test-mongodb.js` | 測試 MongoDB 連線 |
+| `node scripts/test-openai.js` | 測試 OpenAI 回應 |
+| `node scripts/test-gemini.js` | 測試 Google Gemini（若有啟用） |
 
-### LINE Webhook
-- `POST /api/line/webhook` - LINE Messaging API Webhook
+---
 
-### 管理後台 API
-- `GET /api/admin/conversations` - 取得對話紀錄列表
-- `GET /api/admin/conversations/[id]` - 取得單一對話詳情
-- `GET /api/admin/stats` - 取得統計資料
-
-### 管理後台頁面
-- `/admin` - 對話紀錄管理後台
-
-## 📝 環境變數說明
-
-| 變數名稱 | 說明 | 取得方式 |
-|---------|------|---------|
-| `MONGODB_URI` | MongoDB 連線字串 | MongoDB Atlas Dashboard |
-| `LINE_CHANNEL_ACCESS_TOKEN` | LINE Channel Access Token | LINE Developers Console |
-| `LINE_CHANNEL_SECRET` | LINE Channel Secret | LINE Developers Console |
-| `OPENAI_API_KEY` | OpenAI API Key | OpenAI Platform |
-| `NEXT_PUBLIC_APP_URL` | 應用程式 URL | 部署後取得 |
-
-## 🚨 錯誤處理
-
-系統實作了完整的錯誤處理機制：
-
-- **LLM 配額用盡**：顯示友善提示，不中斷服務
-- **LLM 超時**：提供降級回應
-- **外部服務失效**：使用預設回應，確保 Bot 持續運作
-
-## 📊 管理後台功能
-
-- 檢視所有對話紀錄
-- 依使用者 ID、日期、遊戲階段篩選
-- 查看統計資料（總使用者數、會話數、訊息數等）
-- 檢視遊戲狀態（HP、金錢、道具、進度）
-
-## 🎨 遊戲世界觀
-
-- **地點**：管理學院、資工系館、總圖、椰林大道、體育館、地底城
-- **怪物**：Bug、例外錯誤、Deadline 怪、規格變更之靈
-- **道具**：卷軸、魔法書、資料寶石、簡報卡
-- **目標**：找到「星光之心」，完成主線任務
-
-## 📦 部署到 Vercel
-
-1. 將專案推送到 GitHub
-2. 在 Vercel 匯入專案
-3. 設定環境變數
-4. 部署完成後，更新 LINE Webhook URL
-
-## 🔒 安全性
-
-- LINE Webhook 簽名驗證
-- 環境變數不提交到版本控制
-- MongoDB 連線使用 SSL
-
-## 📄 授權
-
-本專案為課程作業專案。
-
-## 🤝 貢獻
-
-歡迎提出 Issue 或 Pull Request！
-
+## 🧾 遊戲流程概述
+1. 使用者輸入「開始冒險」→ 固定開場敘事 & 角色命名  
+2. 選擇職業（程式法師 / 資料騎士 / 簡報遊俠）  
+3. 之後每個回合皆由 LLM 依照遊戲狀態生成敘事、選項與效果  
+4. HP 歸零或主線進度達 100% 會進入結局  
+5. 任何 LLM 錯誤（超時、配額、格式）都會回傳純文字降級訊息，確保玩家體驗不中斷
