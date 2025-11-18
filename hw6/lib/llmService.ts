@@ -227,7 +227,7 @@ export async function generateGameTurn(
     try {
       completion = await openaiClient.chat.completions.create(
         {
-          model: 'gpt-4o-mini', // 使用先前較穩定的模型（gpt-4o-mini）
+          model: 'gpt-3.5-turbo', // 使用先前較穩定的模型（gpt-4o-mini）
           messages,
           temperature: 0.8,
           response_format: { type: 'json_object' },
