@@ -50,10 +50,6 @@
    - 開發：使用 ngrok/expose 將 `http://localhost:3000/api/line/webhook` 暴露到公網  
    - 部署：`https://your-vercel-app.vercel.app/api/line/webhook`
 
-更多細節：
-- [SETUP.md](./SETUP.md) – 一次看懂環境設定流程  
-- [ENV_SETUP.md](./ENV_SETUP.md) – `.env.local` 詳細說明  
-- [MONGODB_SETUP.md](./MONGODB_SETUP.md) / [OPENAI_SETUP.md](./OPENAI_SETUP.md) – 雲端服務設定教學
 
 ---
 
