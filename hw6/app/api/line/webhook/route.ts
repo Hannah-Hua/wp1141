@@ -7,9 +7,13 @@ import { GamePhase, CharacterClass } from '@/types/game';
 import User from '@/models/User';
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now();
+  const timings: Record<string, number> = { start: startTime };
+  
   try {
     // 連線資料庫
     await connectDB();
+    timings.dbConnect = Date.now();
 
     // 取得請求內容
     const body = await request.text();
@@ -143,15 +147,15 @@ export async function POST(request: NextRequest) {
           continue;
         }
 
-        // 優化：減少對話歷史到 3 條，加快處理速度
+        // 優化：減少對話歷史到 2 條，加快處理速度
         // 背景儲存使用者訊息，不阻塞 LLM 呼叫
-        const recentMessages = await getRecentMessages(lineUserId, 3);
+        const recentMessages = await getRecentMessages(lineUserId, 2);
         addMessage(lineUserId, 'user', userMessage).catch(err => 
           console.error('Failed to save user message:', err)
         );
 
         try {
-          // 呼叫 LLM 生成遊戲回合（設定 5 秒 timeout）
+          // 呼叫 LLM 生成遊戲回合（設定 2 秒 timeout，如果超時會使用 fallback）
           const turnResult = await generateGameTurn(
             userMessage,
             {
@@ -209,6 +213,15 @@ export async function POST(request: NextRequest) {
             }).catch(() => {});
           });
 
+          // 記錄執行時間（用於診斷）
+          timings.end = Date.now();
+          if (timings.end - timings.start > 5000) {
+            console.log('Slow request timings:', {
+              dbConnect: timings.dbConnect ? timings.dbConnect - timings.start : 0,
+              total: timings.end - timings.start,
+            });
+          }
+          
           // 不需要等待，直接 continue
           continue;
         } catch (error: any) {
