@@ -138,7 +138,10 @@ export async function applyGameEffects(
   lineUserId: string,
   effects: GameTurnResult['effects']
 ) {
-  const conversation = await Conversation.findOne({ lineUserId }).sort({ createdAt: -1 });
+  // 優化：只選擇需要的欄位，減少資料傳輸
+  const conversation = await Conversation.findOne({ lineUserId })
+    .select('gameState')
+    .sort({ createdAt: -1 });
   if (!conversation) {
     throw new Error('Conversation not found');
   }

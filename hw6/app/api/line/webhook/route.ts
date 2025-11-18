@@ -143,9 +143,9 @@ export async function POST(request: NextRequest) {
           continue;
         }
 
-        // 優化：先取得對話歷史（不需要等待儲存完成）
+        // 優化：減少對話歷史到 3 條，加快處理速度
         // 背景儲存使用者訊息，不阻塞 LLM 呼叫
-        const recentMessages = await getRecentMessages(lineUserId, 5);
+        const recentMessages = await getRecentMessages(lineUserId, 3);
         addMessage(lineUserId, 'user', userMessage).catch(err => 
           console.error('Failed to save user message:', err)
         );
@@ -163,36 +163,54 @@ export async function POST(request: NextRequest) {
             recentMessages
           );
 
-          // 應用遊戲效果（會更新 conversation）
-          const updatedConversation = await applyGameEffects(lineUserId, turnResult.effects);
+          // 先回覆 LINE（最重要，避免 timeout）
+          // 然後在背景應用遊戲效果
+          let isGameOver = false;
+          let isVictory = false;
+          let finalProgress = currentConversation.gameState.progress;
 
-          // 檢查遊戲是否結束
-          if (updatedConversation.gameState.phase === 'game_over') {
-            // 判斷是勝利還是失敗
-            const isVictory = updatedConversation.gameState.progress >= 100 || 
-                              (turnResult.effects.game_over !== false && 
-                               updatedConversation.gameState.character.hp > 0);
-            
-            // 並行執行：回覆訊息和儲存對話（不等待儲存完成）
+          // 快速檢查是否需要結束遊戲（不等待資料庫）
+          if (turnResult.effects.game_over || 
+              (turnResult.effects.progress_change !== undefined && 
+               currentConversation.gameState.progress + turnResult.effects.progress_change >= 100)) {
+            isGameOver = true;
+            isVictory = currentConversation.gameState.progress + (turnResult.effects.progress_change || 0) >= 100;
+          }
+
+          // 立即回覆 LINE（不等待資料庫更新）
+          if (isGameOver) {
             await replyGameOverMessage(replyToken, isVictory);
-            addMessage(lineUserId, 'assistant', turnResult.narration, {
-              gamePhase: 'game_over',
-              gameState: updatedConversation.gameState,
-            }).catch(err => console.error('Failed to save message:', err));
           } else {
-            // 回覆遊戲選項（傳遞進度資訊）
+            // 估算進度（快速計算，不等待資料庫）
+            finalProgress = Math.min(100, 
+              currentConversation.gameState.progress + (turnResult.effects.progress_change || 0)
+            );
             await replyGameOptionsMessage(
               replyToken, 
               turnResult.narration, 
               turnResult.options,
-              { progress: updatedConversation.gameState.progress }
+              { progress: finalProgress }
             );
-            // 背景儲存訊息（不阻塞回應）
+          }
+
+          // 背景應用遊戲效果（不阻塞回應）
+          applyGameEffects(lineUserId, turnResult.effects).then(updatedConversation => {
+            // 背景儲存訊息
             addMessage(lineUserId, 'assistant', turnResult.narration, {
-              gamePhase: 'playing',
+              gamePhase: updatedConversation.gameState.phase,
               gameState: updatedConversation.gameState,
             }).catch(err => console.error('Failed to save message:', err));
-          }
+          }).catch(err => {
+            console.error('Failed to apply game effects:', err);
+            // 即使失敗，也嘗試儲存訊息
+            addMessage(lineUserId, 'assistant', turnResult.narration, {
+              gamePhase: currentGameState,
+              error: err.message,
+            }).catch(() => {});
+          });
+
+          // 不需要等待，直接 continue
+          continue;
         } catch (error: any) {
           console.error('Game turn error:', error);
           console.error('Error type:', error.constructor.name);
@@ -249,8 +267,8 @@ export async function POST(request: NextRequest) {
             error: error.message,
             errorType: error.constructor.name,
           }).catch(err => console.error('Failed to save error message:', err));
+          continue;
         }
-        continue;
       }
 
       // 遊戲結束狀態
