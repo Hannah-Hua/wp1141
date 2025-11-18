@@ -65,17 +65,17 @@ export async function replyClassSelectionMessage(replyToken: string, name: strin
       actions: [
         {
           type: 'message',
-          label: '1️⃣ 程式法師（Coder Mage）',
+          label: '1️⃣ 程式法師',
           text: '1',
         },
         {
           type: 'message',
-          label: '2️⃣ 資料騎士（Data Knight）',
+          label: '2️⃣ 資料騎士',
           text: '2',
         },
         {
           type: 'message',
-          label: '3️⃣ 簡報遊俠（Slide Ranger）',
+          label: '3️⃣ 簡報遊俠',
           text: '3',
         },
       ],
@@ -212,7 +212,7 @@ export async function replyGameStartMessage(replyToken: string) {
 
 你發現有一扇從未看過的門，上面寫著：
 
-**「位元交界點：未授權者禁止進入」**
+「位元交界點：未授權者禁止進入」
 
 你還沒來得及反應，門突然發出藍色的光，把你吸了進去……
 
@@ -257,7 +257,7 @@ ${info.description}
 但天空中漂浮著看起來像巨大程式碼的符文，
 這裡並不是現實世界的校園。
 
-你的冒險從 **平行台大大門** 開始。
+你的冒險從平行台大大門開始。
 
 請問你想要：`;
 
@@ -280,7 +280,7 @@ ${info.description}
         },
         {
           type: 'message',
-          label: '3️⃣ 嘗試回到原本世界（失敗機率很高）',
+          label: '3️⃣ 嘗試回到原本世界',
           text: '3',
         },
       ],

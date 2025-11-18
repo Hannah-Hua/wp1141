@@ -239,39 +239,31 @@ export async function POST(request: NextRequest) {
 
           // 根據錯誤類型提供更詳細的錯誤訊息（使用 replyGameOptionsMessage 確保有選項）
           if (error.message === 'LLM_QUOTA_EXCEEDED') {
-            await replyGameOptionsMessage(
+            await replyTextMessage(
               replyToken, 
-              '⚠️ 劇情之神暫時無法回應（API 配額已用完），請稍後再試。\n\n你的冒險仍在繼續。',
-              ['稍後再試', '查看當前狀態']
+              '⚠️ 劇情之神暫時無法回應（API 配額已用完），請稍後再試。\n\n你的冒險仍在繼續。'
             );
           } else if (error.message === 'LLM_TIMEOUT') {
-            await replyGameOptionsMessage(
+            await replyTextMessage(
               replyToken,
-              '⏱️ 劇情之神回應超時，請稍後再試。\n\n你的冒險仍在繼續。',
-              ['稍後再試', '查看當前狀態']
+              '⏱️ 劇情之神回應超時，請稍後再試。\n\n你的冒險仍在繼續。'
             );
           } else if (error.message === 'OPENAI_JSON_PARSE_ERROR') {
             console.error('OpenAI 回應格式錯誤，無法解析 JSON');
-            await replyGameOptionsMessage(
+            await replyTextMessage(
               replyToken,
-              '⚠️ 劇情之神的回應格式有誤，請稍後再試。\n\n你的冒險仍在繼續。',
-              ['稍後再試', '查看當前狀態', '繼續探索']
+              '⚠️ 劇情之神的回應格式有誤，請稍後再試。\n\n你的冒險仍在繼續。'
             );
           } else if (error.message === 'OPENAI_INVALID_FORMAT') {
             console.error('OpenAI 回應格式不符合預期');
-            await replyGameOptionsMessage(
+            await replyTextMessage(
               replyToken,
-              '⚠️ 劇情之神的回應格式不符合預期，請稍後再試。\n\n你的冒險仍在繼續。',
-              ['稍後再試', '查看當前狀態', '繼續探索']
+              '⚠️ 劇情之神的回應格式不符合預期，請稍後再試。\n\n你的冒險仍在繼續。'
             );
           } else {
             // 其他錯誤，使用降級回應（有選項）
             console.error('Unknown error, using fallback response');
-            await replyGameOptionsMessage(
-              replyToken,
-              fallbackResult.narration,
-              fallbackResult.options
-            );
+            await replyTextMessage(replyToken, fallbackResult.narration);
           }
           
           // 背景儲存錯誤訊息（不阻塞回應）
