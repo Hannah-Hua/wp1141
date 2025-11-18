@@ -29,7 +29,10 @@ export async function getOrCreateConversation(
   options?: { createNewIfGameOver?: boolean }
 ) {
   const { createNewIfGameOver = false } = options || {};
-  let conversation = await Conversation.findOne({ lineUserId }).sort({ createdAt: -1 });
+  // 只選擇需要的欄位，減少資料傳輸
+  let conversation = await Conversation.findOne({ lineUserId })
+    .select('gameState messages')
+    .sort({ createdAt: -1 });
   
   // 如果沒有會話，自動建立
   if (!conversation) {
@@ -109,8 +112,12 @@ export async function getRecentMessages(
   lineUserId: string,
   limit: number = 10
 ): Promise<Array<{ role: string; content: string }>> {
-  const conversation = await Conversation.findOne({ lineUserId }).sort({ createdAt: -1 });
-  if (!conversation) {
+  // 使用 lean() 和 select() 優化查詢，只取得需要的欄位
+  const conversation = await Conversation.findOne({ lineUserId })
+    .select('messages')
+    .sort({ createdAt: -1 })
+    .lean() as { messages?: Array<{ role: string; content: string }> } | null;
+  if (!conversation || !conversation.messages) {
     return [];
   }
 
@@ -121,6 +128,8 @@ export async function getRecentMessages(
       content: msg.content,
     }));
 }
+<｜tool▁call▁begin｜>
+run_terminal_cmd
 
 /**
  * 應用遊戲效果到遊戲狀態

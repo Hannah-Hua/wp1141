@@ -135,66 +135,62 @@ export async function POST(request: NextRequest) {
 
       // Step 3: 遊戲進行中（交給 LLM）
       if (gameState.phase === 'playing') {
-        await addMessage(lineUserId, 'user', userMessage);
-
-        // 取得最近的對話歷史
-        const recentMessages = await getRecentMessages(lineUserId, 5);
-        
-        // 更新會話以取得最新狀態
-        const updatedConversation = await getOrCreateConversation(lineUserId);
-        const currentGameState: GamePhase = updatedConversation.gameState.phase as GamePhase;
+        // 優化：先取得會話，減少重複查詢
+        const currentConversation = await getOrCreateConversation(lineUserId);
+        const currentGameState: GamePhase = currentConversation.gameState.phase as GamePhase;
 
         if (currentGameState !== 'playing') {
           continue;
         }
 
+        // 並行執行：同時儲存使用者訊息和取得對話歷史
+        const [_, recentMessages] = await Promise.all([
+          addMessage(lineUserId, 'user', userMessage),
+          getRecentMessages(lineUserId, 5),
+        ]);
+
         try {
-          // 呼叫 LLM 生成遊戲回合
+          // 呼叫 LLM 生成遊戲回合（設定 5 秒 timeout）
           const turnResult = await generateGameTurn(
             userMessage,
             {
               phase: currentGameState,
-              character: updatedConversation.gameState.character as any,
-              progress: updatedConversation.gameState.progress,
-              currentLocation: updatedConversation.gameState.currentLocation,
+              character: currentConversation.gameState.character as any,
+              progress: currentConversation.gameState.progress,
+              currentLocation: currentConversation.gameState.currentLocation,
             },
             recentMessages
           );
 
-          // 應用遊戲效果
-          await applyGameEffects(lineUserId, turnResult.effects);
+          // 應用遊戲效果（會更新 conversation）
+          const updatedConversation = await applyGameEffects(lineUserId, turnResult.effects);
 
           // 檢查遊戲是否結束
-          const finalConversation = await getOrCreateConversation(lineUserId);
-          if (finalConversation.gameState.phase === 'game_over') {
+          if (updatedConversation.gameState.phase === 'game_over') {
             // 判斷是勝利還是失敗
-            const isVictory = finalConversation.gameState.progress >= 100 || 
+            const isVictory = updatedConversation.gameState.progress >= 100 || 
                               (turnResult.effects.game_over !== false && 
-                               finalConversation.gameState.character.hp > 0);
+                               updatedConversation.gameState.character.hp > 0);
             
+            // 並行執行：回覆訊息和儲存對話（不等待儲存完成）
             await replyGameOverMessage(replyToken, isVictory);
-            await addMessage(lineUserId, 'assistant', turnResult.narration, {
+            addMessage(lineUserId, 'assistant', turnResult.narration, {
               gamePhase: 'game_over',
-              gameState: finalConversation.gameState,
-            });
+              gameState: updatedConversation.gameState,
+            }).catch(err => console.error('Failed to save message:', err));
           } else {
             // 回覆遊戲選項（傳遞進度資訊）
-            console.log('Replying with options:', {
-              narrationLength: turnResult.narration.length,
-              optionsCount: turnResult.options.length,
-              options: turnResult.options,
-              progress: finalConversation.gameState.progress,
-            });
             await replyGameOptionsMessage(
               replyToken, 
               turnResult.narration, 
               turnResult.options,
-              { progress: finalConversation.gameState.progress }
+              { progress: updatedConversation.gameState.progress }
             );
-            await addMessage(lineUserId, 'assistant', turnResult.narration, {
+            // 背景儲存訊息（不阻塞回應）
+            addMessage(lineUserId, 'assistant', turnResult.narration, {
               gamePhase: 'playing',
-              gameState: finalConversation.gameState,
-            });
+              gameState: updatedConversation.gameState,
+            }).catch(err => console.error('Failed to save message:', err));
           }
         } catch (error: any) {
           console.error('Game turn error:', error);
@@ -202,11 +198,11 @@ export async function POST(request: NextRequest) {
           console.error('Error message:', error.message);
           console.error('Error stack:', error.stack);
           
-          // 降級處理
+          // 降級處理（使用當前會話狀態）
           const fallbackResult = getFallbackResponse({
             phase: currentGameState,
-            character: updatedConversation.gameState.character as any,
-            progress: updatedConversation.gameState.progress,
+            character: currentConversation.gameState.character as any,
+            progress: currentConversation.gameState.progress,
           });
 
           // 根據錯誤類型提供更詳細的錯誤訊息（使用 replyGameOptionsMessage 確保有選項）
@@ -246,11 +242,12 @@ export async function POST(request: NextRequest) {
             );
           }
           
-          await addMessage(lineUserId, 'assistant', fallbackResult.narration, {
+          // 背景儲存錯誤訊息（不阻塞回應）
+          addMessage(lineUserId, 'assistant', fallbackResult.narration, {
             gamePhase: currentGameState,
             error: error.message,
             errorType: error.constructor.name,
-          });
+          }).catch(err => console.error('Failed to save error message:', err));
         }
         continue;
       }

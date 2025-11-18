@@ -215,8 +215,8 @@ export async function generateGameTurn(
       },
     ];
 
-    // 設定 timeout：8 秒（Vercel 免費方案限制 10 秒，留 2 秒緩衝）
-    const timeoutMs = 8000;
+    // 設定 timeout：5 秒（Vercel 免費方案限制 10 秒，留 5 秒給其他操作）
+    const timeoutMs = 5000;
     const abortController = new AbortController();
     const timeoutId = setTimeout(() => {
       abortController.abort();
