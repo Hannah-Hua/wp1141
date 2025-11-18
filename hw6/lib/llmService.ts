@@ -217,7 +217,7 @@ export async function generateGameTurn(
 
     // 設定 timeout：5 秒（LINE 需要在 30 秒內回應，保留充足時間給資料庫與 LINE API）
     // 如果超時，會使用 fallback 回應，確保 LINE 能收到回覆
-    const timeoutMs = 5000;
+    const timeoutMs = 7000;
     const abortController = new AbortController();
     const timeoutId = setTimeout(() => {
       abortController.abort();
@@ -227,7 +227,7 @@ export async function generateGameTurn(
     try {
       completion = await openaiClient.chat.completions.create(
         {
-          model: 'gpt-3.5-turbo', // 使用先前較穩定的模型（gpt-4o-mini）
+          model: 'gpt-4o-mini', // 使用先前較穩定的模型（gpt-4o-mini）
           messages,
           temperature: 0.8,
           response_format: { type: 'json_object' },
