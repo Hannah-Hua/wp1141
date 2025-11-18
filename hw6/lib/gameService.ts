@@ -128,8 +128,6 @@ export async function getRecentMessages(
       content: msg.content,
     }));
 }
-<｜tool▁call▁begin｜>
-run_terminal_cmd
 
 /**
  * 應用遊戲效果到遊戲狀態
