@@ -215,8 +215,9 @@ export async function generateGameTurn(
       },
     ];
 
-    // 設定 timeout：5 秒（Vercel 免費方案限制 10 秒，留 5 秒給其他操作）
-    const timeoutMs = 5000;
+    // 設定 timeout：2.5 秒（LINE 需要在 30 秒內回應，考慮冷啟動和網路延遲）
+    // 留更多時間給資料庫操作和 LINE API 回覆
+    const timeoutMs = 2500;
     const abortController = new AbortController();
     const timeoutId = setTimeout(() => {
       abortController.abort();
@@ -230,7 +231,7 @@ export async function generateGameTurn(
           messages,
           temperature: 0.8,
           response_format: { type: 'json_object' },
-          max_tokens: 1000,
+          max_tokens: 500, // 減少到 500 以加快回應速度
         },
         {
           signal: abortController.signal,

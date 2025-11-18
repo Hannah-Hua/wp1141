@@ -113,9 +113,11 @@ export async function getRecentMessages(
   limit: number = 10
 ): Promise<Array<{ role: string; content: string }>> {
   // 使用 lean() 和 select() 優化查詢，只取得需要的欄位
+  // 使用 limit(1) 確保只取得一個文件，減少資料傳輸
   const conversation = await Conversation.findOne({ lineUserId })
     .select('messages')
     .sort({ createdAt: -1 })
+    .limit(1)
     .lean() as { messages?: Array<{ role: string; content: string }> } | null;
   if (!conversation || !conversation.messages) {
     return [];

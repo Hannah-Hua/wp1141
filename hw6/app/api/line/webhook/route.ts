@@ -143,11 +143,12 @@ export async function POST(request: NextRequest) {
           continue;
         }
 
-        // 並行執行：同時儲存使用者訊息和取得對話歷史
-        const [_, recentMessages] = await Promise.all([
-          addMessage(lineUserId, 'user', userMessage),
-          getRecentMessages(lineUserId, 5),
-        ]);
+        // 優化：先取得對話歷史（不需要等待儲存完成）
+        // 背景儲存使用者訊息，不阻塞 LLM 呼叫
+        const recentMessages = await getRecentMessages(lineUserId, 5);
+        addMessage(lineUserId, 'user', userMessage).catch(err => 
+          console.error('Failed to save user message:', err)
+        );
 
         try {
           // 呼叫 LLM 生成遊戲回合（設定 5 秒 timeout）
