@@ -217,7 +217,7 @@ export async function generateGameTurn(
 
     // 設定 timeout：2 秒（LINE 需要在 30 秒內回應，但考慮冷啟動和網路延遲，需要更保守）
     // 如果超時，會使用 fallback 回應，確保 LINE 能收到回覆
-    const timeoutMs = 2000;
+    const timeoutMs = 5000;
     const abortController = new AbortController();
     const timeoutId = setTimeout(() => {
       abortController.abort();
