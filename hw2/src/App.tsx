@@ -27,8 +27,8 @@ interface Enemy {
   direction: 'left' | 'right';
 }
 
-const GAME_WIDTH = 450;
-const GAME_HEIGHT = 800;
+const GAME_WIDTH = 405;
+const GAME_HEIGHT = 720;
 const GRAVITY = 0.5;
 const JUMP_FORCE = -12;
 const PLAYER_SPEED = 16; // 從 8 增加到 16，讓移動距離再變為兩倍

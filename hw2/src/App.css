@@ -228,8 +228,8 @@
 /* 響應式設計 */
 @media (max-width: 500px) {
   .game-canvas {
-    width: 360px !important;
-    height: 640px !important;
+    width: 324px !important;
+    height: 576px !important;
   }
   
   .score {
