@@ -425,15 +425,7 @@ class PortfolioManager {
     }
 
     private setupPortfolioLinks(): void {
-        // 移除所有「查看詳情」連結的跳轉功能
-        const portfolioLinks = document.querySelectorAll('.portfolio-link');
-        portfolioLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                // 不執行任何跳轉動作
-                console.log('查看詳情按鈕被點擊，但已禁用跳轉功能');
-            });
-        });
+        // 「查看詳情」已連結至 portfolio-detail.html#id，無需攔截
     }
 
     private filterPortfolio(filter: string | null): void {

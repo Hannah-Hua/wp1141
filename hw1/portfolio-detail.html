@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>作品詳情 - Hannah 作品集</title>
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👩‍💼</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="src/css/styles.css">
+    <style>
+        .detail-page { margin-top: 80px; padding: 40px 24px 80px; max-width: 900px; margin-left: auto; margin-right: auto; }
+        .detail-back { display: inline-flex; align-items: center; gap: 8px; color: #667eea; text-decoration: none; font-weight: 500; margin-bottom: 32px; }
+        .detail-back:hover { text-decoration: underline; }
+        .detail-hero { margin-bottom: 32px; }
+        .detail-hero img { width: 100%; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+        .detail-title { font-family: 'Playfair Display', serif; font-size: 2rem; color: #1a202c; margin-bottom: 8px; }
+        .detail-category { display: inline-block; padding: 6px 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 20px; font-size: 0.875rem; margin-bottom: 20px; }
+        .detail-lead { font-size: 1.125rem; color: #4a5568; line-height: 1.7; margin-bottom: 24px; }
+        .detail-section { margin-bottom: 28px; }
+        .detail-section h3 { font-size: 1.25rem; color: #1a202c; margin-bottom: 12px; }
+        .detail-section p { color: #4a5568; line-height: 1.8; margin-bottom: 12px; }
+        .detail-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+        .detail-tag { padding: 8px 16px; background: #edf2f7; color: #4a5568; border-radius: 8px; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a href="index.html" style="text-decoration:none;color:inherit;"><h1>Hannah</h1></a>
+            <span class="nav-subtitle">B12705022</span>
+        </div>
+        <div class="nav-menu">
+            <a href="index.html#home" class="nav-link">首頁</a>
+            <a href="index.html#about" class="nav-link">關於我</a>
+            <a href="index.html#portfolio" class="nav-link">作品集</a>
+            <a href="index.html#blog" class="nav-link">部落格</a>
+            <a href="index.html#contact" class="nav-link">聯絡我</a>
+        </div>
+        <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="選單">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+
+    <main class="detail-page" id="detailContent">
+        <!-- 由 JS 填入 -->
+    </main>
+
+    <script>
+        const projects = {
+            'personal-website': {
+                title: '個人作品集網站',
+                category: '網頁開發',
+                image: 'src/images/個人網頁.png',
+                imageAlt: '個人作品集網站',
+                lead: '使用 HTML/CSS/JavaScript 開發的響應式個人網站，展示學習歷程與專案成果。',
+                sections: [
+                    { title: '專案簡介', body: '本專案為一頁式個人作品集網站，採用原生 HTML、CSS 與 JavaScript 實作，具備響應式版面與平滑捲動導航，方便在不同裝置上瀏覽。' },
+                    { title: '實作重點', body: '包含首頁簡介、技能展示、作品集篩選、部落格預覽與聯絡表單等區塊；並整合載入動畫、粒子背景與鍵盤／觸控導航，提升使用體驗。' },
+                    { title: '學習收穫', body: '熟悉 DOM 操作、事件處理與 CSS 動畫，並練習模組化撰寫 TypeScript 以管理頁面行為。' }
+                ],
+                tags: ['HTML5', 'CSS3', 'JavaScript', 'TypeScript', '響應式設計']
+            },
+            'ecommerce-analysis': {
+                title: '電商銷售資料分析',
+                category: '資料分析',
+                image: 'src/images/電商.webp',
+                imageAlt: '電商銷售資料分析',
+                lead: '使用 Python 分析電商平台銷售數據並製作視覺化圖表，產出營運洞察。',
+                sections: [
+                    { title: '專案簡介', body: '針對電商平台的訂單與銷售資料進行清洗、彙總與視覺化，找出銷售趨勢、熱門品類與客群特徵。' },
+                    { title: '實作重點', body: '使用 Pandas 進行資料處理，Matplotlib 與 Seaborn 繪製折線圖、長條圖與熱力圖，並產出簡要分析報告。' },
+                    { title: '學習收穫', body: '掌握資料清洗流程與視覺化最佳實踐，並練習從數據中提出可行建議。' }
+                ],
+                tags: ['Python', 'Pandas', 'Matplotlib', 'Seaborn', '資料視覺化']
+            },
+            'library-system': {
+                title: '圖書館管理系統',
+                category: '網頁開發',
+                image: 'src/images/圖書館.jpg',
+                imageAlt: '圖書館管理系統',
+                lead: '基於 Web 的圖書借還管理系統，整合資料庫功能，供讀者查詢與館員管理。',
+                sections: [
+                    { title: '專案簡介', body: '提供書籍查詢、借閱與歸還流程，以及館員端的書目新增、修改與借閱紀錄查詢等功能。' },
+                    { title: '實作重點', body: '前後端分離架構，後端提供 REST API 並連接資料庫儲存書目與借閱紀錄；前端以表單與列表呈現操作介面。' },
+                    { title: '學習收穫', body: '了解 CRUD 流程、API 設計與資料庫正規化，並練習前後端協作開發。' }
+                ],
+                tags: ['Web API', '資料庫', '前後端整合']
+            },
+            'campus-app': {
+                title: '校園活動 APP',
+                category: '行動應用',
+                image: 'src/images/校園活動.jpg',
+                imageAlt: '校園活動 APP',
+                lead: '以 React Native 開發的校園活動資訊與報名應用，方便學生瀏覽與報名活動。',
+                sections: [
+                    { title: '專案簡介', body: '整合校園活動公告，提供活動列表、詳情與報名功能，並支援推播提醒，讓學生不錯過重要活動。' },
+                    { title: '實作重點', body: '使用 React Native 撰寫跨平台介面，串接後端活動 API，並實作報名狀態與我的活動等頁面。' },
+                    { title: '學習收穫', body: '熟悉 React Native 元件與導航，以及與後端 API 的串接方式。' }
+                ],
+                tags: ['React Native', '行動應用', 'API 串接']
+            },
+            'learning-analysis': {
+                title: '學生學習成效分析',
+                category: '資料分析',
+                image: 'src/images/學習成效分析.jpg',
+                imageAlt: '學生學習成效分析',
+                lead: '分析學生學習數據，產出視覺化報表並提供個人化學習建議。',
+                sections: [
+                    { title: '專案簡介', body: '針對學習歷程資料（如測驗成績、登入次數、學習時長）進行分析，找出學習模式與可能的風險指標。' },
+                    { title: '實作重點', body: '以 Python 進行統計分析與視覺化，並設計簡單的規則或模型產出個人化建議與警示。' },
+                    { title: '學習收穫', body: '結合教育情境與資料分析，練習解讀指標並產出可執行的建議。' }
+                ],
+                tags: ['Python', '資料分析', '視覺化', '學習分析']
+            },
+            'learning-platform': {
+                title: '線上學習平台',
+                category: '網頁開發',
+                image: 'src/images/學習平台.jpg',
+                imageAlt: '線上學習平台',
+                lead: '全端開發的線上課程管理與學習平台，支援課程瀏覽、報名與學習進度追蹤。',
+                sections: [
+                    { title: '專案簡介', body: '提供學員端課程瀏覽、報名、影片觀看與進度紀錄，以及教師端課程上架、教材管理與學員名單查詢。' },
+                    { title: '實作重點', body: '前後端分離，後端負責課程、使用者與學習紀錄的 API；前端實作多頁面流程與權限控制。' },
+                    { title: '學習收穫', body: '整合身份驗證、權限設計與資料關聯，並練習全端功能規劃與實作。' }
+                ],
+                tags: ['全端開發', '課程管理', '使用者系統']
+            }
+        };
+
+        function getProjectId() {
+            const hash = window.location.hash.slice(1) || '';
+            return projects[hash] ? hash : null;
+        }
+
+        function renderDetail() {
+            const id = getProjectId();
+            const container = document.getElementById('detailContent');
+            if (!id || !container) {
+                container.innerHTML = '<p><a href="index.html#portfolio" class="detail-back">← 返回作品集</a></p><p>找不到該作品，請從<a href="index.html#portfolio">作品集</a>選擇一項作品。</p>';
+                return;
+            }
+            const p = projects[id];
+            let html = '<a href="index.html#portfolio" class="detail-back">← 返回作品集</a>';
+            html += '<div class="detail-hero"><img src="' + p.image + '" alt="' + (p.imageAlt || p.title) + '"></div>';
+            html += '<h1 class="detail-title">' + p.title + '</h1>';
+            html += '<span class="detail-category">' + p.category + '</span>';
+            html += '<p class="detail-lead">' + p.lead + '</p>';
+            p.sections.forEach(function(s) {
+                html += '<div class="detail-section"><h3>' + s.title + '</h3><p>' + s.body + '</p></div>';
+            });
+            if (p.tags && p.tags.length) {
+                html += '<div class="detail-section"><h3>技術與工具</h3><div class="detail-tags">';
+                p.tags.forEach(function(t) { html += '<span class="detail-tag">' + t + '</span>'; });
+                html += '</div></div>';
+            }
+            container.innerHTML = html;
+            document.title = p.title + ' - Hannah 作品集';
+        }
+
+        window.addEventListener('DOMContentLoaded', renderDetail);
+        window.addEventListener('hashchange', renderDetail);
+    </script>
+</body>
+</html>
