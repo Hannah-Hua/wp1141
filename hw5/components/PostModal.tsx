@@ -8,9 +8,10 @@ interface PostModalProps {
   onClose: () => void;
   parentPostId?: string;
   isReply?: boolean;
+  onSuccess?: () => void;
 }
 
-export default function PostModal({ onClose, parentPostId, isReply = false }: PostModalProps) {
+export default function PostModal({ onClose, parentPostId, isReply = false, onSuccess }: PostModalProps) {
   const { data: session } = useSession();
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
@@ -102,9 +103,12 @@ export default function PostModal({ onClose, parentPostId, isReply = false }: Po
       });
 
       if (res.ok) {
+        // 呼叫成功回調（用於即時更新 UI）
+        if (onSuccess) {
+          onSuccess();
+        }
         onClose();
-        // 重新載入頁面以顯示新貼文
-        window.location.reload();
+        // 不再需要重新載入頁面，Pusher 會處理即時更新
       } else {
         alert('發文失敗');
       }

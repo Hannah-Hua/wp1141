@@ -52,6 +52,8 @@ class MemoryCache {
       }
     }
     keysToDelete.forEach(key => this.cache.delete(key));
+    
+    console.log(`[Cache] Deleted ${keysToDelete.length} entries with prefix "${prefix}":`, keysToDelete);
   }
 
   // 清除所有快取

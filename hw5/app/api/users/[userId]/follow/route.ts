@@ -49,6 +49,7 @@ export async function POST(
       await User.findByIdAndUpdate(targetUser._id, {
         $pull: { followers: session.user.id },
       });
+      console.log('[Follow API] Unfollowed user:', targetUser._id.toString());
     } else {
       // Follow
       await User.findByIdAndUpdate(session.user.id, {
@@ -57,7 +58,20 @@ export async function POST(
       await User.findByIdAndUpdate(targetUser._id, {
         $addToSet: { followers: session.user.id },
       });
+      console.log('[Follow API] Followed user:', targetUser._id.toString());
     }
+
+    // 清除貼文快取，確保 Following 頁面會重新查詢
+    const cache = (await import('@/lib/cache')).default;
+    
+    // 清除當前用戶的 Following 快取（使用新的快取鍵格式）
+    const followingCacheKey = `posts:${session.user.id}:following:true`;
+    cache.delete(followingCacheKey);
+    console.log('[Follow API] Deleted Following cache for user:', session.user.id, 'key:', followingCacheKey);
+    
+    // 同時清除所有 posts 快取（以防萬一）
+    cache.deleteByPrefix('posts:');
+    console.log('[Follow API] Cleared posts cache');
 
     return NextResponse.json({ success: true, isFollowing: !isFollowing });
   } catch (error) {

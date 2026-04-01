@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import MainLayout from '@/components/MainLayout';
 import PostCard from '@/components/PostCard';
 import PostComposer from '@/components/PostComposer';
+import { getPusher } from '@/lib/pusher';
 
 export default function PostPage() {
   const params = useParams();
@@ -28,6 +29,74 @@ export default function PostPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [post]);
+
+  // 訂閱 Pusher 頻道以接收即時更新
+  useEffect(() => {
+    const pusher = getPusher();
+    if (!pusher) {
+      return;
+    }
+
+    const channel = pusher.subscribe('posts');
+
+    channel.bind('post-updated', (data: any) => {
+      console.log('[PostPage] Pusher post-updated event:', data);
+      
+      const originalPostId = data.originalPostId || data.postId;
+      const targetPostId = post?.originalPost || postId;
+      
+      if (originalPostId === targetPostId) {
+        // 更新主貼文
+        if (post) {
+          setPost((prevPost: any) => {
+            const updatedPost = { ...prevPost };
+            if (data.likes) updatedPost.likes = data.likes;
+            if (data.repostCount !== undefined) updatedPost.repostCount = data.repostCount;
+            if (data.replies) updatedPost.replies = data.replies;
+            console.log('[PostPage] Pusher updated main post');
+            return updatedPost;
+          });
+        }
+        
+        // 更新回覆列表中的貼文
+        setReplies(prevReplies => 
+          prevReplies.map(reply => {
+            const replyOriginalId = reply.originalPost || reply._id;
+            if (replyOriginalId === originalPostId) {
+              const updatedReply = { ...reply };
+              if (data.likes) updatedReply.likes = data.likes;
+              if (data.repostCount !== undefined) updatedReply.repostCount = data.repostCount;
+              if (data.replies) updatedReply.replies = data.replies;
+              return updatedReply;
+            }
+            return reply;
+          })
+        );
+      }
+    });
+
+    channel.bind('post-deleted', (data: any) => {
+      console.log('[PostPage] Pusher post-deleted event:', data);
+      if (data.postId === postId || data.postId === post?.originalPost) {
+        router.back();
+      } else {
+        setReplies(prevReplies => prevReplies.filter(reply => reply._id !== data.postId));
+      }
+    });
+
+    channel.bind('post-created', (data: any) => {
+      // 如果是新回覆，重新載入回覆列表
+      if (data.post && data.post.parentPost === (post?.originalPost || postId)) {
+        console.log('[PostPage] Pusher: new reply created, reloading replies');
+        fetchReplies();
+      }
+    });
+
+    return () => {
+      channel.unbind_all();
+      channel.unsubscribe();
+    };
+  }, [postId, post]);
 
   const fetchPost = async () => {
     try {
@@ -57,9 +126,44 @@ export default function PostPage() {
     }
   };
 
-  const handleUpdate = () => {
-    fetchPost();
+  // 樂觀更新單個貼文（不重新載入）
+  const handleUpdatePost = (postId: string, updates: any) => {
+    // 更新主貼文
+    if (post && (post._id === postId || post.originalPost === postId)) {
+      setPost((prevPost: any) => ({ ...prevPost, ...updates }));
+    }
+    // 更新回覆列表中的貼文
+    setReplies(prevReplies => 
+      prevReplies.map(reply => {
+        if (reply._id === postId || reply.originalPost === postId) {
+          return { ...reply, ...updates };
+        }
+        return reply;
+      })
+    );
+  };
+
+  // 移除貼文（用於刪除）
+  const handleRemovePost = (postId: string) => {
+    // 如果刪除的是主貼文，返回上一頁
+    if (post && post._id === postId) {
+      router.back();
+      return;
+    }
+    // 從回覆列表中移除
+    setReplies(prevReplies => prevReplies.filter(reply => reply._id !== postId));
+  };
+
+  // 留言發送成功後重新載入回覆
+  const handleReplyCreated = () => {
     fetchReplies();
+    // 更新主貼文的回覆數量
+    if (post) {
+      setPost((prevPost: any) => ({
+        ...prevPost,
+        replies: [...(prevPost.replies || []), 'temp-id']
+      }));
+    }
   };
 
   if (loading) {
@@ -98,13 +202,18 @@ export default function PostPage() {
 
         {/* Main Post */}
         <div className="border-b border-gray-200">
-          <PostCard post={post} onUpdate={handleUpdate} disableClick={true} />
+          <PostCard 
+            post={post} 
+            onUpdate={handleUpdatePost} 
+            onRemove={handleRemovePost}
+            disableClick={true} 
+          />
         </div>
 
         {/* Reply Composer */}
         <div className="border-b border-gray-200">
           <PostComposer 
-            onPostCreated={handleUpdate} 
+            onPostCreated={handleReplyCreated} 
             parentPostId={post.originalPost || postId}
             placeholder="Post your reply"
             defaultExpanded={true}
@@ -120,7 +229,11 @@ export default function PostPage() {
           ) : (
             replies.map((reply) => (
               <div key={reply._id} className="border-b border-gray-200">
-                <PostCard post={reply} onUpdate={handleUpdate} />
+                <PostCard 
+                  post={reply} 
+                  onUpdate={handleUpdatePost}
+                  onRemove={handleRemovePost}
+                />
               </div>
             ))
           )}

@@ -42,17 +42,30 @@ export async function POST(
       });
     }
 
-    // 清除相關快取
+    // 清除相關快取（確保返回首頁時能看到最新狀態）
     cache.deleteByPrefix('posts:');
+    console.log('[Like API] Cleared posts cache after like/unlike');
     
     // 觸發 Pusher 事件（包含完整更新資訊）
+    // 重要：需要同時更新原始貼文和所有 repost
     const updatedPost = await Post.findById(params.id);
+    
+    // 觸發原始貼文的更新事件
     await triggerPusherEvent('posts', 'post-updated', {
       postId: params.id,
+      originalPostId: params.id, // 原始貼文 ID
       likesCount: updatedPost.likes.length,
       likes: updatedPost.likes,
       isLiked: !isLiked,
       userId: userId,
+    });
+    
+    console.log('[Like API] Pusher event triggered for post:', params.id);
+
+    console.log('[Like API] Like operation successful:', {
+      postId: params.id,
+      isLiked: !isLiked,
+      likesCount: updatedPost.likes.length
     });
 
     return NextResponse.json({ success: true, isLiked: !isLiked });

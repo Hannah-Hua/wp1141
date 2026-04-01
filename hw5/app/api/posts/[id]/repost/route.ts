@@ -61,8 +61,9 @@ export async function POST(
       User.findById(originalPost.author).select('userId name image'),
     ]);
 
-    // 清除相關快取
+    // 清除相關快取（確保返回首頁時能看到新轉發的貼文）
     cache.deleteByPrefix('posts:');
+    console.log('[Repost API] Cleared posts cache after repost');
     
     // 建立完整的 repost 物件供 Pusher 使用
     const repostWithDetails = {
@@ -77,14 +78,34 @@ export async function POST(
         name: originalAuthor.name,
         image: originalAuthor.image,
       } : null,
-      likes: [],
-      replies: [],
+      likes: originalPost.likes || [],  // 使用原始貼文的 likes
+      replies: originalPost.replies || [],  // 使用原始貼文的 replies
       repostCount: 0,
     };
     
-    // 觸發 Pusher 事件
+    // 計算原始貼文的 repostCount
+    const repostCount = await Post.countDocuments({
+      originalPost: params.id,
+    });
+    
+    // 觸發新 repost 的創建事件
     await triggerPusherEvent('posts', 'post-created', {
       post: repostWithDetails,
+    });
+    
+    // 觸發原始貼文的更新事件（更新 repostCount）
+    await triggerPusherEvent('posts', 'post-updated', {
+      postId: params.id,
+      originalPostId: params.id,
+      repostCount: repostCount,
+    });
+    
+    console.log('[Repost API] Pusher events triggered - new repost created, original post repostCount updated');
+
+    console.log('[Repost API] Repost created successfully:', {
+      repostId: repost._id,
+      originalPostId: params.id,
+      reposterId: session.user.id
     });
 
     return NextResponse.json({ repost }, { status: 201 });

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import SafeImage from '@/components/SafeImage';
@@ -8,20 +8,38 @@ import PostModal from './PostModal';
 
 interface PostCardProps {
   post: any;
-  onUpdate: () => void;
+  onUpdate?: (postId: string, updates: any) => void;
+  onRemove?: (postId: string) => void;
   disableClick?: boolean; // 是否禁用點擊跳轉（用於單個貼文頁面的主貼文）
 }
 
-export default function PostCard({ post, onUpdate, disableClick = false }: PostCardProps) {
+export default function PostCard({ post, onUpdate, onRemove, disableClick = false }: PostCardProps) {
   const { data: session } = useSession();
   const router = useRouter();
   const [showMenu, setShowMenu] = useState(false);
   const [showReplyModal, setShowReplyModal] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
   const [isReposting, setIsReposting] = useState(false);
+  
+  // 使用本地狀態來實現即時更新
+  const [localLikes, setLocalLikes] = useState(post.likes || []);
+  const [localReplyCount, setLocalReplyCount] = useState(post.replies?.length || 0);
+  const [localRepostCount, setLocalRepostCount] = useState(post.repostCount || 0);
 
-  const isLiked = post.likes?.includes(session?.user?.id);
+  const isLiked = localLikes?.includes(session?.user?.id);
   const isOwnPost = post.author === session?.user?.id && !post.repostBy;
+
+  // 同步外部更新（例如 Pusher 事件）
+  // 但要避免覆蓋正在進行的樂觀更新
+  useEffect(() => {
+    // 只有在不進行操作時，才同步外部更新
+    // 這樣可以避免 API 返回前的舊資料覆蓋樂觀更新
+    if (!isLiking && !isReposting) {
+      setLocalLikes(post.likes || []);
+      setLocalReplyCount(post.replies?.length || 0);
+      setLocalRepostCount(post.repostCount || 0);
+    }
+  }, [post.likes, post.replies, post.repostCount, isLiking, isReposting]);
 
   const formatTimestamp = (date: string) => {
     const now = new Date();
@@ -116,9 +134,19 @@ export default function PostCard({ post, onUpdate, disableClick = false }: PostC
 
   const handleLike = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isLiking) return;
+    if (isLiking || !session?.user?.id) return;
 
     setIsLiking(true);
+    
+    // 樂觀更新：立即更新 UI
+    const userId = session.user.id;
+    const wasLiked = isLiked;
+    const newLikes = wasLiked 
+      ? localLikes.filter(id => id !== userId)
+      : [...localLikes, userId];
+    
+    setLocalLikes(newLikes);
+
     try {
       // 如果是 repost，應該對原始貼文進行 like 操作
       const targetPostId = post.originalPost || post._id;
@@ -128,10 +156,30 @@ export default function PostCard({ post, onUpdate, disableClick = false }: PostC
       });
 
       if (res.ok) {
-        onUpdate();
+        const data = await res.json();
+        console.log('[PostCard] Like API response:', data);
+        
+        // 使用伺服器返回的最新狀態來設置最終狀態
+        const finalLikes = data.isLiked 
+          ? (newLikes.includes(userId) ? newLikes : [...newLikes, userId])
+          : newLikes.filter(id => id !== userId);
+        
+        setLocalLikes(finalLikes);
+        
+        // 通知父元件更新
+        if (onUpdate) {
+          console.log('[PostCard] Calling onUpdate with:', { postId: targetPostId, likes: finalLikes });
+          onUpdate(targetPostId, { likes: finalLikes });
+        }
+      } else {
+        // 如果失敗，回滾更新
+        console.error('[PostCard] Like API failed');
+        setLocalLikes(localLikes);
       }
     } catch (error) {
-      console.error('Failed to like post:', error);
+      console.error('[PostCard] Failed to like post:', error);
+      // 回滾更新
+      setLocalLikes(localLikes);
     } finally {
       setIsLiking(false);
     }
@@ -142,6 +190,11 @@ export default function PostCard({ post, onUpdate, disableClick = false }: PostC
     if (isReposting) return;
 
     setIsReposting(true);
+    
+    // 樂觀更新：立即增加轉發數
+    const newRepostCount = localRepostCount + 1;
+    setLocalRepostCount(newRepostCount);
+
     try {
       // 如果是 repost，應該對原始貼文進行 repost 操作
       const targetPostId = post.originalPost || post._id;
@@ -151,10 +204,25 @@ export default function PostCard({ post, onUpdate, disableClick = false }: PostC
       });
 
       if (res.ok) {
-        onUpdate();
+        // 通知父元件更新
+        if (onUpdate) {
+          onUpdate(targetPostId, { repostCount: newRepostCount });
+        }
+        // 轉發成功後，清除快取以確保新貼文會出現
+        // 不需要手動刷新，Pusher 會處理即時更新
+        console.log('[PostCard] Repost successful, cache should be cleared by API');
+      } else {
+        // 如果失敗，回滾更新
+        const data = await res.json();
+        if (data.error === 'Already reposted') {
+          alert('您已經轉發過這篇貼文');
+        }
+        setLocalRepostCount(localRepostCount);
       }
     } catch (error) {
       console.error('Failed to repost:', error);
+      // 回滾更新
+      setLocalRepostCount(localRepostCount);
     } finally {
       setIsReposting(false);
     }
@@ -169,7 +237,10 @@ export default function PostCard({ post, onUpdate, disableClick = false }: PostC
       });
 
       if (res.ok) {
-        onUpdate();
+        // 立即從 UI 移除
+        if (onRemove) {
+          onRemove(post._id);
+        }
       } else {
         alert('刪除失敗');
       }
@@ -292,7 +363,7 @@ export default function PostCard({ post, onUpdate, disableClick = false }: PostC
                     <path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"/>
                   </svg>
                 </div>
-                <span className="text-sm">{post.replies?.length || 0}</span>
+                <span className="text-sm">{localReplyCount}</span>
               </button>
 
               <button
@@ -305,7 +376,7 @@ export default function PostCard({ post, onUpdate, disableClick = false }: PostC
                     <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>
                   </svg>
                 </div>
-                <span className="text-sm">{post.repostCount || 0}</span>
+                <span className="text-sm">{localRepostCount}</span>
               </button>
 
               <button
@@ -320,7 +391,7 @@ export default function PostCard({ post, onUpdate, disableClick = false }: PostC
                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                   </svg>
                 </div>
-                <span className="text-sm">{post.likes?.length || 0}</span>
+                <span className="text-sm">{localLikes.length}</span>
               </button>
             </div>
           </div>
@@ -332,6 +403,16 @@ export default function PostCard({ post, onUpdate, disableClick = false }: PostC
           onClose={() => setShowReplyModal(false)}
           parentPostId={post.originalPost || post._id}
           isReply={true}
+          onSuccess={() => {
+            // 留言成功後，立即增加回覆數
+            const newReplyCount = localReplyCount + 1;
+            setLocalReplyCount(newReplyCount);
+            if (onUpdate) {
+              onUpdate(post.originalPost || post._id, { 
+                replies: [...(post.replies || []), 'temp-id'] 
+              });
+            }
+          }}
         />
       )}
     </>

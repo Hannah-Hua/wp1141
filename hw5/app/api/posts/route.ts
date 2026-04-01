@@ -14,12 +14,30 @@ export async function GET(request: NextRequest) {
     const following = searchParams.get('following');
 
     // 建立快取 key
-    const cacheKey = `posts:${userId || ''}:${parentPost || ''}:${following || ''}`;
+    // 對於 Following 頁面，包含用戶 ID 以確保每個用戶的快取獨立
+    let cacheKey = `posts:${userId || ''}:${parentPost || ''}:${following || ''}`;
     
-    // 檢查快取
-    const cachedData = cache.get<any>(cacheKey);
-    if (cachedData) {
-      return NextResponse.json(cachedData);
+    if (following === 'true') {
+      // Following 頁面需要包含當前用戶 ID，因為每個用戶的 following 列表不同
+      const session = await auth();
+      if (session?.user?.id) {
+        cacheKey = `posts:${session.user.id}:following:true`;
+      } else {
+        // 未登入，不使用快取
+        cacheKey = '';
+      }
+    }
+    
+    // 檢查快取（如果有有效的快取鍵）
+    if (cacheKey) {
+      const cachedData = cache.get<any>(cacheKey);
+      if (cachedData) {
+        console.log('[Posts API] Returning cached data for:', cacheKey);
+        return NextResponse.json(cachedData);
+      }
+      console.log('[Posts API] No cache, querying database for:', cacheKey);
+    } else {
+      console.log('[Posts API] No cache key (unauthorized), querying database');
     }
 
     await connectDB();
@@ -64,9 +82,12 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'User not found' }, { status: 404 });
       }
 
+      console.log('[Posts API] Current user following list:', currentUser.following);
+
       // 確保 following 列表不是空的
       if (!currentUser.following || currentUser.following.length === 0) {
         // 如果沒有追蹤任何人，返回空列表
+        console.log('[Posts API] No following, returning empty');
         return NextResponse.json({ posts: [] });
       }
 
@@ -92,6 +113,10 @@ export async function GET(request: NextRequest) {
       // 獲取所有貼文（首頁 feed）
       query.parentPost = { $exists: false };
     }
+
+    // 獲取當前用戶的 session（用於檢查 like 狀態）
+    const session = await auth();
+    const currentUserId = session?.user?.id;
 
     const posts = await Post.find(query).sort({ createdAt: -1 }).limit(50);
 
@@ -201,7 +226,11 @@ export async function GET(request: NextRequest) {
     const result = { posts: postsWithAuthors };
     
     // 將結果存入快取（TTL: 30 秒，因為有 Pusher 即時更新）
-    cache.set(cacheKey, result, 30 * 1000);
+    // 只有當有有效的快取鍵時才設置快取
+    if (cacheKey) {
+      cache.set(cacheKey, result, 30 * 1000);
+      console.log('[Posts API] Set cache for:', cacheKey);
+    }
 
     return NextResponse.json(result);
   } catch (error) {

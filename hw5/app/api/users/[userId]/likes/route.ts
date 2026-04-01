@@ -33,6 +33,8 @@ export async function GET(
       likes: user._id.toString(),
       repostBy: { $exists: false } // 排除 repost，只顯示原始貼文
     }).sort({ createdAt: -1 });
+    
+    console.log('[Likes API] Found', posts.length, 'liked posts for user:', params.userId, 'user._id:', user._id.toString());
 
     // 為每個貼文添加作者資訊（批量查詢優化）
     const userIds = new Set<string>();

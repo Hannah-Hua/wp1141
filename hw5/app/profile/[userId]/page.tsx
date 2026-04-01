@@ -2,16 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, usePathname } from 'next/navigation';
 import SafeImage from '@/components/SafeImage';
 import MainLayout from '@/components/MainLayout';
 import PostCard from '@/components/PostCard';
 import EditProfileModal from '@/components/EditProfileModal';
+import { getPusher } from '@/lib/pusher';
 
 export default function ProfilePage() {
   const { data: session } = useSession();
   const router = useRouter();
   const params = useParams();
+  const pathname = usePathname();
   const userId = params.userId as string;
 
   const [user, setUser] = useState<any>(null);
@@ -22,6 +24,7 @@ export default function ProfilePage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isHoveringFollow, setIsHoveringFollow] = useState(false);
+  const [isFollowingLoading, setIsFollowingLoading] = useState(false);
 
   const isOwnProfile = session?.user?.userId === userId;
 
@@ -32,6 +35,106 @@ export default function ProfilePage() {
       fetchLikedPosts();
     }
   }, [userId]);
+
+  // 監聽路由變化，當返回 Profile 頁面時重新載入貼文（確保看到最新的 like/repost 狀態）
+  useEffect(() => {
+    if (pathname?.startsWith('/profile/') && userId && pathname === `/profile/${userId}`) {
+      // 返回 Profile 頁面時，重新載入貼文以確保顯示最新的狀態
+      // 因為 like/repost API 會清除快取，所以這裡會從資料庫重新查詢
+      console.log('[Profile] Returned to profile page, reloading posts to sync state');
+      
+      // 使用 setTimeout 避免與初始載入衝突
+      const timer = setTimeout(() => {
+        fetchUserPosts();
+        if (isOwnProfile) {
+          fetchLikedPosts();
+        }
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [pathname, userId, isOwnProfile]);
+
+  // 監聽 tab 切換，當切換到 likes tab 時重新載入 liked posts
+  useEffect(() => {
+    if (activeTab === 'likes' && isOwnProfile) {
+      console.log('[Profile] Switched to likes tab, reloading liked posts');
+      fetchLikedPosts();
+    }
+  }, [activeTab, isOwnProfile]);
+
+  // 訂閱 Pusher 頻道以接收即時更新
+  useEffect(() => {
+    const pusher = getPusher();
+    if (!pusher) {
+      return;
+    }
+
+    const channel = pusher.subscribe('posts');
+
+    channel.bind('post-updated', (data: any) => {
+      console.log('[Profile] Pusher post-updated event:', data);
+      
+      const originalPostId = data.originalPostId || data.postId;
+      
+      if (originalPostId) {
+        // 更新 posts 列表
+        setPosts(prevPosts => {
+          const updatedPosts = prevPosts.map(post => {
+            const postOriginalId = post.originalPost || post._id;
+            const postId = post._id;
+            
+            if (postOriginalId === originalPostId || postId === originalPostId) {
+              const updatedPost = { ...post };
+              if (data.likes) updatedPost.likes = data.likes;
+              if (data.repostCount !== undefined) updatedPost.repostCount = data.repostCount;
+              if (data.replies) updatedPost.replies = data.replies;
+              console.log('[Profile] Pusher updated post in posts list:', updatedPost._id);
+              return updatedPost;
+            }
+            return post;
+          });
+          return updatedPosts;
+        });
+        
+        // 更新 likedPosts 列表（如果是自己的 Profile）
+        if (isOwnProfile) {
+          setLikedPosts(prevLikedPosts => {
+            const updatedLikedPosts = prevLikedPosts.map(post => {
+              const postOriginalId = post.originalPost || post._id;
+              const postId = post._id;
+              
+              if (postOriginalId === originalPostId || postId === originalPostId) {
+                const updatedPost = { ...post };
+                if (data.likes) updatedPost.likes = data.likes;
+                if (data.repostCount !== undefined) updatedPost.repostCount = data.repostCount;
+                if (data.replies) updatedPost.replies = data.replies;
+                console.log('[Profile] Pusher updated post in likedPosts list:', updatedPost._id);
+                return updatedPost;
+              }
+              return post;
+            });
+            return updatedLikedPosts;
+          });
+        }
+      }
+    });
+
+    channel.bind('post-deleted', (data: any) => {
+      console.log('[Profile] Pusher post-deleted event:', data);
+      if (data.postId) {
+        setPosts(prevPosts => prevPosts.filter(post => post._id !== data.postId));
+        if (isOwnProfile) {
+          setLikedPosts(prevPosts => prevPosts.filter(post => post._id !== data.postId));
+        }
+      }
+    });
+
+    return () => {
+      channel.unbind_all();
+      channel.unsubscribe();
+    };
+  }, [isOwnProfile]);
 
   const fetchUserProfile = async () => {
     try {
@@ -79,6 +182,103 @@ export default function ProfilePage() {
     }
   };
 
+  // 樂觀更新單個貼文（不重新載入整個列表）
+  const handleUpdatePost = (postId: string, updates: any) => {
+    console.log('[Profile] Updating post:', postId, updates);
+    
+    // 更新 posts 列表
+    setPosts(prevPosts => {
+      const updatedPosts = prevPosts.map(post => {
+        // 檢查是否為目標貼文（可能是原貼文或 repost）
+        if (post._id === postId || post.originalPost === postId) {
+          const updatedPost = { ...post, ...updates };
+          console.log('[Profile] Updated post in posts list:', updatedPost._id);
+          return updatedPost;
+        }
+        return post;
+      });
+      
+      // 如果是自己的 Profile 且更新的是 likes，需要同步更新 likedPosts
+      if (isOwnProfile && updates.likes) {
+        const currentUserId = session?.user?.id;
+        const isLiked = updates.likes.includes(currentUserId);
+        
+        // 找到被更新的貼文（可能是原貼文或 repost）
+        const updatedPost = updatedPosts.find(p => p._id === postId || p.originalPost === postId);
+        
+        if (updatedPost) {
+          // 找到原始貼文 ID（如果是 repost，使用 originalPost）
+          const originalPostId = updatedPost.originalPost || updatedPost._id;
+          
+          setLikedPosts(prevLikedPosts => {
+            const wasInLikedPosts = prevLikedPosts.some(p => {
+              const likedPostOriginalId = p.originalPost || p._id;
+              return likedPostOriginalId === originalPostId;
+            });
+            
+            // 如果按讚了，且該貼文不在 likedPosts 中，需要加入
+            if (isLiked && !wasInLikedPosts) {
+              // 找到原始貼文（如果是 repost，需要找到原貼文；否則使用自己）
+              const postToAdd = updatedPost.originalPost 
+                ? updatedPosts.find(p => p._id === updatedPost.originalPost) || updatedPost
+                : updatedPost;
+              
+              // 只添加原始貼文，不添加 repost
+              if (!postToAdd.repostBy) {
+                console.log('[Profile] Adding post to likedPosts:', postToAdd._id);
+                return [postToAdd, ...prevLikedPosts].sort((a, b) => 
+                  new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                );
+              }
+            }
+            
+            // 如果取消按讚，且該貼文在 likedPosts 中，需要移除
+            if (!isLiked && wasInLikedPosts) {
+              console.log('[Profile] Removing post from likedPosts:', originalPostId);
+              return prevLikedPosts.filter(p => {
+                const likedPostOriginalId = p.originalPost || p._id;
+                return likedPostOriginalId !== originalPostId;
+              });
+            }
+            
+            // 更新現有貼文
+            return prevLikedPosts.map(post => {
+              const postOriginalId = post.originalPost || post._id;
+              if (postOriginalId === originalPostId) {
+                const updatedLikedPost = { ...post, ...updates };
+                console.log('[Profile] Updated post in likedPosts list:', updatedLikedPost._id);
+                return updatedLikedPost;
+              }
+              return post;
+            });
+          });
+        }
+      }
+      
+      return updatedPosts;
+    });
+    
+    // 更新 likedPosts 列表（如果是自己的 Profile 且不是 likes 更新）
+    if (isOwnProfile && !updates.likes) {
+      setLikedPosts(prevPosts => 
+        prevPosts.map(post => {
+          if (post._id === postId || post.originalPost === postId) {
+            const updatedPost = { ...post, ...updates };
+            console.log('[Profile] Updated post in likedPosts list:', updatedPost._id);
+            return updatedPost;
+          }
+          return post;
+        })
+      );
+    }
+  };
+
+  // 移除貼文（用於刪除）
+  const handleRemovePost = (postId: string) => {
+    setPosts(prevPosts => prevPosts.filter(post => post._id !== postId));
+    setLikedPosts(prevPosts => prevPosts.filter(post => post._id !== postId));
+  };
+
   const handleFollow = async (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
@@ -88,6 +288,15 @@ export default function ProfilePage() {
       return;
     }
     
+    if (isFollowingLoading) return; // 防止重複點擊
+    
+    setIsFollowingLoading(true);
+    
+    // 樂觀更新：立即更新 UI 狀態
+    const wasFollowing = isFollowing;
+    const newFollowingState = !wasFollowing;
+    setIsFollowing(newFollowingState);
+    
     try {
       const res = await fetch(`/api/users/${userId}/follow`, {
         method: 'POST',
@@ -95,17 +304,42 @@ export default function ProfilePage() {
 
       if (res.ok) {
         const data = await res.json();
-        // 確保狀態正確更新
-        setIsFollowing(data.isFollowing);
+        const nowFollowing = data.isFollowing;
+        
+        // 確保狀態正確（使用伺服器返回的狀態）
+        setIsFollowing(nowFollowing);
+        
         // 重新獲取用戶資料以更新 followers 數量
         await fetchUserProfile();
+        
+        // 標記 following 列表變化
+        const timestamp = Date.now().toString();
+        localStorage.setItem('followingChanged', timestamp);
+        console.log('[Profile] Following changed:', { wasFollowing, nowFollowing, timestamp });
+        
+        // 如果是 unfollow，觸發自定義事件（用於同一頁面內的即時更新）
+        if (wasFollowing && !nowFollowing) {
+          console.log('[Profile] 🚫 Unfollowed user, dispatching event:', { userId: user._id, userDisplayId: userId });
+          window.dispatchEvent(new CustomEvent('user-unfollowed', {
+            detail: { 
+              userId: user._id,
+              userDisplayId: userId 
+            }
+          }));
+        }
       } else {
+        // 如果失敗，回滾狀態
+        setIsFollowing(wasFollowing);
         const errorData = await res.json();
         alert(errorData.error || '操作失敗');
       }
     } catch (error) {
+      // 如果失敗，回滾狀態
+      setIsFollowing(wasFollowing);
       console.error('Failed to follow/unfollow:', error);
       alert('操作時發生錯誤');
+    } finally {
+      setIsFollowingLoading(false);
     }
   };
 
@@ -206,18 +440,23 @@ export default function ProfilePage() {
               {!isOwnProfile && (
                 <button
                   onClick={handleFollow}
-                  onMouseEnter={() => setIsHoveringFollow(true)}
+                  onMouseEnter={() => !isFollowingLoading && setIsHoveringFollow(true)}
                   onMouseLeave={() => setIsHoveringFollow(false)}
                   type="button"
+                  disabled={isFollowingLoading}
                   className={`px-6 py-2 rounded-full font-bold transition-all ${
-                    isFollowing
+                    isFollowingLoading
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : isFollowing
                       ? isHoveringFollow
                         ? 'bg-red-100 bg-opacity-90 text-red-600 border border-red-500'
                         : 'bg-white text-black border border-gray-300'
                       : 'bg-black text-white hover:bg-gray-800'
                   }`}
                 >
-                  {isFollowing 
+                  {isFollowingLoading 
+                    ? '處理中...'
+                    : isFollowing 
                     ? (isHoveringFollow ? 'Unfollow' : 'Following')
                     : 'Follow'
                   }
@@ -308,7 +547,12 @@ export default function ProfilePage() {
               </div>
             ) : (
               posts.map((post) => (
-                <PostCard key={post._id} post={post} onUpdate={fetchUserPosts} />
+                <PostCard 
+                  key={post._id} 
+                  post={post} 
+                  onUpdate={handleUpdatePost}
+                  onRemove={handleRemovePost}
+                />
               ))
             )
           ) : (
@@ -318,7 +562,12 @@ export default function ProfilePage() {
               </div>
             ) : (
               likedPosts.map((post) => (
-                <PostCard key={post._id} post={post} onUpdate={fetchLikedPosts} />
+                <PostCard 
+                  key={post._id} 
+                  post={post} 
+                  onUpdate={handleUpdatePost}
+                  onRemove={handleRemovePost}
+                />
               ))
             )
           )}
